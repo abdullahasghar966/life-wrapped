@@ -1,0 +1,9 @@
+pnpm-lock.yaml
+public/duckdb
+.next
+coverage
+test-results
+playwright-report
+MASTER_PROMPT.md
+tests/fixtures
+src/components/ui
