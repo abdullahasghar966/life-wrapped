@@ -105,7 +105,25 @@
   font-family: var(--t-font-body);
 }
 
+/*
+ * Animated headlines stay hidden until SplitText has split them (no flash of
+ * unsplit text). If JS never runs, a zero-length animation shows them after 2.5 s.
+ */
+.t-reveal {
+  visibility: hidden;
+  animation: reveal-fallback 0s linear 2.5s forwards;
+}
+@keyframes reveal-fallback {
+  to {
+    visibility: visible;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .t-reveal {
+    visibility: visible;
+    animation: none;
+  }
   *,
   *::before,
   *::after {

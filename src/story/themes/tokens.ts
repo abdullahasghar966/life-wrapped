@@ -28,8 +28,11 @@ export interface ThemeTokens {
   text: string;
   muted: string;
   accent: string;
-  /** Text colour that sits on a filled accent shape (buttons, pills). */
+  /** Text colour that sits on a filled accent shape (large text and icons only). */
   onAccent: string;
+  /** Filled call-to-action button with small text: must pass 4.5:1. */
+  cta: string;
+  onCta: string;
   /** Optional decorative gradient (aurora). */
   gradient?: string;
   backdrops: Backdrop[];
@@ -63,6 +66,7 @@ export function contrastPairs(t: ThemeTokens): ContrastPair[] {
     { label: 'muted on surface', fg: t.muted, bg: t.surface, kind: 'body' },
     { label: 'accent on bg', fg: t.accent, bg: t.bg, kind: 'large' },
     { label: 'onAccent on accent', fg: t.onAccent, bg: t.accent, kind: 'large' },
+    { label: 'onCta on cta', fg: t.onCta, bg: t.cta, kind: 'body' },
   ];
   t.backdrops.forEach((b, i) => {
     pairs.push({ label: `backdrop ${i} ink`, fg: b.ink, bg: b.bg, kind: 'body' });
@@ -81,6 +85,8 @@ export function themeStyle(t: ThemeTokens): CSSProperties {
     '--t-muted': t.muted,
     '--t-accent': t.accent,
     '--t-on-accent': t.onAccent,
+    '--t-cta': t.cta,
+    '--t-on-cta': t.onCta,
     '--t-gradient': t.gradient ?? t.accent,
     '--t-font-display': t.font.display,
     '--t-font-body': t.font.body,

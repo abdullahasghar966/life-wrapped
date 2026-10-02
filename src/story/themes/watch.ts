@@ -10,6 +10,9 @@ export const watch: ThemeTokens = {
   muted: '#AAAAAA',
   accent: '#FF0033',
   onAccent: '#FFFFFF',
+  // A deeper red so small white text on it passes 4.5:1.
+  cta: '#CC0029',
+  onCta: '#FFFFFF',
   backdrops: [
     { bg: '#0F0F0F', ink: '#F1F1F1', muted: '#AAAAAA', accent: '#FF0033' },
     { bg: '#181818', ink: '#F1F1F1', muted: '#AAAAAA', accent: '#FF0033' },
@@ -25,5 +28,4 @@ export const watch: ThemeTokens = {
   },
   radius: { tile: '12px', frame: '12px', pill: '999px' },
   motion: { ease: 'power3.out', pop: 'power3.out', duration: 0.35, stagger: 0.06 },
-  extraPairs: [{ label: 'white on red pill', fg: '#FFFFFF', bg: '#CC0029', kind: 'body' }],
 };

@@ -11,6 +11,9 @@ export const binge: ThemeTokens = {
   // Large text and shapes only: its contrast on black is under 4.5:1.
   accent: '#E50914',
   onAccent: '#FFFFFF',
+  // The big white play button.
+  cta: '#FFFFFF',
+  onCta: '#000000',
   backdrops: [
     { bg: '#000000', ink: '#FFFFFF', muted: '#B3B3B3', accent: '#E50914' },
     { bg: '#141414', ink: '#FFFFFF', muted: '#B3B3B3', accent: '#E50914' },

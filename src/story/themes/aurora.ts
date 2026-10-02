@@ -10,6 +10,8 @@ export const aurora: ThemeTokens = {
   muted: '#A6A6C8',
   accent: '#22D3EE',
   onAccent: '#0A0A1A',
+  cta: '#22D3EE',
+  onCta: '#0A0A1A',
   gradient: 'linear-gradient(120deg, #7C5CFF 0%, #22D3EE 50%, #A3E635 100%)',
   backdrops: [
     { bg: '#0A0A1A', ink: '#F5F5FF', muted: '#A6A6C8', accent: '#22D3EE' },

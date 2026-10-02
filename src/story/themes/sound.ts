@@ -10,6 +10,8 @@ export const sound: ThemeTokens = {
   muted: '#B3B3B3',
   accent: '#1ED760',
   onAccent: '#121212',
+  cta: '#1ED760',
+  onCta: '#121212',
   backdrops: [
     { bg: '#C6F432', ink: '#121212', muted: '#2B3A06', accent: '#121212' },
     { bg: '#FF6FB5', ink: '#121212', muted: '#3A0D23', accent: '#121212' },
