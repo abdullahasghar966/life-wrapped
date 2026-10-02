@@ -13,6 +13,7 @@ import { THEMES, themeStyle } from '@/story/themes';
 export function StoryClient({ deck }: { deck: DeckId }) {
   const params = useSearchParams();
   const sample = params.get('sample') === '1';
+  const asOf = params.get('asOf') ?? undefined;
   const router = useRouter();
   const { summary } = useEngineState();
   // Cards are tagged with their deck, so moving to the next deck shows a loading state.
@@ -26,7 +27,9 @@ export function StoryClient({ deck }: { deck: DeckId }) {
     void (async () => {
       try {
         let s = await engine.restore();
-        if (sample && !s?.isSample) s = await engine.loadSample();
+        if (sample && (!s?.isSample || (asOf && s.sampleToday !== asOf))) {
+          s = await engine.loadSample(asOf);
+        }
         if (!s) {
           // Real data lives only in this tab's memory, so a reload starts over by design.
           router.replace('/start?reason=reload');
@@ -41,7 +44,7 @@ export function StoryClient({ deck }: { deck: DeckId }) {
     return () => {
       cancelled = true;
     };
-  }, [deck, sample, router, setCards]);
+  }, [deck, sample, asOf, router, setCards]);
 
   const onOptions = useCallback(
     async (patch: OptionsPatch) => {
@@ -70,7 +73,7 @@ export function StoryClient({ deck }: { deck: DeckId }) {
             <p className="t-body max-w-sm text-(--t-muted)">{error}</p>
             <Link
               href="/start"
-              className="rounded-full bg-(--t-accent) px-5 py-2 font-semibold text-(--t-on-accent)"
+              className="rounded-full bg-(--t-cta) px-5 py-2 font-semibold text-(--t-on-cta)"
             >
               Back to your data
             </Link>
@@ -83,7 +86,7 @@ export function StoryClient({ deck }: { deck: DeckId }) {
             </p>
             <Link
               href="/start"
-              className="rounded-full bg-(--t-accent) px-5 py-2 font-semibold text-(--t-on-accent)"
+              className="rounded-full bg-(--t-cta) px-5 py-2 font-semibold text-(--t-on-cta)"
             >
               Back to your data
             </Link>

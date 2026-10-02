@@ -77,10 +77,11 @@ export const engine = {
     return restorePromise;
   },
 
-  async loadSample(): Promise<IngestSummary | null> {
+  /** `asOf` pins the sample's "today" (YYYY-MM-DD) so it looks the same on every run. */
+  async loadSample(asOf?: string): Promise<IngestSummary | null> {
     set({ status: 'loading-sample', error: null, progress: null });
     try {
-      const summary = await getEngine().loadSample(undefined, { timeZone: timeZone() });
+      const summary = await getEngine().loadSample(undefined, { timeZone: timeZone(), asOf });
       set({ status: 'ready', summary });
       return summary;
     } catch (e) {

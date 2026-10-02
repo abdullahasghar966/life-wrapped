@@ -85,6 +85,8 @@ export interface IngestSummary {
   availableDecks: DeckId[];
   /** Set when a YouTube HTML export was dropped (unsupported in v1). */
   youtubeHtmlFound: boolean;
+  /** For the sample: the "today" it was generated for (data ends the day before). */
+  sampleToday: string | null;
 }
 
 // ---------- Normalised rows (UTC; sensitive fields already dropped) ----------

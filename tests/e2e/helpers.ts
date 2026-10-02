@@ -7,8 +7,8 @@ export const slide = (page: Page) => page.locator('[aria-roledescription="slide"
  * boots its own DuckDB and generates the sample, so this can take a few seconds
  * when several tests run at once.
  */
-export async function openDeck(page: Page, deck = 'spotify'): Promise<void> {
-  await page.goto(`/story/${deck}?sample=1`);
+export async function openDeck(page: Page, deck = 'spotify', asOf?: string): Promise<void> {
+  await page.goto(`/story/${deck}?sample=1${asOf ? `&asOf=${asOf}` : ''}`);
   await expect(slide(page)).toHaveAttribute('aria-label', /^1 of /, { timeout: 45_000 });
 }
 

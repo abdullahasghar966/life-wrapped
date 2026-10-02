@@ -43,11 +43,12 @@ export const Slide = forwardRef<SlideHandle, Props>(function Slide(
     [controller],
   );
 
+  // The entrance transition always runs to the end, even if the story is paused
+  // mid-way; otherwise a paused card could freeze half-faded. useGSAP kills it on unmount.
   useGSAP(
     () => {
       if (!surface.current || still) return;
-      const anim = enterSlide(surface.current, theme.id, direction, reduced);
-      controller.add(anim);
+      enterSlide(surface.current, theme.id, direction, reduced);
     },
     { scope: surface, dependencies: [] },
   );

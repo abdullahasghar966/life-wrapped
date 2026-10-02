@@ -199,3 +199,45 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 **Decision.** The persona is the highest of four scores (metric ÷ threshold, like the Life archetypes): Binger (episodes in a day), Night Watcher (share after midnight), Movie Buff (share of films) and Series Loyalist (top series' share). Thresholds live in `constants.ts`. Binge tiles show the season label and episode name with their order that day (1…9), never invented episode numbers.
 
 **Consequences.** Nothing on screen claims more than the export says.
+
+## ADR-024: Cards are sized in container-query units
+
+**Context.** A card must look identical in a phone-sized frame, a desktop frame and a 1080 × 1920 PNG.
+
+**Decision.** The 9:16 frame is a size container, and everything inside a card is sized in `cqw`/`cqh`. The frame decides the scale; the card's layout never changes.
+
+**Alternatives.** Rem-based sizes with breakpoints (cards would reflow differently on every device); rendering at a fixed size and scaling with `transform` (blurry text, broken hit-testing).
+
+**Consequences.** One layout everywhere, and the export is a re-render at 1080 px wide rather than an upscaled screenshot.
+
+## ADR-025: Image export re-renders the card off-screen
+
+**Context.** `html-to-image` inlines the computed styles of the node it captures, so capturing the on-screen card at a different size keeps on-screen pixel sizes; mid-animation captures also catch half-finished motion.
+
+**Decision.** "Save image" mounts a second copy of the card in an off-screen 1080 × 1920 box with motion off (the final frame) and captures that. Only the card surface is captured, not the player chrome.
+
+**Consequences.** Crisp, complete images every time. The cost is one extra render of one card, only when the user asks.
+
+## ADR-026: Chrome colours come from contrast-tested pairs
+
+**Context.** The player's controls sit on every backdrop: lime, pink, blue, black, white. Semi-transparent black pills failed contrast on bright cards, and white text on YouTube red (#FF0033) is only 3.96:1.
+
+**Decision.** Controls use the current card's ink and background (`--c-ink`/`--c-bg`), which `tests/unit/themes.test.ts` checks for every backdrop. Each theme also declares a call-to-action pair (`cta`/`onCta`) for filled buttons with small text, checked at 4.5:1. YouTube's uses a deeper red (#CC0029). Axe runs on every card in E2E.
+
+**Consequences.** Controls adapt to the card instead of fighting it, and a new backdrop can't introduce an unreadable control without failing a test.
+
+## ADR-027: Pausing freezes content, not the card transition
+
+**Context.** Hold-to-pause and the pause button stop a card's animations and the auto-advance timer. Pausing during the entrance transition left a card frozen half-faded.
+
+**Decision.** The card-to-card transition always runs to the end; pausing affects the card's own timelines, ambient loops and the timer.
+
+**Consequences.** A paused card is always fully visible.
+
+## ADR-028: A pinned date for the sample, and per-OS visual baselines
+
+**Context.** The sample ends "yesterday", so its dates (and pixels) change daily. Font rendering also differs between Windows and Linux, so one set of screenshots can't serve both.
+
+**Decision.** `/story/<deck>?sample=1&asOf=YYYY-MM-DD` generates the sample for a fixed date (it only affects the sample). Visual tests use it with a fixed time zone and reduced motion. Baselines are stored per OS; Linux ones are produced by the manual "Visual baselines" workflow and committed. Until a deck has Linux baselines, CI skips its visual test instead of silently writing new ones.
+
+**Consequences.** Visual tests are deterministic. A deliberate visual change needs one workflow run to refresh the Linux baselines.

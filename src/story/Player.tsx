@@ -247,12 +247,13 @@ export function Player({
           onClick={prev}
           disabled={safeIndex === 0}
           aria-label="Previous card"
-          className="hidden size-12 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30 sm:flex"
+          className="hidden size-12 items-center justify-center rounded-full bg-(--t-text)/10 text-(--t-text) transition hover:bg-(--t-text)/20 disabled:opacity-30 sm:flex"
         >
           <ChevronLeft className="size-6" />
         </button>
 
         <div
+          data-testid="story-frame"
           style={backdropStyle(backdrop)}
           className="[container-type:size] relative h-dvh w-screen overflow-hidden sm:aspect-[9/16] sm:h-[min(90vh,920px)] sm:w-auto sm:rounded-(--t-radius-frame) sm:shadow-2xl"
         >
@@ -369,7 +370,7 @@ export function Player({
           onClick={next}
           disabled={isLast && !nextDeck}
           aria-label="Next card"
-          className="hidden size-12 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 disabled:opacity-30 sm:flex"
+          className="hidden size-12 items-center justify-center rounded-full bg-(--t-text)/10 text-(--t-text) transition hover:bg-(--t-text)/20 disabled:opacity-30 sm:flex"
         >
           <ChevronRight className="size-6" />
         </button>

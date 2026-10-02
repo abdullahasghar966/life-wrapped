@@ -44,13 +44,15 @@ export interface EngineApi {
     onProgress?: (p: IngestProgress) => void,
   ): Promise<IngestSummary>;
   cancelIngest(): Promise<void>;
-  loadSample(seed?: number, opts?: { timeZone?: string }): Promise<IngestSummary>;
+  loadSample(seed?: number, opts?: { timeZone?: string; asOf?: string }): Promise<IngestSummary>;
   setOptions(o: OptionsPatch): Promise<IngestSummary>;
   summary(): Promise<IngestSummary | null>;
   availableDecks(): Promise<DeckId[]>;
   getDeck(deck: DeckId): Promise<InsightResult[]>;
   clear(): Promise<void>;
 }
+
+const ISO_DATE = /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/;
 
 const EMPTY_COUNTS: IngestSummary['counts'] = {
   spotifyPlays: 0,
@@ -69,6 +71,7 @@ export function createEngine(deps: EngineDeps): EngineApi {
   let dataset = new Dataset();
   let reports: FileReport[] = [];
   let isSample = false;
+  let sampleToday: string | null = null;
   let youtubeHtmlFound = false;
   let cancelled = false;
   let loaded = false;
@@ -187,6 +190,7 @@ export function createEngine(deps: EngineDeps): EngineApi {
       periods: all,
       availableDecks: c ? decksFor(c.availablePlatforms) : [],
       youtubeHtmlFound,
+      sampleToday,
     };
     return cachedSummary;
   }
@@ -206,6 +210,7 @@ export function createEngine(deps: EngineDeps): EngineApi {
     dataset = new Dataset();
     reports = [];
     isSample = false;
+    sampleToday = null;
     youtubeHtmlFound = false;
     loaded = false;
     cachedSummary = null;
@@ -265,7 +270,12 @@ export function createEngine(deps: EngineDeps): EngineApi {
     async loadSample(seed = DEFAULT_SEED, opts = {}) {
       resetState();
       if (opts.timeZone && isValidTimeZone(opts.timeZone)) options.timeZone = opts.timeZone;
-      const today = new TimeConverter(options.timeZone).toLocal(now()).date;
+      // A pinned date makes the sample identical on every run (visual snapshots, demos).
+      const today =
+        opts.asOf && ISO_DATE.test(opts.asOf)
+          ? opts.asOf
+          : new TimeConverter(options.timeZone).toLocal(now()).date;
+      sampleToday = today;
       const files = generateSample({ seed, timeZone: options.timeZone, today }).map(
         (f) =>
           new File([f.text], f.name, {

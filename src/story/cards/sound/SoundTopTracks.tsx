@@ -39,7 +39,7 @@ export function SoundTopTracks({ result }: CardProps<SpotifyTopTracks>) {
           <li
             key={`${t.track}-${t.artist}`}
             data-row
-            className={`flex items-center gap-[3cqw] rounded-(--t-radius-tile) p-[2cqw] ${i === 0 ? 'bg-white/10' : ''}`}
+            className={`flex items-center gap-[3cqw] rounded-(--t-radius-tile) p-[2cqw] ${i === 0 ? 'bg-(--c-ink)/10' : ''}`}
           >
             <span
               aria-hidden

@@ -1,0 +1,31 @@
+name: Visual baselines
+
+# Run by hand after an intentional visual change. It renders every card on Linux
+# (the CI platform) and uploads the PNGs; commit them under
+# tests/e2e/visual.spec.ts-snapshots/ so CI compares against them.
+on:
+  workflow_dispatch:
+
+jobs:
+  baselines:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: Render baselines
+        run: pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all
+        env:
+          VISUAL_BASELINES: '1'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: visual-baselines-linux
+          path: tests/e2e/visual.spec.ts-snapshots/*-linux.png
+          retention-days: 7

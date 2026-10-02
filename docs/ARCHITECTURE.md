@@ -64,6 +64,23 @@ Each insight is one file under `src/engine/insights/<deck>/` exporting an `Insig
 
 Tests: `tests/unit/insights.sample.test.ts` snapshots every insight against the seeded sample; `insights.rules.test.ts` checks the minimum-data, privacy and period rules on small hand-built datasets.
 
+## Story player
+
+`src/story/Player.tsx` plays one deck. Each card is a `Slide` (`role="group"`, `aria-roledescription="slide"`, `aria-label="3 of 12: Top artist"`) wrapping a card component from `src/story/cards/`, looked up by insight id in `cards/index.ts`.
+
+- **Navigation:** `gestures.ts` (tap left third / right two thirds, hold to pause, swipe down to close), arrow keys, Space, Esc, and visible buttons for all of them.
+- **Timing:** one GSAP tween per card drives auto-advance (7 s) and the progress chrome; summary cards don't auto-advance. Holding, the pause button, the settings sheet and a hidden tab all pause it.
+- **Motion:** each card builds one GSAP timeline with `useCardAnim`, registered with a `CardController` so pause/resume reaches every animation; `useGSAP` cleans up on unmount. Reduced motion builds no timelines at all, so the DOM already shows the final state; count-ups keep the real number in screen-reader text from the start.
+- **Announcements:** an `aria-live="polite"` region reads the card's `a11yText` on every change.
+- **Export:** `ExportStage` re-renders the current card off-screen at 1080 × 1920 with motion off and captures it with `html-to-image`.
+- **Chaining:** the last card links to the next available deck; the Life deck plays last.
+
 ## Theme system
 
-_Documented with the story player (M3)._
+Each theme is a typed token object (`src/story/themes/{sound,watch,binge,aurora}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.
+
+- `themeStyle(theme)` turns tokens into CSS variables (`--t-*`) on the player root next to `data-theme`; `backdropStyle(backdrop)` sets the per-card `--c-*` variables. Cards read colours only through these variables.
+- Fonts come from `next/font/google` (self-hosted at build time). Only the app-shell fonts are preloaded.
+- Theme-specific motion lives in `transitions.ts` (card-to-card), in each theme's `motion` tokens (eases, durations, staggers) and in the progress chrome (`progress/Progress.tsx`).
+- `tests/unit/themes.test.ts` checks every declared text/background pair against WCAG AA.
+- Generated artwork (`src/story/art/`) turns a name into a palette, pattern and initials, so covers, thumbnails, posters and avatars are deterministic and never fetched.
