@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description:
     'Turn your Spotify, YouTube and Netflix data exports into animated story decks. Everything runs in your browser; your data never leaves your device.',
   applicationName: 'Life, Wrapped',
-  manifest: '/manifest.webmanifest',
+  icons: { apple: '/apple-touch-icon.png' },
 };
 
 export const viewport: Viewport = {

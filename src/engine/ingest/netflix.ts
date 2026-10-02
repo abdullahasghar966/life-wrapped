@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 import type { DeviceClass, NetflixRow, ParseResult } from '../types';
 import { minimise } from './minimise';
 import { parseDuration, parseUtc } from './time';

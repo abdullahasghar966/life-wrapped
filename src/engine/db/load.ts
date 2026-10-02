@@ -1,7 +1,7 @@
-import { tableFromArrays } from 'apache-arrow';
 import { estimateWatches } from '../ingest/youtubeEstimate';
 import type { Dataset } from '../ingest/pipeline';
 import { TimeConverter } from '../ingest/time';
+import { tableOf, type Column } from './arrow';
 import { SCHEMA_SQL } from './schema';
 import type { Db } from './types';
 
@@ -39,22 +39,22 @@ function localColumns<T extends { ts: number }>(rows: readonly T[], tc: TimeConv
 async function stageAndInsert(
   db: Db,
   stage: string,
-  columns: Record<string, unknown>,
+  columns: Record<string, Column>,
   insertSql: string,
 ) {
-  // Arrow can't infer a type for an empty or all-null column, so skip empty tables entirely.
-  const first = Object.values(columns)[0] as ArrayLike<unknown> | undefined;
+  // An empty column has no type to infer, so skip empty tables entirely.
+  const first = Object.values(columns)[0];
   if (!first || first.length === 0) return;
   await db.exec(`DROP TABLE IF EXISTS ${stage}`);
-  await db.insertArrow(stage, tableFromArrays(columns as Parameters<typeof tableFromArrays>[0]));
+  await db.insertArrow(stage, tableOf(columns));
   await db.exec(insertSql);
   await db.exec(`DROP TABLE ${stage}`);
 }
 
 /**
- * Nulls travel as '' and become NULL again via NULLIF in SQL, so Arrow always sees
- * a plain string column (it can't infer a type for an all-null column). Parsers
- * already turn empty strings into null, so '' is unambiguous.
+ * Nulls travel as '' and become NULL again via NULLIF in SQL, so every Arrow
+ * column is null-free (see db/arrow.ts). Parsers already turn empty strings into
+ * null, so '' is unambiguous.
  */
 const strings = (values: Array<string | null>) => values.map((v) => v ?? '');
 

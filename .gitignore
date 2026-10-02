@@ -52,3 +52,6 @@ next-env.d.ts
 
 # serwist
 /public/sw.js*
+
+# local review scripts and screenshots
+/.scratch/

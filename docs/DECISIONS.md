@@ -117,3 +117,53 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 **Decision.** Build M0–M6 sequentially in one session, still committing per milestone and keeping PROGRESS.md current so the history reads milestone by milestone.
 
 **Consequences.** Same commit history and docs as the multi-session plan.
+
+## ADR-014: Spotify play start = timestamp − ms played, for both formats
+
+**Context.** The spec says Account data's `endTime` marks the end of playback. Spotify documents Extended history's `ts` the same way ("when the track stopped playing"), but the spec doesn't say.
+
+**Decision.** For both formats, start ≈ end − ms played. Local hour, day and streaks use the start.
+
+**Alternatives.** Using `ts` as the start for Extended (simpler, but long podcast episodes would be counted an hour late and both formats would disagree).
+
+**Consequences.** Both formats agree to the minute, and a song that started at 23:58 counts for that day.
+
+## ADR-015: "Prefer Extended" compares whole UTC days
+
+**Context.** When both Spotify formats are uploaded, Account rows that overlap Extended must be dropped. Account data only has minute precision, so the same play can land a few seconds outside Extended's exact time range and be counted twice.
+
+**Decision.** Compute the first and last UTC day covered by Extended; drop Account rows on or between those days.
+
+**Consequences.** No double counting at the edges. Extended is the user's whole history, so Account rows inside its range are always redundant.
+
+## ADR-016: How the sample persona's data is shaped
+
+**Context.** The sample must make every card worth showing. The discovery card shows "new artists" only when data starts before the period, and the night-owl story only works if "after midnight" is after midnight for the viewer.
+
+**Decision.** Alex's Spotify history spans 14 months (YouTube and Netflix 12), ending yesterday. The generator works in local wall-clock time for the viewer's time zone and converts to UTC, so the planted moments (27 plays in a day, a 63-day streak, a 41-video rabbit hole ending at 3:12 AM, a 9-episode binge) land as intended everywhere. Tests pin the seed, the time zone and "now".
+
+**Consequences.** Same seed + time zone + date → byte-identical files. The sample covers slightly more than the "12 months" in the persona description, which only shows up as a correct "new to you" count.
+
+## ADR-017: No code evaluation anywhere (CSP without 'unsafe-eval')
+
+**Context.** Two libraries try to compile code at runtime: Apache Arrow's builders build a null check with `new Function`, and Zod 4 compiles fast validators the same way. Our CSP correctly blocks this, which broke ingestion in the browser while every Node test passed.
+
+**Decision.** Build Arrow vectors directly with `nullValues: []` (our columns never contain nulls; they travel as '' and become NULL in SQL) and run Zod with `jitless: true`. A unit test replaces the global `Function` constructor with one that throws and runs the full sample ingestion.
+
+**Consequences.** The CSP stays strict, and any future dependency that evaluates strings fails in CI, not in production.
+
+## ADR-018: Which zip entries are opened
+
+**Context.** The spec says to decompress only entries matching known patterns, but Takeout localises file names (`historial-de-reproducciones.json`).
+
+**Decision.** Allow known English names for all three platforms, plus any `.json`/`.html` inside a folder whose path mentions "YouTube". Everything that is opened is then identified by its content shape.
+
+**Consequences.** Account details, payment history, mail and other unrelated files in an export are never inflated. A localised YouTube history still works.
+
+## ADR-019: Performance budgets are asserted in serial tests
+
+**Context.** Functional E2E tests run in parallel workers, each with its own DuckDB-WASM, which makes wall-clock timings noisy.
+
+**Decision.** Functional tests record timings as annotations; budgets (sample under 3 s, landing → story under 5 s) are asserted by a unit test in Node and a dedicated serial Playwright perf spec.
+
+**Consequences.** No flaky timing failures, while the budgets are still enforced.

@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 import type { ParseResult, YoutubeSearchRow, YoutubeWatchRow } from '../types';
 import { minimise } from './minimise';
 import { parseUtc } from './time';

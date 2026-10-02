@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from './zod';
 import { SPOTIFY_PLAY_MS } from '../insights/constants';
 import type { ParseResult, SpotifyKind, SpotifyRow } from '../types';
 import { minimise } from './minimise';
