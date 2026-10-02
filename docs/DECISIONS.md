@@ -140,7 +140,7 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 
 **Context.** The sample must make every card worth showing. The discovery card shows "new artists" only when data starts before the period, and the night-owl story only works if "after midnight" is after midnight for the viewer.
 
-**Decision.** Alex's Spotify history spans 14 months (YouTube and Netflix 12), ending yesterday. The generator works in local wall-clock time for the viewer's time zone and converts to UTC, so the planted moments (27 plays in a day, a 63-day streak, a 41-video rabbit hole ending at 3:12 AM, a 9-episode binge) land as intended everywhere. Tests pin the seed, the time zone and "now".
+**Decision.** Alex's Spotify history spans 18 months (YouTube and Netflix 12), ending yesterday. About 60k rows over 18 months, with a realistic mix of skips and partial plays, works out to roughly 3–4 hours of music a day; squeezing 60k rows into 12 months would mean 6+ hours a day. Sessions never overlap (one person, one device), and Alex isn't on Spotify or YouTube during the Netflix binge. The generator works in local wall-clock time for the viewer's time zone and converts to UTC, so the planted moments (27 plays in a day, a 63-day streak, a 41-video rabbit hole ending at 3:12 AM, a 9-episode binge) land as intended everywhere. Tests pin the seed, the time zone and "now".
 
 **Consequences.** Same seed + time zone + date → byte-identical files. The sample covers slightly more than the "12 months" in the persona description, which only shows up as a correct "new to you" count.
 
@@ -167,3 +167,35 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 **Decision.** Functional tests record timings as annotations; budgets (sample under 3 s, landing → story under 5 s) are asserted by a unit test in Node and a dedicated serial Playwright perf spec.
 
 **Consequences.** No flaky timing failures, while the budgets are still enforced.
+
+## ADR-020: What private sessions count towards
+
+**Context.** The spec says private sessions count in totals but not in top lists or anything shareable.
+
+**Decision.** Private-session rows count in time totals and patterns: minutes, the listening clock, the streak, the skip rate and the Life deck's totals. They are excluded from everything that names something: top artist/songs, on repeat, discovery, most-skipped artist, top podcast and the summary card. One shared SQL fragment (`spotifyPlays`) applies the rule, and "Include private sessions" switches it off.
+
+**Consequences.** A test proves a private-only artist never appears in any card's JSON until the user opts in.
+
+## ADR-021: YouTube Music is kept apart from channel rankings
+
+**Context.** Takeout mixes YouTube Music plays ("Artist - Topic") into watch history. Music listening is many short plays, so artist channels would push real channels out of the top-5.
+
+**Decision.** Channel cards, the rewatch card and the summary rank regular YouTube watches only. YouTube Music gets its own card. Totals (videos, estimated hours, the clock and heatmap) include everything that was watched.
+
+**Consequences.** "Top channel" means a channel you watched, and the music card still tells the music story.
+
+## ADR-022: How the Life deck phrases the daily rhythm
+
+**Context.** "Mornings: music. Nights: YouTube." is generated from data. Picking the platform with the most time in each daypart makes the biggest platform win every slot ("Mornings: music. Nights: music.").
+
+**Decision.** Each daypart names the platform that is most over-represented there: its share of that daypart divided by its share of all time. Weekends name the platform whose time per day grows most from weekdays to weekends.
+
+**Consequences.** The sentence describes what defines each part of the day, which is what people mean by it, and it stays true to the data. The stacked-area chart beside it shows the absolute hours.
+
+## ADR-023: Netflix persona and binge tiles
+
+**Context.** The Netflix summary needs a persona, and the binge card's "S1:E1 … S1:E9" visual implies episode numbers the export doesn't contain (it has episode names, not numbers).
+
+**Decision.** The persona is the highest of four scores (metric ÷ threshold, like the Life archetypes): Binger (episodes in a day), Night Watcher (share after midnight), Movie Buff (share of films) and Series Loyalist (top series' share). Thresholds live in `constants.ts`. Binge tiles show the season label and episode name with their order that day (1…9), never invented episode numbers.
+
+**Consequences.** Nothing on screen claims more than the export says.

@@ -91,6 +91,21 @@ export const NF_COUNTRIES_MIN = 2;
 /** "About N movies' worth": an average feature film is roughly two hours. */
 export const NF_MOVIE_HOURS = 2;
 
+/**
+ * Netflix summary persona: each score is metric ÷ threshold, highest wins,
+ * ties go to the first in this order.
+ */
+export const NF_PERSONA_THRESHOLDS = {
+  /** Most episodes of one series in a day. */
+  binger: 4,
+  /** Share of viewing between 00:00 and 04:59. */
+  nightWatcher: 0.25,
+  /** Share of viewing that was films. */
+  movieBuff: 0.5,
+  /** Top series' share of all viewing. */
+  seriesLoyalist: 0.35,
+} as const;
+
 // ---------- Life deck archetypes (§9.4) ----------
 
 export const ARCHETYPE_THRESHOLDS = {

@@ -1,2 +1,7 @@
-// Registers every insight. Each deck's folder exports its InsightDef list.
-export {};
+import { lifeInsights } from './life';
+import { netflixInsights } from './netflix';
+import { registerInsights } from './registry';
+import { spotifyInsights } from './spotify';
+import { youtubeInsights } from './youtube';
+
+registerInsights([...spotifyInsights, ...youtubeInsights, ...netflixInsights, ...lifeInsights]);

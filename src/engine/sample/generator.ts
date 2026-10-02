@@ -39,15 +39,31 @@ export interface SampleFile {
 }
 
 const MIN = 60_000;
+const HOUR = 3_600_000;
 const dayStart = (date: string) => Date.parse(`${date}T00:00:00Z`);
+const dateOf = (local: number) => new Date(local).toISOString().slice(0, 10);
 
 /** Night-owl listening: weights for the local hour a session starts. Peak at 1 AM. */
 const LISTEN_HOURS = [
-  9, 10, 7, 4, 2, 0.4, 0.4, 1, 2, 2.5, 2.5, 2.5, 3, 3, 3, 3, 3.5, 4, 4, 4.5, 5, 6, 7, 8,
+  11, 12, 9, 5, 2.5, 0.4, 0.4, 0.8, 1.6, 2, 2, 2, 2.5, 2.5, 2.5, 2.5, 3, 3, 3, 3.5, 4, 5, 6, 7,
 ];
+/** YouTube is Alex's after-midnight habit: even more night-heavy than music. */
 const WATCH_HOURS = [
-  8, 7, 5, 3, 1, 0.3, 0.3, 0.6, 1.2, 1.5, 1.5, 2, 2.5, 2.5, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9,
+  12, 11, 9, 6, 2, 0.3, 0.3, 0.5, 0.8, 1, 1, 1.5, 2, 2, 2, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7,
 ];
+
+/** The Saturday of the planted 9-episode Netflix binge (about 12 weeks ago). */
+function bingeDay(today: string): string {
+  let d = addDays(today, -82);
+  while (new Date(dayStart(d)).getUTCDay() !== 6) d = addDays(d, 1);
+  return d;
+}
+
+/** While the binge is on (12:00–22:00), Alex isn't also listening or watching YouTube. */
+function duringBinge(today: string, t: number): boolean {
+  const b = dayStart(bingeDay(today));
+  return t >= b + 12 * HOUR && t < b + 22 * HOUR;
+}
 
 function daysBetween(start: string, endExclusive: string): string[] {
   const out: string[] = [];
@@ -55,8 +71,17 @@ function daysBetween(start: string, endExclusive: string): string[] {
   return out;
 }
 
+/** Session start times for one day: weighted hours, sorted. */
+function sessionStarts(rng: Rng, day: string, count: number, hourCum: Float64Array): number[] {
+  const starts: number[] = [];
+  for (let i = 0; i < count; i++) {
+    starts.push(dayStart(day) + rng.weightedIndex(hourCum) * HOUR + rng.int(0, 59) * MIN);
+  }
+  return starts.sort((a, b) => a - b);
+}
+
 // ---------------------------------------------------------------------------
-// Spotify Extended streaming history (~60k rows)
+// Spotify Extended streaming history (~60k rows over 18 months)
 // ---------------------------------------------------------------------------
 
 interface Track {
@@ -76,7 +101,7 @@ interface Artist {
 
 function buildArtists(rng: Rng, spStart: string, today: string): Artist[] {
   const names = [...TOP_ARTISTS];
-  for (let i = 0; names.length < 450; i++) names.push(inventedName(i * 13 + 5));
+  for (let i = 0; names.length < 330; i++) names.push(inventedName(i * 13 + 5));
   let songIdx = 0;
   const span = daysBetween(addDays(spStart, 30), addDays(today, -10));
   return names.map((name, rank) => {
@@ -84,21 +109,21 @@ function buildArtists(rng: Rng, spStart: string, today: string): Artist[] {
     const tracks: Track[] = Array.from({ length: nTracks }, (_, t) => ({
       title: rank === 0 && t === 0 ? 'Paper Moons' : songTitle(songIdx++),
       album: `${rng.pick(ALBUM_WORDS)}${rank % 3 === 0 ? ' (Deluxe)' : ''}`,
-      durationMs: rng.int(150, 270) * 1000,
+      durationMs: rng.int(150, 250) * 1000,
       uri: `spotify:track:${rng.id(22)}`,
     }));
     return {
       name,
       tracks,
       trackCum: cumulative(zipf(nTracks, 0.9)),
-      skipRate: name === 'Static Bloom' ? 0.6 : rank < 10 ? 0.18 : 0.28,
+      skipRate: name === 'Static Bloom' ? 0.65 : rank < 10 ? 0.22 : 0.32,
       introduced: rank >= 60 && rng.chance(0.55) ? rng.pick(span) : null,
     };
   });
 }
 
 function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] {
-  const spStart = addMonths(today, -14);
+  const spStart = addMonths(today, -18);
   const days = daysBetween(spStart, today);
   const artists = buildArtists(rng, spStart, today);
   // A flattened head (1 / (rank + 3)) so no single song dominates a day by chance.
@@ -148,18 +173,26 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
     }
   }
   // A late session must not spill past midnight into a silent day.
-  const spillsIntoOff = (t: number) => offDays.has(new Date(t).toISOString().slice(0, 10));
+  const spillsIntoOff = (t: number) => offDays.has(dateOf(t));
 
+  // One person, one device: sessions never overlap, even across midnight.
+  let lastEnd = -Infinity;
   for (const day of days) {
     if (offDays.has(day)) continue;
     const dow = new Date(dayStart(day)).getUTCDay();
     const weekend = dow === 0 || dow === 6;
-    let target = Math.round(rng.range(95, 205) * (weekend ? 1.12 : 1));
-    const sessions = rng.int(3, 6);
+    let target = Math.round(rng.range(70, 165) * (weekend ? 1.12 : 1));
+    // The planted repeat evening needs 19:00 onwards to itself.
+    const starts = sessionStarts(rng, day, rng.int(2, 5), hourCum).filter(
+      (s) =>
+        (day !== repeatDay || s < dayStart(day) + 13 * HOUR) &&
+        !duringBinge(today, s) &&
+        !duringBinge(today, s + 2 * HOUR),
+    );
     const platform = rng.chance(0.7) ? 'android' : rng.chance(0.6) ? 'windows' : 'web_player';
-    for (let s = 0; s < sessions && target > 0; s++) {
-      const hour = rng.weightedIndex(hourCum);
-      let t = dayStart(day) + hour * 3600_000 + rng.int(0, 59) * MIN;
+    for (let s = 0; s < starts.length && target > 0; s++) {
+      let t = Math.max(starts[s]!, lastEnd + rng.int(15, 60) * MIN);
+      if (dateOf(t) > day && dateOf(t) !== addDays(day, 1)) break;
       const incognito = rng.chance(0.04);
       if (rng.chance(0.06)) {
         // Podcast session.
@@ -181,10 +214,11 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
           t += ms + rng.int(1, 5) * MIN;
           target -= 4;
         }
+        lastEnd = t;
         continue;
       }
       const shuffle = rng.chance(0.4);
-      const n = Math.max(4, Math.round(target / (sessions - s)) + rng.int(-6, 6));
+      const n = Math.max(4, Math.round(target / (starts.length - s)) + rng.int(-6, 6));
       for (let i = 0; i < n; i++) {
         if (spillsIntoOff(t + 5 * MIN)) break;
         let artist = artists[rng.weightedIndex(artistCum)]!;
@@ -194,12 +228,14 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
         if (artist.introduced && artist.introduced > day) continue;
         const track = artist.tracks[rng.weightedIndex(artist.trackCum)]!;
         // Keep the planted repeat day's count exact, including sessions that run past midnight.
-        if (track.title === 'Paper Moons' && new Date(t).toISOString().startsWith(repeatDay))
-          continue;
+        if (track.title === 'Paper Moons' && dateOf(t) === repeatDay) continue;
         const skipped = rng.chance(artist.skipRate);
+        const partial = !skipped && rng.chance(0.08);
         const ms = skipped
           ? rng.int(3, 28) * 1000
-          : Math.round(track.durationMs * rng.range(0.92, 1));
+          : partial
+            ? rng.int(35, 110) * 1000
+            : Math.round(track.durationMs * rng.range(0.92, 1));
         push(t, ms, {
           platform,
           track: track.title,
@@ -207,7 +243,7 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
           album: track.album,
           uri: track.uri,
           reasonStart: i === 0 ? 'clickrow' : skipped ? 'fwdbtn' : 'trackdone',
-          reasonEnd: skipped ? 'fwdbtn' : 'trackdone',
+          reasonEnd: skipped ? 'fwdbtn' : partial ? 'endplay' : 'trackdone',
           shuffle,
           skipped,
           offline: rng.chance(0.03),
@@ -216,15 +252,15 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
         t += ms + rng.int(0, 3) * 1000;
       }
       target -= n;
+      lastEnd = t;
     }
     if (day === repeatDay) {
-      // Planted: one song played 27 times in a single day.
+      // Planted: one song played 27 times in a single day (an evening on repeat).
       const nova = artists[0]!;
       const paper = nova.tracks[0]!;
-      let t = dayStart(day) + 21 * 3600_000 + 5 * MIN;
+      let t = Math.max(dayStart(day) + 19 * HOUR, lastEnd + 10 * MIN);
       for (let i = 0; i < 27; i++) {
-        const ms = paper.durationMs;
-        push(t, ms, {
+        push(t, paper.durationMs, {
           platform,
           track: paper.title,
           artist: nova.name,
@@ -237,15 +273,16 @@ function generateSpotify(rng: Rng, tc: TimeConverter, today: string): unknown[] 
           offline: false,
           incognito: false,
         });
-        t += ms + 2000;
+        t += paper.durationMs + 2000;
       }
+      lastEnd = t;
     }
   }
   return rows;
 }
 
 // ---------------------------------------------------------------------------
-// YouTube watch + search history (~9k watches, 600 searches)
+// YouTube watch + search history (~9–10k watches, 600 searches)
 // ---------------------------------------------------------------------------
 
 interface Video {
@@ -253,18 +290,27 @@ interface Video {
   title: string;
 }
 
+type Watch =
+  | { kind: 'video'; local: number; channel: string; video: Video }
+  | { kind: 'music'; local: number; channel: string; video: Video }
+  | { kind: 'removed'; local: number };
+
 function generateYoutube(rng: Rng, tc: TimeConverter, today: string) {
   const start = addMonths(today, -12);
   const days = daysBetween(start, today);
   const channels = [...TOP_CHANNELS];
   for (let i = 0; channels.length < 360; i++) channels.push(`${inventedName(i * 7 + 3)} TV`);
   const channelCum = cumulative(zipf(channels.length, 1.05));
+  const musicCum = cumulative(zipf(MUSIC_CHANNELS.length, 1.3));
   const hourCum = cumulative(WATCH_HOURS);
   const watched = new Map<string, Video[]>();
   const pick = <T>(items: readonly T[]) => rng.pick(items);
 
-  const watches: Array<{ local: number; channel: string; video: Video; music?: boolean }> = [];
+  const watches: Watch[] = [];
   const rabbitDay = addDays(today, -75);
+  // Nothing else may happen on the rabbit hole's evening and night.
+  const quietFrom = dayStart(rabbitDay) + 17 * HOUR;
+  const quietTo = dayStart(rabbitDay) + 34 * HOUR;
   const comfortVideo: Video = { id: 'rAinT1nR00f', title: COMFORT_VIDEO.title };
 
   const newVideo = (channel: string): Video => {
@@ -276,117 +322,117 @@ function generateYoutube(rng: Rng, tc: TimeConverter, today: string) {
     return v;
   };
 
-  const sessions: Array<{ start: number; end: number }> = [];
+  /** One session: videos 2–10 minutes apart, with the odd YouTube Music play or removed video. */
+  const session = (from: number, n: number, gapMin: [number, number]): number => {
+    let t = from;
+    for (let i = 0; i < n; i++) {
+      const x = rng.float();
+      if (x < 0.035) {
+        const channel = MUSIC_CHANNELS[rng.weightedIndex(musicCum)]!;
+        watches.push({
+          kind: 'music',
+          local: t,
+          channel,
+          video: { id: rng.id(11), title: songTitle(rng.int(0, 399)) },
+        });
+      } else if (x < 0.039) {
+        watches.push({ kind: 'removed', local: t });
+      } else {
+        const channel = channels[rng.weightedIndex(channelCum)]!;
+        watches.push({ kind: 'video', local: t, channel, video: newVideo(channel) });
+      }
+      if (i < n - 1) t += rng.int(gapMin[0], gapMin[1]) * MIN + rng.int(0, 59) * 1000;
+    }
+    return t;
+  };
+
+  const lateSessions: number[] = [];
+  let lastEnd = -Infinity;
   for (const day of days) {
     const dow = new Date(dayStart(day)).getUTCDay();
-    const count = rng.int(2, 4) + (dow === 5 || dow === 6 ? 1 : 0);
-    const starts: number[] = [];
-    for (let i = 0; i < count; i++) {
-      let hour = rng.weightedIndex(hourCum);
-      if (dow === 5 && rng.chance(0.35)) hour = 23; // Friday-night prime time
-      starts.push(dayStart(day) + hour * 3600_000 + rng.int(0, 59) * MIN);
-    }
-    starts.sort((a, b) => a - b);
-    let lastEnd = -Infinity;
-    for (let s of starts) {
-      // Keep the planted rabbit hole's night clear.
-      const rabbitStart = dayStart(rabbitDay) + 22 * 3600_000;
-      if (s >= rabbitStart - 60 * MIN && s <= rabbitStart + 7 * 3600_000) continue;
-      if (s < lastEnd + 35 * MIN) s = lastEnd + rng.int(35, 90) * MIN;
-      const n = Math.min(18, 3 + Math.floor(Math.log(1 - rng.float()) / Math.log(0.83)));
-      let t = s;
-      for (let i = 0; i < n; i++) {
-        const channel = channels[rng.weightedIndex(channelCum)]!;
-        watches.push({ local: t, channel, video: newVideo(channel) });
-        if (i < n - 1) t += rng.int(2, 12) * MIN + rng.int(0, 59) * 1000;
-      }
-      sessions.push({ start: s, end: t });
-      lastEnd = t;
+    const friday = dow === 5;
+    const starts = sessionStarts(rng, day, rng.int(2, 4) + (dow === 6 ? 1 : 0), hourCum).filter(
+      // Fridays keep the late evening free for the planted prime-time session.
+      (s) => !friday || s < dayStart(day) + 21 * HOUR,
+    );
+    if (friday) starts.push(dayStart(day) + 23 * HOUR + rng.int(0, 4) * MIN);
+    for (const planned of starts) {
+      const s = Math.max(planned, lastEnd + rng.int(35, 90) * MIN);
+      if (s >= quietFrom - 4 * HOUR && s < quietTo) continue;
+      if (duringBinge(today, s) || duringBinge(today, s + 3 * HOUR)) continue;
+      const isPrime = friday && planned >= dayStart(day) + 23 * HOUR;
+      if (isPrime && s !== planned) continue;
+      const n = isPrime
+        ? rng.int(9, 12)
+        : Math.min(18, 3 + Math.floor(Math.log(1 - rng.float()) / Math.log(0.83)));
+      const end = session(s, n, isPrime ? [4, 5] : [2, 10]);
+      const endHour = new Date(end).getUTCHours();
+      if (endHour >= 21 || endHour < 3) lateSessions.push(end);
+      lastEnd = end;
     }
   }
 
   // Planted: a 41-video, ~4-hour rabbit hole that ends at 3:12 AM.
   {
-    const end = dayStart(addDays(rabbitDay, 1)) + 3 * 3600_000 + 12 * MIN;
+    const end = dayStart(addDays(rabbitDay, 1)) + 3 * HOUR + 12 * MIN;
     const gaps = Array.from({ length: RABBIT_HOLE.videos - 1 }, () => rng.range(3, 9));
     const scale = 240 / gaps.reduce((a, b) => a + b, 0);
     let t = end - 240 * MIN;
     for (let i = 0; i < RABBIT_HOLE.videos; i++) {
-      const channel =
-        i === 0 ? RABBIT_HOLE.channel : i % 3 === 0 ? RABBIT_HOLE.channel : rng.pick(TOP_CHANNELS);
+      const channel = i === 0 || i % 3 === 0 ? RABBIT_HOLE.channel : rng.pick(TOP_CHANNELS);
       const video = i === 0 ? { id: rng.id(11), title: RABBIT_HOLE.first } : newVideo(channel);
-      watches.push({ local: Math.round(t), channel, video });
+      watches.push({ kind: 'video', local: Math.round(t), channel, video });
       t += (gaps[i] ?? 0) * scale * MIN;
     }
   }
 
-  // Planted: a comfort video rewatched 14 times, each at the end of a late session.
-  const late = sessions.filter(
-    (s) => new Date(s.end).getUTCHours() >= 21 || new Date(s.end).getUTCHours() < 3,
-  );
+  // Planted: a comfort video rewatched 14 times, each closing a late session.
   for (let i = 0; i < COMFORT_VIDEO.times; i++) {
-    const s = late[Math.floor(((i + 0.5) / COMFORT_VIDEO.times) * late.length)]!;
-    watches.push({ local: s.end + 4 * MIN, channel: COMFORT_VIDEO.channel, video: comfortVideo });
-  }
-
-  // YouTube Music listening.
-  const musicCum = cumulative(zipf(MUSIC_CHANNELS.length, 1.3));
-  for (let i = 0; i < 360; i++) {
-    const day = rng.pick(days);
-    const channel = MUSIC_CHANNELS[rng.weightedIndex(musicCum)]!;
+    const end = lateSessions[Math.floor(((i + 0.5) / COMFORT_VIDEO.times) * lateSessions.length)]!;
     watches.push({
-      local: dayStart(day) + rng.int(8, 18) * 3600_000 + rng.int(0, 59) * MIN,
-      channel,
-      video: { id: rng.id(11), title: songTitle(rng.int(0, 399)) },
-      music: true,
+      kind: 'video',
+      local: end + 4 * MIN,
+      channel: COMFORT_VIDEO.channel,
+      video: comfortVideo,
     });
   }
 
   const iso = (local: number) => new Date(tc.fromLocal(local) + rng.int(0, 999)).toISOString();
-  const entries: Array<Record<string, unknown> & { time: string }> = watches.map((w) =>
-    w.music
-      ? {
-          header: 'YouTube Music',
-          title: `Watched ${w.video.title}`,
-          titleUrl: `https://music.youtube.com/watch?v=${w.video.id}`,
-          subtitles: [
-            {
-              name: `${w.channel} - Topic`,
-              url: `https://www.youtube.com/channel/UC${rng.id(22)}`,
-            },
-          ],
-          time: iso(w.local),
-          products: ['YouTube'],
-          activityControls: ['YouTube watch history'],
-        }
-      : {
-          header: 'YouTube',
-          title: `Watched ${w.video.title}`,
-          titleUrl: `https://www.youtube.com/watch?v=${w.video.id}`,
-          subtitles: [{ name: w.channel, url: `https://www.youtube.com/channel/UC${rng.id(22)}` }],
-          time: iso(w.local),
-          products: ['YouTube'],
-          activityControls: ['YouTube watch history'],
-        },
-  );
-  // Ads and removed videos, so the sample exercises those rules too.
+  const channelUrl = () => `https://www.youtube.com/channel/UC${rng.id(22)}`;
+  const entries: Array<Record<string, unknown> & { time: string }> = watches.map((w) => {
+    const base = {
+      time: iso(w.local),
+      products: ['YouTube'],
+      activityControls: ['YouTube watch history'],
+    };
+    if (w.kind === 'removed')
+      return { header: 'YouTube', title: 'Watched a video that has been removed', ...base };
+    if (w.kind === 'music') {
+      return {
+        header: 'YouTube Music',
+        title: `Watched ${w.video.title}`,
+        titleUrl: `https://music.youtube.com/watch?v=${w.video.id}`,
+        subtitles: [{ name: `${w.channel} - Topic`, url: channelUrl() }],
+        ...base,
+      };
+    }
+    return {
+      header: 'YouTube',
+      title: `Watched ${w.video.title}`,
+      titleUrl: `https://www.youtube.com/watch?v=${w.video.id}`,
+      subtitles: [{ name: w.channel, url: channelUrl() }],
+      ...base,
+    };
+  });
+  // Ads, so the sample exercises that rule too (they never count as watches).
   for (let i = 0; i < 140; i++) {
     entries.push({
       header: 'YouTube',
       title: `Watched ${videoTitle(pick)}`,
       titleUrl: `https://www.youtube.com/watch?v=${rng.id(11)}`,
-      time: iso(dayStart(rng.pick(days)) + rng.int(10, 22) * 3600_000),
+      time: iso(dayStart(rng.pick(days)) + rng.int(10, 22) * HOUR),
       products: ['YouTube'],
       details: [{ name: 'From Google Ads' }],
-      activityControls: ['YouTube watch history'],
-    });
-  }
-  for (let i = 0; i < 38; i++) {
-    entries.push({
-      header: 'YouTube',
-      title: 'Watched a video that has been removed',
-      time: iso(dayStart(rng.pick(days)) + rng.int(10, 23) * 3600_000),
-      products: ['YouTube'],
       activityControls: ['YouTube watch history'],
     });
   }
@@ -406,7 +452,7 @@ function generateYoutube(rng: Rng, tc: TimeConverter, today: string) {
       title: `Searched for ${q}`,
       titleUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(q).replace(/%20/g, '+')}`,
       time: iso(
-        dayStart(rng.pick(days)) + rng.weightedIndex(hourCum) * 3600_000 + rng.int(0, 59) * MIN,
+        dayStart(rng.pick(days)) + rng.weightedIndex(hourCum) * HOUR + rng.int(0, 59) * MIN,
       ),
       products: ['YouTube'],
       activityControls: ['YouTube search history'],
@@ -481,8 +527,8 @@ function generateNetflix(rng: Rng, tc: TimeConverter, today: string): string {
     const total = rng.int(mins[0], mins[1]) * 60;
     const device = deviceFor(profile, local);
     const country = countryOn(day, profile);
-    // A third of views are watched in two sittings, as real activity logs show.
-    if (rng.chance(0.33)) {
+    // A third of evening views are watched in two sittings, as real activity logs show.
+    if (new Date(local).getUTCHours() >= 6 && rng.chance(0.33)) {
       const first = Math.round(total * rng.range(0.3, 0.7));
       rows.push({
         local,
@@ -519,27 +565,41 @@ function generateNetflix(rng: Rng, tc: TimeConverter, today: string): string {
     return local + (total + rng.int(1, 6) * 60) * 1000;
   };
 
-  const viewer = (profile: string, shows: ShowDef[], viewingDays: number, extraNight: boolean) => {
+  const viewer = (profile: string, shows: ShowDef[], viewingDays: number, nights: boolean) => {
     const queues = shows.map((s) => ({ show: s, eps: episodeTitles(s), next: 0 }));
-    const weights = cumulative(shows.map((s) => s.weight));
     const chosen = new Set<string>();
-    while (chosen.size < viewingDays) chosen.add(rng.pick(days));
+    while (chosen.size < viewingDays) {
+      const d = rng.pick(days);
+      const dow = new Date(dayStart(d)).getUTCDay();
+      // Netflix is a weekend thing: Fri–Sun are about twice as likely as other days.
+      if (dow >= 1 && dow <= 4 && rng.chance(0.5)) continue;
+      chosen.add(d);
+    }
     for (const day of [...chosen].sort()) {
-      const night = extraNight && rng.chance(0.12);
+      // Night views start no later than 2:50 AM; the planted 3:47 AM stays the record.
+      const night = nights && rng.chance(0.12);
       let t =
         dayStart(day) +
         (night
-          ? rng.int(0, 2) * 3600_000 + rng.int(0, 50) * MIN
-          : rng.int(18, 22) * 3600_000 + rng.int(0, 59) * MIN);
-      const n = rng.int(1, 3);
+          ? rng.int(0, 2) * HOUR + rng.int(0, 50) * MIN
+          : rng.int(18, 21) * HOUR + rng.int(0, 59) * MIN);
+      const n = night ? 1 : rng.int(1, 3);
       for (let i = 0; i < n; i++) {
         if (rng.chance(0.14)) {
           t = addView(profile, day, t, rng.pick(MOVIES), [84, 138]);
           continue;
         }
-        const q = queues[rng.weightedIndex(weights)]!;
-        const title = q.eps[q.next % q.eps.length]!;
-        q.next++;
+        // Shows are watched through once; finished ones only come back as the odd rewatch.
+        const open = queues.filter((q) => q.next < q.eps.length);
+        let title: string;
+        let q;
+        if (open.length > 0) {
+          q = open[rng.weightedIndex(cumulative(open.map((o) => o.show.weight)))]!;
+          title = q.eps[q.next++]!;
+        } else {
+          q = rng.pick(queues);
+          title = rng.pick(q.eps);
+        }
         t = addView(profile, day, t, title, q.show.minutes);
       }
       // Autoplayed previews and trailers: dropped by the parser, but part of every real export.
@@ -573,7 +633,7 @@ function generateNetflix(rng: Rng, tc: TimeConverter, today: string): string {
   viewer(
     PERSONA.name,
     ALEX_SHOWS.filter((s) => s.weight > 0),
-    120,
+    100,
     true,
   );
   viewer(PERSONA.otherProfile, SAM_SHOWS, 70, false);
@@ -581,9 +641,12 @@ function generateNetflix(rng: Rng, tc: TimeConverter, today: string): string {
   // Planted: Midnight Harbor, including a 9-episode binge day and rewatches.
   const mh = ALEX_SHOWS[0]!;
   const mhEps = episodeTitles(mh);
-  let binge = addDays(today, -82);
-  while (new Date(dayStart(binge)).getUTCDay() !== 6) binge = addDays(binge, 1);
-  let t = dayStart(binge) + 13 * 3600_000 + 10 * MIN;
+  const binge = bingeDay(today);
+  // The binge is the only viewing that day.
+  for (let i = rows.length - 1; i >= 0; i--) {
+    if (rows[i]!.profile === PERSONA.name && dateOf(rows[i]!.local) === binge) rows.splice(i, 1);
+  }
+  let t = dayStart(binge) + 13 * HOUR + 10 * MIN;
   for (let e = 0; e < 9; e++) {
     const dur = rng.int(46, 54) * 60;
     rows.push({
@@ -601,21 +664,21 @@ function generateNetflix(rng: Rng, tc: TimeConverter, today: string): string {
   const after = daysBetween(addDays(binge, 1), today);
   for (let e = 9; e < mhEps.length; e++) {
     const day = after[Math.min(after.length - 1, (e - 9) * 4 + rng.int(0, 2))]!;
-    addView(PERSONA.name, day, dayStart(day) + rng.int(20, 22) * 3600_000, mhEps[e]!, mh.minutes);
+    addView(PERSONA.name, day, dayStart(day) + rng.int(20, 21) * HOUR, mhEps[e]!, mh.minutes);
   }
-  for (let r = 0; r < 12; r++) {
+  for (let r = 0; r < 16; r++) {
     const day = rng.pick(after);
-    addView(
-      PERSONA.name,
-      day,
-      dayStart(day) + rng.int(19, 22) * 3600_000,
-      mhEps[rng.int(0, mhEps.length - 1)]!,
-      mh.minutes,
-    );
+    addView(PERSONA.name, day, dayStart(day) + rng.int(19, 21) * HOUR, rng.pick(mhEps), mh.minutes);
+  }
+  // Planted: some viewing during the trip, so "Around the world" always has two countries.
+  for (const offset of [1, 3, 5]) {
+    const day = addDays(tripStart, offset);
+    const comfort = episodeTitles(ALEX_SHOWS.find((s) => s.title === 'Bureau of Lost Things')!);
+    addView(PERSONA.name, day, dayStart(day) + 21 * HOUR, rng.pick(comfort), [22, 30]);
   }
   // Planted: the latest night, 3:47 AM.
   const lateDay = addDays(today, -40);
-  addView(PERSONA.name, lateDay, dayStart(lateDay) + 3 * 3600_000 + 47 * MIN, mhEps[4]!, [30, 40]);
+  addView(PERSONA.name, lateDay, dayStart(lateDay) + 3 * HOUR + 47 * MIN, mhEps[4]!, [30, 40]);
 
   rows.sort((a, b) => b.local - a.local);
   return Papa.unparse({

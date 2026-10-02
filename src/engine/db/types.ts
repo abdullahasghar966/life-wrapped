@@ -10,7 +10,7 @@ export interface Db {
   /** Runs a statement with no parameters (DDL, internal maintenance). Never pass user data here. */
   exec(sql: string): Promise<void>;
   /** Runs a parameterised query. User data must only ever travel through `params`. */
-  query<T extends Row = Row>(sql: string, params?: readonly unknown[]): Promise<T[]>;
+  query<T extends object = Row>(sql: string, params?: readonly unknown[]): Promise<T[]>;
   /** Creates `table` from an Arrow table (used for staging tables). */
   insertArrow(table: string, data: Table): Promise<void>;
   close(): Promise<void>;

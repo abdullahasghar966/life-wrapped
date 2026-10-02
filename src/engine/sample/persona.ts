@@ -352,10 +352,11 @@ const EPISODE_NAMES = [
   'Open Water',
 ];
 
+/** Unique within a season: consecutive names, with "(Part 2)" once the list wraps. */
 export function episodeName(show: string, season: number, ep: number): string {
-  return EPISODE_NAMES[(season * 7 + ep * 3 + show.length) % EPISODE_NAMES.length]!.concat(
-    ep > 12 ? ` (Part ${ep - 11})` : '',
-  );
+  const n = EPISODE_NAMES.length;
+  const name = EPISODE_NAMES[(ep - 1 + season * 7 + show.length) % n]!;
+  return ep > n ? `${name} (Part ${Math.ceil(ep / n)})` : name;
 }
 
 export const ALEX_SHOWS: ShowDef[] = [
@@ -376,9 +377,30 @@ export const ALEX_SHOWS: ShowDef[] = [
   {
     title: 'Bureau of Lost Things',
     seasons: null,
-    episodesPerSeason: 12,
+    episodesPerSeason: 30,
     minutes: [22, 30],
     weight: 4,
+  },
+  {
+    title: 'Kestrel Point',
+    seasons: ['Season 1', 'Season 2'],
+    episodesPerSeason: 10,
+    minutes: [38, 48],
+    weight: 3,
+  },
+  {
+    title: 'Saltmarsh Detectives',
+    seasons: ['Series 1', 'Series 2'],
+    episodesPerSeason: 6,
+    minutes: [52, 60],
+    weight: 2,
+  },
+  {
+    title: 'Orbit Kitchen',
+    seasons: ['Season 1', 'Season 2'],
+    episodesPerSeason: 8,
+    minutes: [24, 30],
+    weight: 2,
   },
   {
     title: 'Copper & Ash',
@@ -430,6 +452,13 @@ export const SAM_SHOWS: ShowDef[] = [
     seasons: ['Season 1'],
     episodesPerSeason: 8,
     minutes: [42, 50],
+    weight: 2,
+  },
+  {
+    title: 'Quiet Fields',
+    seasons: ['Season 1', 'Season 2'],
+    episodesPerSeason: 10,
+    minutes: [40, 50],
     weight: 2,
   },
 ];

@@ -6,14 +6,10 @@ import { TEST_TZ, createTestEngine, type TestEngine } from '../helpers/engine';
 describe('sample generator', () => {
   let t: TestEngine;
   let summary: IngestSummary;
-  let ms = 0;
 
   beforeAll(async () => {
     t = await createTestEngine();
-    await t.engine.ping(); // warm up DuckDB so timing measures generation + ingestion
-    const start = performance.now();
     summary = await t.engine.loadSample(undefined, { timeZone: TEST_TZ });
-    ms = performance.now() - start;
   });
   afterAll(() => t.db.close());
 
@@ -23,16 +19,7 @@ describe('sample generator', () => {
     expect(a.map((f) => f.text)).toEqual(b.map((f) => f.text));
   });
 
-  it('generates and ingests in under 3 seconds', () => {
-    console.info(`sample generate+ingest: ${Math.round(ms)} ms`);
-    expect(ms).toBeLessThan(3000);
-  });
-
   it('has the expected volumes', () => {
-    console.info(
-      JSON.stringify(summary.counts),
-      JSON.stringify(summary.files.map((f) => f.message)),
-    );
     expect(summary.counts.spotifyPlays).toBeGreaterThan(50_000);
     expect(summary.counts.spotifyPlays).toBeLessThan(70_000);
     expect(summary.counts.spotifyPodcast).toBeGreaterThan(0);

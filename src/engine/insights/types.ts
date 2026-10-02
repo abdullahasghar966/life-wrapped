@@ -1,7 +1,7 @@
 import type { Row } from '../db/types';
 import type { DeckId, Period } from '../types';
 
-export type QueryFn = <T extends Row = Row>(
+export type QueryFn = <T extends object = Row>(
   sql: string,
   params?: readonly unknown[],
 ) => Promise<T[]>;

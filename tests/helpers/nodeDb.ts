@@ -24,7 +24,7 @@ export async function createNodeDb(): Promise<Db> {
     async exec(sql) {
       conn.query(sql);
     },
-    async query<T extends Row = Row>(sql: string, params: readonly unknown[] = []) {
+    async query<T extends object = Row>(sql: string, params: readonly unknown[] = []) {
       if (params.length === 0)
         return conn
           .query(sql)

@@ -1,0 +1,1363 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`life deck > life.busiestDay 1`] = `
+{
+  "a11y": "Your busiest day was March 28: 15 hours of everything.",
+  "props": {
+    "date": "2026-03-28",
+    "hours": 15.1,
+    "hoursByPlatform": {
+      "netflix": 7.6,
+      "spotify": 6.4,
+      "youtube": 1.1,
+    },
+    "segments": [
+      {
+        "end": 45,
+        "platform": "spotify",
+        "start": 1,
+      },
+      {
+        "end": 493,
+        "platform": "spotify",
+        "start": 147,
+      },
+      {
+        "end": 239,
+        "platform": "youtube",
+        "start": 171,
+      },
+      {
+        "end": 1266,
+        "platform": "netflix",
+        "start": 790,
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.opener 1`] = `
+{
+  "a11y": "Now, all of it together: Spotify, YouTube and Netflix.",
+  "props": {
+    "platforms": [
+      "spotify",
+      "youtube",
+      "netflix",
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.personality 1`] = `
+{
+  "a11y": "You're The Binge Master: 9 episodes of Midnight Harbor in one day.",
+  "props": {
+    "archetype": "bingeMaster",
+    "label": "The Binge Master",
+    "why": [
+      {
+        "id": "bingeMaster",
+        "metric": 9,
+        "reason": "9 episodes of Midnight Harbor in one day",
+        "score": 1.8,
+        "threshold": 5,
+      },
+      {
+        "id": "nightOwl",
+        "metric": 0.425,
+        "reason": "43% of your time was after midnight",
+        "score": 1.418,
+        "threshold": 0.3,
+      },
+      {
+        "id": "rabbitHoleDiver",
+        "metric": 4.133,
+        "reason": "a 4.1-hour YouTube session",
+        "score": 1.378,
+        "threshold": 3,
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.rhythm 1`] = `
+{
+  "a11y": "Mornings: music. Nights: YouTube. Weekends: Netflix.",
+  "props": {
+    "dayparts": {
+      "afternoon": "youtube",
+      "evening": "netflix",
+      "morning": "spotify",
+      "night": "youtube",
+    },
+    "hours": [
+      {
+        "hour": 0,
+        "netflix": 7.6,
+        "spotify": 133.7,
+        "youtube": 89.6,
+      },
+      {
+        "hour": 1,
+        "netflix": 5.6,
+        "spotify": 146.5,
+        "youtube": 100.1,
+      },
+      {
+        "hour": 2,
+        "netflix": 1.2,
+        "spotify": 149.9,
+        "youtube": 115.4,
+      },
+      {
+        "hour": 3,
+        "netflix": 0.5,
+        "spotify": 143.1,
+        "youtube": 95.5,
+      },
+      {
+        "hour": 4,
+        "netflix": 0,
+        "spotify": 120.4,
+        "youtube": 72.4,
+      },
+      {
+        "hour": 5,
+        "netflix": 0,
+        "spotify": 81.9,
+        "youtube": 36.6,
+      },
+      {
+        "hour": 6,
+        "netflix": 0,
+        "spotify": 46.3,
+        "youtube": 14.9,
+      },
+      {
+        "hour": 7,
+        "netflix": 0,
+        "spotify": 29.6,
+        "youtube": 8.5,
+      },
+      {
+        "hour": 8,
+        "netflix": 0,
+        "spotify": 22.1,
+        "youtube": 6.7,
+      },
+      {
+        "hour": 9,
+        "netflix": 0,
+        "spotify": 25.7,
+        "youtube": 10.8,
+      },
+      {
+        "hour": 10,
+        "netflix": 0,
+        "spotify": 22.7,
+        "youtube": 9.8,
+      },
+      {
+        "hour": 11,
+        "netflix": 0,
+        "spotify": 28.3,
+        "youtube": 16.1,
+      },
+      {
+        "hour": 12,
+        "netflix": 0,
+        "spotify": 29.7,
+        "youtube": 23.7,
+      },
+      {
+        "hour": 13,
+        "netflix": 0.9,
+        "spotify": 25.3,
+        "youtube": 27.5,
+      },
+      {
+        "hour": 14,
+        "netflix": 0.9,
+        "spotify": 37.4,
+        "youtube": 26.2,
+      },
+      {
+        "hour": 15,
+        "netflix": 1.7,
+        "spotify": 37.4,
+        "youtube": 24.1,
+      },
+      {
+        "hour": 16,
+        "netflix": 0.8,
+        "spotify": 31.8,
+        "youtube": 21.8,
+      },
+      {
+        "hour": 17,
+        "netflix": 0.8,
+        "spotify": 38.6,
+        "youtube": 30.8,
+      },
+      {
+        "hour": 18,
+        "netflix": 10.4,
+        "spotify": 41.8,
+        "youtube": 33.4,
+      },
+      {
+        "hour": 19,
+        "netflix": 24.5,
+        "spotify": 46.6,
+        "youtube": 30.5,
+      },
+      {
+        "hour": 20,
+        "netflix": 35.6,
+        "spotify": 64.9,
+        "youtube": 37.4,
+      },
+      {
+        "hour": 21,
+        "netflix": 42.5,
+        "spotify": 79.5,
+        "youtube": 48.8,
+      },
+      {
+        "hour": 22,
+        "netflix": 22,
+        "spotify": 90.7,
+        "youtube": 54.2,
+      },
+      {
+        "hour": 23,
+        "netflix": 8.8,
+        "spotify": 101.1,
+        "youtube": 102.9,
+      },
+    ],
+    "weekends": "netflix",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.split 1`] = `
+{
+  "a11y": "How your time split: Spotify 57%, YouTube 37% and Netflix 6%.",
+  "props": {
+    "platforms": [
+      {
+        "hours": 1575,
+        "platform": "spotify",
+        "share": 0.567,
+      },
+      {
+        "hours": 1038,
+        "platform": "youtube",
+        "share": 0.374,
+      },
+      {
+        "hours": 164,
+        "platform": "netflix",
+        "share": 0.059,
+      },
+    ],
+    "top": "spotify",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.summary 1`] = `
+{
+  "a11y": "Your online life, wrapped: about 2,777 hours, mostly Spotify. You're The Binge Master.",
+  "props": {
+    "archetype": "bingeMaster",
+    "days": 116,
+    "estimated": true,
+    "hours": 2777,
+    "label": "The Binge Master",
+    "shares": {
+      "netflix": 0.059,
+      "spotify": 0.567,
+      "youtube": 0.374,
+    },
+    "top": "spotify",
+  },
+  "share": {
+    "cardType": "life.summary",
+    "names": {
+      "archetype": "The Binge Master",
+      "top": "Spotify",
+    },
+    "numbers": {
+      "days": 116,
+      "hours": 2777,
+      "netflixShare": 0.059,
+      "spotifyShare": 0.567,
+      "youtubeShare": 0.374,
+    },
+    "theme": "aurora",
+  },
+}
+`;
+
+exports[`life deck > life.total 1`] = `
+{
+  "a11y": "About 2,777 hours in total, that's 116 days. YouTube time is estimated.",
+  "props": {
+    "days": 116,
+    "estimated": true,
+    "hours": 2777,
+    "hoursByPlatform": {
+      "netflix": 164,
+      "spotify": 1575,
+      "youtube": 1038,
+    },
+  },
+  "share": undefined,
+}
+`;
+
+exports[`life deck > life.weekdayWeekend 1`] = `
+{
+  "a11y": "On weekdays you spent about 7.2 hours a day, on weekends 8.7. Weekends belong to Netflix.",
+  "props": {
+    "weekday": {
+      "perDay": 7.2,
+      "shares": {
+        "netflix": 0.051,
+        "spotify": 0.57,
+        "youtube": 0.379,
+      },
+      "top": "spotify",
+    },
+    "weekend": {
+      "perDay": 8.7,
+      "shares": {
+        "netflix": 0.074,
+        "spotify": 0.562,
+        "youtube": 0.364,
+      },
+      "top": "spotify",
+    },
+    "weekendWinner": "netflix",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.binge 1`] = `
+{
+  "a11y": "Your binge record: 9 episodes of Midnight Harbor on March 28.",
+  "props": {
+    "count": 9,
+    "date": "2026-03-28",
+    "episodes": [
+      {
+        "episode": "Driftwood",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Beacon",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Open Water",
+        "season": "Season 1",
+      },
+      {
+        "episode": "The Lighthouse Keeper",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Low Tide",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Signals",
+        "season": "Season 1",
+      },
+      {
+        "episode": "The Long Night",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Undertow",
+        "season": "Season 1",
+      },
+      {
+        "episode": "Paper Boats",
+        "season": "Season 1",
+      },
+    ],
+    "series": "Midnight Harbor",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.countries 1`] = `
+{
+  "a11y": "You streamed from 2 countries: United States and Canada.",
+  "props": {
+    "countries": [
+      {
+        "code": "US",
+        "hours": 156,
+        "name": "United States",
+      },
+      {
+        "code": "CA",
+        "hours": 7.6,
+        "name": "Canada",
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.devices 1`] = `
+{
+  "a11y": "Where you watched: TV 65%, Phone 25% and Computer 10%.",
+  "props": {
+    "classes": [
+      {
+        "device": "TV",
+        "hours": 105.7,
+        "share": 0.646,
+      },
+      {
+        "device": "Phone",
+        "hours": 41,
+        "share": 0.251,
+      },
+      {
+        "device": "Computer",
+        "hours": 16.9,
+        "share": 0.103,
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.hours 1`] = `
+{
+  "a11y": "You watched 164 hours of Netflix, about 82 movies' worth.",
+  "props": {
+    "days": 122,
+    "hours": 164,
+    "movieEquivalents": 82,
+    "titles": 18,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.lateNight 1`] = `
+{
+  "a11y": "Your latest night: you pressed play at 3:47 AM. 9% of your viewing happened after midnight.",
+  "props": {
+    "date": "2026-05-06",
+    "latestMinute": 227,
+    "nightShare": 0.091,
+    "title": "Midnight Harbor",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.opener 1`] = `
+{
+  "a11y": "Previously on… you. Netflix viewing for Alex, June 16, 2025 to June 15, 2026.",
+  "props": {
+    "end": "2026-06-15",
+    "periodLabel": "Last 12 months",
+    "profile": "Alex",
+    "start": "2025-06-16",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.split 1`] = `
+{
+  "a11y": "You're a series person: 79% of your viewing was episodes.",
+  "props": {
+    "movieHours": 34.3,
+    "seriesHours": 129.3,
+    "seriesShare": 0.79,
+    "topMovie": {
+      "hours": 8,
+      "title": "Atlas: The Long Road",
+    },
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.summary 1`] = `
+{
+  "a11y": "Summary: 164 hours of Netflix. Top series Midnight Harbor. Binge record 9 episodes of Midnight Harbor. You're a Binger.",
+  "props": {
+    "binge": {
+      "count": 9,
+      "series": "Midnight Harbor",
+    },
+    "hours": 164,
+    "persona": "Binger",
+    "topSeries": "Midnight Harbor",
+  },
+  "share": {
+    "cardType": "netflix.summary",
+    "names": {
+      "persona": "Binger",
+      "topSeries": "Midnight Harbor",
+    },
+    "numbers": {
+      "bingeEpisodes": 9,
+      "hours": 164,
+    },
+    "theme": "binge",
+  },
+}
+`;
+
+exports[`netflix deck > netflix.topSeries 1`] = `
+{
+  "a11y": "Your top series was Midnight Harbor: 31 hours across 20 episodes.",
+  "props": {
+    "episodes": 20,
+    "hours": 30.7,
+    "seasons": 2,
+    "series": "Midnight Harbor",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`netflix deck > netflix.topTitles 1`] = `
+{
+  "a11y": "Your top 5 titles: Midnight Harbor, Copper & Ash, Bureau of Lost Things, Kestrel Point and Saltmarsh Detectives.",
+  "props": {
+    "titles": [
+      {
+        "episodes": 20,
+        "hours": 30.7,
+        "isSeries": true,
+        "title": "Midnight Harbor",
+      },
+      {
+        "episodes": 24,
+        "hours": 18.5,
+        "isSeries": true,
+        "title": "Copper & Ash",
+      },
+      {
+        "episodes": 30,
+        "hours": 16,
+        "isSeries": true,
+        "title": "Bureau of Lost Things",
+      },
+      {
+        "episodes": 20,
+        "hours": 14.7,
+        "isSeries": true,
+        "title": "Kestrel Point",
+      },
+      {
+        "episodes": 12,
+        "hours": 11.4,
+        "isSeries": true,
+        "title": "Saltmarsh Detectives",
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.clock 1`] = `
+{
+  "a11y": "Your peak listening hour was 2 AM. 44% of your listening fits the Night Owl pattern.",
+  "props": {
+    "hours": [
+      7666,
+      8458,
+      8598,
+      8254,
+      6873,
+      4587,
+      2690,
+      1733,
+      1297,
+      1502,
+      1309,
+      1669,
+      1722,
+      1498,
+      2245,
+      2192,
+      1751,
+      2141,
+      2401,
+      2705,
+      3741,
+      4574,
+      5103,
+      5830,
+    ],
+    "peakHour": 2,
+    "persona": "Night Owl",
+    "personaShare": 0.44,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.discovery 1`] = `
+{
+  "a11y": "You listened to 328 different artists, and 102 of them were new to you.",
+  "props": {
+    "artists": 328,
+    "newArtists": 102,
+    "topNew": [
+      "The Gromiros",
+      "Mivenis & Venimo",
+      "Seldaneis",
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.minutes 1`] = `
+{
+  "a11y": "You listened to 90,537 minutes of music, plus 3,976 minutes of podcasts.",
+  "props": {
+    "activeDays": 345,
+    "minutes": 90537,
+    "perActiveDay": 262,
+    "podcastMinutes": 3976,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.onRepeat 1`] = `
+{
+  "a11y": "On February 15 you played Paper Moons by Nova Vale 27 times.",
+  "props": {
+    "artist": "Nova Vale",
+    "date": "2026-02-15",
+    "plays": 27,
+    "track": "Paper Moons",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.opener 1`] = `
+{
+  "a11y": "Your year in sound: June 16, 2025 to June 15, 2026.",
+  "props": {
+    "end": "2026-06-15",
+    "firstDate": "2025-06-16",
+    "lastDate": "2026-06-15",
+    "periodLabel": "Last 12 months",
+    "start": "2025-06-16",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.podcasts 1`] = `
+{
+  "a11y": "Your favourite podcast was Margins & Footnotes: 1,012 minutes across 25 episodes.",
+  "props": {
+    "episodes": 25,
+    "show": "Margins & Footnotes",
+    "showMinutes": 1012,
+    "shows": 4,
+    "totalMinutes": 3850,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.skips 1`] = `
+{
+  "a11y": "You skipped 30% of the 40,663 tracks you started. The artist you skipped most was Static Bloom.",
+  "props": {
+    "mostSkipped": {
+      "artist": "Static Bloom",
+      "rate": 0.65,
+      "skipped": 944,
+      "started": 1452,
+    },
+    "rate": 0.297,
+    "skipped": 12060,
+    "started": 40663,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.streak 1`] = `
+{
+  "a11y": "Your longest listening streak was 63 days in a row, from October 28, 2025 to December 29, 2025.",
+  "props": {
+    "days": 63,
+    "end": "2025-12-29",
+    "start": "2025-10-28",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.summary 1`] = `
+{
+  "a11y": "Summary: 90,537 minutes of music. Top artist Nova Vale. Top song Paper Moons. Listening style: Night Owl. Longest streak 63 days.",
+  "props": {
+    "minutes": 90537,
+    "persona": "Night Owl",
+    "streak": 63,
+    "topArtist": "Nova Vale",
+    "topTrack": {
+      "artist": "Nova Vale",
+      "track": "Paper Moons",
+    },
+  },
+  "share": {
+    "cardType": "spotify.summary",
+    "names": {
+      "persona": "Night Owl",
+      "topArtist": "Nova Vale",
+      "topTrack": "Paper Moons",
+    },
+    "numbers": {
+      "minutes": 90537,
+      "streak": 63,
+    },
+    "theme": "sound",
+  },
+}
+`;
+
+exports[`spotify deck > spotify.topArtist 1`] = `
+{
+  "a11y": "Your top artist was Nova Vale: 7,118 minutes over 2,297 plays, first played on December 15, 2024.",
+  "props": {
+    "artist": "Nova Vale",
+    "firstPlay": "2024-12-15",
+    "minutes": 7118,
+    "plays": 2297,
+    "share": 0.086,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.topArtists 1`] = `
+{
+  "a11y": "Your top 5 artists: Nova Vale, The Paper Lanterns of Oslo Street, Mirela Quist, Juniper & the Hollow Pines and Kai Okonte.",
+  "props": {
+    "artists": [
+      {
+        "minutes": 7118,
+        "name": "Nova Vale",
+        "plays": 2297,
+      },
+      {
+        "minutes": 4946,
+        "name": "The Paper Lanterns of Oslo Street",
+        "plays": 1664,
+      },
+      {
+        "minutes": 4524,
+        "name": "Mirela Quist",
+        "plays": 1375,
+      },
+      {
+        "minutes": 2724,
+        "name": "Juniper & the Hollow Pines",
+        "plays": 952,
+      },
+      {
+        "minutes": 2712,
+        "name": "Kai Okonte",
+        "plays": 818,
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`spotify deck > spotify.topTracks 1`] = `
+{
+  "a11y": "Your top 5 songs: Paper Moons by Nova Vale, Midnight Moons by The Paper Lanterns of Oslo Street, Velvet Static by Mirela Quist, Lucky Harbour by Kai Okonte and Quiet Harbour by Juniper & the Hollow Pines.",
+  "props": {
+    "tracks": [
+      {
+        "artist": "Nova Vale",
+        "minutes": 3933,
+        "plays": 1229,
+        "track": "Paper Moons",
+      },
+      {
+        "artist": "The Paper Lanterns of Oslo Street",
+        "minutes": 1146,
+        "plays": 487,
+        "track": "Midnight Moons",
+      },
+      {
+        "artist": "Mirela Quist",
+        "minutes": 1525,
+        "plays": 404,
+        "track": "Velvet Static",
+      },
+      {
+        "artist": "Kai Okonte",
+        "minutes": 945,
+        "plays": 275,
+        "track": "Lucky Harbour",
+      },
+      {
+        "artist": "Juniper & the Hollow Pines",
+        "minutes": 608,
+        "plays": 262,
+        "track": "Quiet Harbour",
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.music 1`] = `
+{
+  "a11y": "Your YouTube Music favourite was Lo-Fi Lagoon, with 157 plays.",
+  "props": {
+    "channel": "Lo-Fi Lagoon",
+    "channels": [
+      {
+        "channel": "Lo-Fi Lagoon",
+        "plays": 157,
+      },
+      {
+        "channel": "Moth Parade",
+        "plays": 99,
+      },
+      {
+        "channel": "Nova Vale",
+        "plays": 38,
+      },
+    ],
+    "plays": 157,
+    "total": 337,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.nightOwl 1`] = `
+{
+  "a11y": "45% of your videos were watched between midnight and 5 AM. Your peak hour was 11 PM.",
+  "props": {
+    "dayparts": {
+      "afternoon": 0.116,
+      "evening": 0.337,
+      "morning": 0.1,
+      "night": 0.447,
+    },
+    "hours": [
+      791,
+      893,
+      1027,
+      854,
+      635,
+      328,
+      136,
+      76,
+      61,
+      100,
+      87,
+      148,
+      213,
+      238,
+      236,
+      215,
+      193,
+      289,
+      301,
+      275,
+      340,
+      442,
+      492,
+      1033,
+    ],
+    "nightShare": 0.447,
+    "peakHour": 23,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.opener 1`] = `
+{
+  "a11y": "Now playing: your year on YouTube, June 16, 2025 to June 15, 2026.",
+  "props": {
+    "end": "2026-06-15",
+    "periodLabel": "Last 12 months",
+    "start": "2025-06-16",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.rabbitHole 1`] = `
+{
+  "a11y": "Your longest rabbit hole was on April 1: it started with How do magnets work?, and 41 videos later it was 3:12 AM.",
+  "props": {
+    "chain": [
+      {
+        "channel": "Brainlight Labs",
+        "title": "How do magnets work?",
+      },
+      {
+        "channel": "Night Bus Stories",
+        "title": "The surprising history of trains",
+      },
+      {
+        "channel": "Studio Overcast",
+        "title": "Fixing a broken lamp",
+      },
+      {
+        "channel": "Brainlight Labs",
+        "title": "7 things you never knew about black holes",
+      },
+      {
+        "channel": "Map Nerd Daily",
+        "title": "pasta three ways (budget edition)",
+      },
+      {
+        "channel": "Retro Rewind Arcade",
+        "title": "The surprising history of elevators",
+      },
+      {
+        "channel": "Brainlight Labs",
+        "title": "What happens if you only cooking with one pan?",
+      },
+      {
+        "channel": "Studio Overcast",
+        "title": "Fixing a broken radio",
+      },
+      {
+        "channel": "Quiet Weather",
+        "title": "How do clocks work?",
+      },
+      {
+        "channel": "Brainlight Labs",
+        "title": "12 things you never knew about rainbows",
+      },
+      {
+        "channel": "Retro Rewind Arcade",
+        "title": "12 things you never knew about maps",
+      },
+      {
+        "channel": "Plant Lab Pete",
+        "title": "Study with me: 7 hours, night train ambience",
+      },
+    ],
+    "crossesMidnight": true,
+    "date": "2026-04-01",
+    "endMinute": 192,
+    "firstTitle": "How do magnets work?",
+    "lastTitle": "Fixing a broken keyboard",
+    "minutes": 248,
+    "startMinute": 1392,
+    "videos": 41,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.rewatched 1`] = `
+{
+  "a11y": "You watched Rain on a tin roof 14 times.",
+  "props": {
+    "channel": "Quiet Weather",
+    "times": 14,
+    "title": "Rain on a tin roof",
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.searches 1`] = `
+{
+  "a11y": "You searched YouTube 599 times. Your most searched phrase was easy pasta.",
+  "props": {
+    "first": {
+      "date": "2025-06-16",
+      "query": "bike chain fix",
+    },
+    "topQueries": [
+      {
+        "count": 138,
+        "query": "easy pasta",
+      },
+      {
+        "count": 72,
+        "query": "how to fix a squeaky door",
+      },
+      {
+        "count": 41,
+        "query": "lofi study",
+      },
+      {
+        "count": 29,
+        "query": "magnets explained",
+      },
+      {
+        "count": 18,
+        "query": "learn piano chords",
+      },
+    ],
+    "topWords": [
+      {
+        "count": 143,
+        "word": "pasta",
+      },
+      {
+        "count": 138,
+        "word": "easy",
+      },
+      {
+        "count": 84,
+        "word": "fix",
+      },
+      {
+        "count": 72,
+        "word": "door",
+      },
+      {
+        "count": 72,
+        "word": "squeaky",
+      },
+      {
+        "count": 54,
+        "word": "study",
+      },
+      {
+        "count": 41,
+        "word": "lofi",
+      },
+      {
+        "count": 40,
+        "word": "explained",
+      },
+    ],
+    "total": 599,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.summary 1`] = `
+{
+  "a11y": "Summary: 9,403 videos, about 1,038 hours. Top channel Pixel Kitchen. Longest rabbit hole 41 videos. Peak hour 11 PM.",
+  "props": {
+    "hours": 1038,
+    "peakHour": 23,
+    "rabbitHole": {
+      "minutes": 248,
+      "videos": 41,
+    },
+    "topChannel": "Pixel Kitchen",
+    "videos": 9403,
+  },
+  "share": {
+    "cardType": "youtube.summary",
+    "names": {
+      "topChannel": "Pixel Kitchen",
+    },
+    "numbers": {
+      "hours": 1038,
+      "peakHour": 23,
+      "rabbitHoleVideos": 41,
+      "videos": 9403,
+    },
+    "theme": "watch",
+  },
+}
+`;
+
+exports[`youtube deck > youtube.topChannel 1`] = `
+{
+  "a11y": "Your most-watched channel was Pixel Kitchen: 1,594 videos, 18% of everything you watched.",
+  "props": {
+    "channel": "Pixel Kitchen",
+    "firstWatch": "2025-06-16",
+    "share": 0.177,
+    "videos": 1594,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.topChannels 1`] = `
+{
+  "a11y": "Your top 5 channels: Pixel Kitchen, Quiet Weather, Brainlight Labs, Tiny Workshop and Map Nerd Daily.",
+  "props": {
+    "channels": [
+      {
+        "channel": "Pixel Kitchen",
+        "hours": 174.8,
+        "videos": 1594,
+      },
+      {
+        "channel": "Quiet Weather",
+        "hours": 85.9,
+        "videos": 778,
+      },
+      {
+        "channel": "Brainlight Labs",
+        "hours": 56.2,
+        "videos": 526,
+      },
+      {
+        "channel": "Tiny Workshop",
+        "hours": 39.8,
+        "videos": 355,
+      },
+      {
+        "channel": "Map Nerd Daily",
+        "hours": 31.8,
+        "videos": 285,
+      },
+    ],
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.total 1`] = `
+{
+  "a11y": "You watched 9,403 videos, about 1,038 hours. Watch time is an estimate based on the gaps between videos.",
+  "props": {
+    "activeDays": 364,
+    "hours": 1038,
+    "unavailable": 40,
+    "videos": 9403,
+  },
+  "share": undefined,
+}
+`;
+
+exports[`youtube deck > youtube.weekly 1`] = `
+{
+  "a11y": "Your YouTube prime time: Fridays at 11 PM.",
+  "props": {
+    "grid": [
+      [
+        129,
+        151,
+        157,
+        123,
+        89,
+        57,
+        33,
+        3,
+        7,
+        0,
+        4,
+        4,
+        19,
+        21,
+        46,
+        46,
+        23,
+        38,
+        44,
+        38,
+        52,
+        94,
+        90,
+        83,
+      ],
+      [
+        101,
+        101,
+        156,
+        125,
+        80,
+        26,
+        13,
+        12,
+        0,
+        2,
+        6,
+        29,
+        52,
+        27,
+        31,
+        55,
+        23,
+        51,
+        81,
+        45,
+        53,
+        54,
+        48,
+        84,
+      ],
+      [
+        143,
+        117,
+        128,
+        104,
+        97,
+        45,
+        26,
+        20,
+        13,
+        4,
+        11,
+        17,
+        19,
+        29,
+        29,
+        21,
+        35,
+        42,
+        34,
+        26,
+        26,
+        46,
+        70,
+        69,
+      ],
+      [
+        107,
+        123,
+        140,
+        121,
+        65,
+        29,
+        3,
+        5,
+        13,
+        27,
+        10,
+        16,
+        30,
+        35,
+        27,
+        15,
+        31,
+        43,
+        48,
+        27,
+        50,
+        80,
+        89,
+        82,
+      ],
+      [
+        165,
+        134,
+        144,
+        126,
+        91,
+        39,
+        8,
+        9,
+        4,
+        21,
+        4,
+        18,
+        33,
+        18,
+        27,
+        12,
+        21,
+        18,
+        29,
+        41,
+        47,
+        72,
+        91,
+        71,
+      ],
+      [
+        96,
+        126,
+        152,
+        115,
+        82,
+        47,
+        11,
+        3,
+        3,
+        16,
+        29,
+        29,
+        9,
+        56,
+        35,
+        14,
+        38,
+        57,
+        17,
+        42,
+        52,
+        31,
+        5,
+        509,
+      ],
+      [
+        50,
+        141,
+        150,
+        140,
+        131,
+        85,
+        42,
+        24,
+        21,
+        30,
+        23,
+        35,
+        51,
+        52,
+        41,
+        52,
+        22,
+        40,
+        48,
+        56,
+        60,
+        65,
+        99,
+        135,
+      ],
+    ],
+    "max": 509,
+    "peakDow": 5,
+    "peakHour": 23,
+  },
+  "share": undefined,
+}
+`;

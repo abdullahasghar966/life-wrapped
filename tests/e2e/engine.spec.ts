@@ -5,6 +5,17 @@ test('the engine worker runs a DuckDB query in the browser', async ({ page }) =>
   await expect(page.getByTestId('duckdb-answer')).toHaveText('42', { timeout: 30_000 });
 });
 
+test('the debug page lists every sample insight', async ({ page }) => {
+  await page.goto('/debug');
+  await page.getByRole('button', { name: 'Load sample and run every deck' }).click();
+  await expect(page.getByTestId('debug-deck-spotify')).toHaveText('spotify: 12 cards', {
+    timeout: 30_000,
+  });
+  await expect(page.getByTestId('debug-deck-youtube')).toHaveText('youtube: 11 cards');
+  await expect(page.getByTestId('debug-deck-netflix')).toHaveText('netflix: 10 cards');
+  await expect(page.getByTestId('debug-deck-life')).toHaveText('life: 8 cards');
+});
+
 test('landing page shows the headline, CTAs and disclaimer', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { level: 1 })).toContainText(

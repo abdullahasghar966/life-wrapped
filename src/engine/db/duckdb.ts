@@ -22,7 +22,7 @@ export async function createBrowserDb(): Promise<Db> {
     async exec(sql) {
       await conn.query(sql);
     },
-    async query<T extends Row = Row>(sql: string, params: readonly unknown[] = []) {
+    async query<T extends object = Row>(sql: string, params: readonly unknown[] = []) {
       if (params.length === 0) {
         const res = await conn.query(sql);
         return res.toArray().map((r) => normaliseRow(r.toJSON()) as T);

@@ -1,3 +1,4 @@
+import { SPOTIFY_PLAY_MS } from './constants';
 import type { DataCtx } from './types';
 
 /**
@@ -11,11 +12,33 @@ export const inPeriod = (ctx: DataCtx, col = 'local_date'): Frag => [
   [ctx.period.start, ctx.period.end],
 ];
 
-/** Music rows in the period. Private sessions count in totals (pass includePrivate=true). */
-export function spotifyMusic(ctx: DataCtx, opts: { includePrivate?: boolean } = {}): Frag {
+/**
+ * Private sessions: the user chose privacy for those plays. They count in time
+ * totals (minutes, clock, streak), but never in named lists or anything shareable
+ * unless "Include private sessions" is on.
+ */
+const privacy = (ctx: DataCtx) => (ctx.includePrivateSessions ? '' : ' AND NOT private_session');
+
+/** All music rows in the period, private sessions included (for totals). */
+export function spotifyMusicAll(ctx: DataCtx): Frag {
   const [p, pp] = inPeriod(ctx);
-  const priv = opts.includePrivate || ctx.includePrivateSessions ? '' : ' AND NOT private_session';
-  return [`kind = 'music' AND ${p}${priv}`, pp];
+  return [`kind = 'music' AND ${p}`, pp];
+}
+
+/** Music "plays" (≥ 30 s) in the period for named lists; private sessions excluded. */
+export function spotifyPlays(ctx: DataCtx): Frag {
+  const [p, pp] = inPeriod(ctx);
+  return [`kind = 'music' AND ms_played >= ${SPOTIFY_PLAY_MS} AND ${p}${privacy(ctx)}`, pp];
+}
+
+/** Like spotifyPlays but across all time (used for "first play" and "new to you"). */
+export function spotifyPlaysAllTime(ctx: DataCtx): Frag {
+  return [`kind = 'music' AND ms_played >= ${SPOTIFY_PLAY_MS}${privacy(ctx)}`, []];
+}
+
+export function spotifyPodcasts(ctx: DataCtx): Frag {
+  const [p, pp] = inPeriod(ctx);
+  return [`kind = 'podcast' AND ${p}${privacy(ctx)}`, pp];
 }
 
 export const netflixProfile = (ctx: DataCtx): Frag => {
