@@ -50,7 +50,10 @@ export default define<YoutubeSummary>({
       .join(' '),
   share(p) {
     const numbers: Record<string, number> = { videos: p.videos, hours: p.hours };
-    if (p.rabbitHole) numbers.rabbitHoleVideos = p.rabbitHole.videos;
+    if (p.rabbitHole) {
+      numbers.rabbitHoleVideos = p.rabbitHole.videos;
+      numbers.rabbitHoleMinutes = p.rabbitHole.minutes;
+    }
     if (p.peakHour !== null) numbers.peakHour = p.peakHour;
     const names: Record<string, string> = {};
     if (p.topChannel) names.topChannel = p.topChannel;

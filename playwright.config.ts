@@ -24,5 +24,7 @@ export default defineConfig({
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
+    // Sharing runs against an in-memory Postgres (PGlite) with the real migrations.
+    env: { DATABASE_URL: 'pglite://memory', SHARE_SALT: 'e2e-only-salt' },
   },
 });

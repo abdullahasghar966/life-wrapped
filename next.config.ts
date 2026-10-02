@@ -38,6 +38,17 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   poweredByHeader: false,
   reactStrictMode: true,
+  // PGlite (in-memory Postgres for the share E2E tests) loads its own WASM and data
+  // files at runtime, so it is required from node_modules rather than bundled.
+  serverExternalPackages: ['@electric-sql/pglite'],
+  outputFileTracingIncludes: {
+    // Read with fs by the OG image routes (root and /s/[id]; route keys match as substrings).
+    '/opengraph-image': ['./assets/fonts/*.woff'],
+  },
+  outputFileTracingExcludes: {
+    // Production uses Neon over HTTP; PGlite (~10 MB) never ships in a function.
+    '/*': ['./node_modules/@electric-sql/pglite/**/*'],
+  },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },

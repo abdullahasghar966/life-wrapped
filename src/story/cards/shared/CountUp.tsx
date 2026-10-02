@@ -16,6 +16,7 @@ export function CountUp({
   delay = 0.2,
   duration = 1.6,
   className,
+  visualClassName,
   prefix = '',
   suffix = '',
 }: {
@@ -24,6 +25,11 @@ export function CountUp({
   delay?: number;
   duration?: number;
   className?: string;
+  /**
+   * Classes for the visible digits only. Text effects such as background-clip:
+   * text must go here: on a parent they would also paint the screen-reader copy.
+   */
+  visualClassName?: string;
   prefix?: string;
   suffix?: string;
 }) {
@@ -55,7 +61,7 @@ export function CountUp({
   return (
     <span className={className}>
       <span className="sr-only">{final}</span>
-      <span ref={ref} aria-hidden="true" className="tabular-nums">
+      <span ref={ref} aria-hidden="true" className={`tabular-nums ${visualClassName ?? ''}`}>
         {final}
       </span>
     </span>

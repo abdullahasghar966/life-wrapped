@@ -36,6 +36,9 @@ export const aurora: ThemeTokens = {
   ],
 };
 
+/** The three aurora glow colours (the stops of `gradient`). Decorative only. */
+export const AURORA_GLOWS = ['#7C5CFF', '#22D3EE', '#A3E635'] as const;
+
 /** Platform colours used by the Life deck. Always paired with a label or icon. */
 export const PLATFORM_COLORS = {
   spotify: '#1ED760',

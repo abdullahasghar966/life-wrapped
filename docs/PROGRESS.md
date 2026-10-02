@@ -12,7 +12,39 @@
 
 ## Next session starts here
 
-M5: the aurora (Life) deck with its charts (donut, stacked area, day timeline) and archetype reveal; the share API (Neon + Drizzle, Zod whitelist, ≤ 4 KB, rate limit, delete token), `/s/[id]` and its OG image; the final CSP; the Playwright privacy and offline tests.
+**M5 is partly done.** Committed and passing typecheck, lint and unit tests:
+
+- the Life deck (8 aurora cards)
+- the share whitelist, `POST/GET /api/share`, `DELETE /api/share/[id]`, the rate limit, and the Drizzle schema and migration
+- the share dialog with the exact-JSON preview
+- `/s/[id]`: the still card rendered on the server, with a sample badge, "Make your own" and a Delete button when this browser holds the token
+- OG images for `/` and `/s/[id]`
+
+The OG images only use the embedded fonts. Names outside their latin set are left out, because next/og would otherwise fetch fallback fonts or emoji from Google or jsDelivr with the text in the URL. `tests/unit/og.test.ts` proves no fetch happens.
+
+Still to do for M5:
+
+1. Run the new E2E specs `tests/e2e/share.spec.ts` and `tests/e2e/privacy.spec.ts` with `pnpm build && pnpm e2e`, fix what fails, then commit them. They are written but **not yet run or committed**.
+   - The Playwright server now uses `DATABASE_URL=pglite://memory`.
+   - The privacy test asserts it saw DuckDB's WASM request. If nested-worker requests aren't reported, record the traffic through CDP instead.
+2. Add the Life deck to `story.spec.ts` (8 cards; it's the last deck, so Next is disabled) and to `visual.spec.ts` (`life: 8`). Refresh the Windows baselines.
+3. Re-screenshot the Life deck after the last layout fixes (LifeTotal, Donut labels, LifePersonality, LifeSummary).
+4. Docs:
+   - PRIVACY.md: the sharing section and "Verify it yourself".
+   - ADRs: Postgres for sharing only; PGlite for tests; the rate-limit table keyed by sha256(ip + salt), trusting the platform's `x-forwarded-for`; OG images with embedded fonts only; the final CSP.
+   - ARCHITECTURE: sharing.
+   - Then tick M5.
+
+**Then M6:**
+
+- Serwist offline support and the offline E2E test
+- the `/privacy` page
+- the full landing page
+- Lighthouse and the performance budgets
+- a copy pass, including an ending for the last deck
+- the README
+- the deploy checklist
+- the Linux visual baselines (run the "Visual baselines" workflow)
 
 ## Known issues
 

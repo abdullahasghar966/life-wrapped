@@ -1,3 +1,10 @@
+import { LifeBusiestDay } from './aurora/LifeBusiestDay';
+import { LifeOpener } from './aurora/LifeOpener';
+import { LifePersonality } from './aurora/LifePersonality';
+import { LifeRhythm } from './aurora/LifeRhythm';
+import { LifeSplit } from './aurora/LifeSplit';
+import { LifeTotal } from './aurora/LifeTotal';
+import { LifeWeekdayWeekend } from './aurora/LifeWeekdayWeekend';
 import { BingeCountries } from './binge/BingeCountries';
 import { BingeDevices } from './binge/BingeDevices';
 import { BingeHours } from './binge/BingeHours';
@@ -5,7 +12,6 @@ import { BingeLateNight } from './binge/BingeLateNight';
 import { BingeOpener } from './binge/BingeOpener';
 import { BingeRecord } from './binge/BingeRecord';
 import { BingeSplit } from './binge/BingeSplit';
-import { BingeSummary } from './binge/BingeSummary';
 import { BingeTopSeries } from './binge/BingeTopSeries';
 import { BingeTopTitles } from './binge/BingeTopTitles';
 import { SoundClock } from './sound/SoundClock';
@@ -16,10 +22,10 @@ import { SoundOpener } from './sound/SoundOpener';
 import { SoundPodcasts } from './sound/SoundPodcasts';
 import { SoundSkips } from './sound/SoundSkips';
 import { SoundStreak } from './sound/SoundStreak';
-import { SoundSummary } from './sound/SoundSummary';
 import { SoundTopArtist } from './sound/SoundTopArtist';
 import { SoundTopArtists } from './sound/SoundTopArtists';
 import { SoundTopTracks } from './sound/SoundTopTracks';
+import { SUMMARY_CARDS } from './summaries';
 import type { CardDef } from './types';
 import { WatchMusic } from './watch/WatchMusic';
 import { WatchNightOwl } from './watch/WatchNightOwl';
@@ -27,7 +33,6 @@ import { WatchOpener } from './watch/WatchOpener';
 import { WatchRabbitHole } from './watch/WatchRabbitHole';
 import { WatchRewatched } from './watch/WatchRewatched';
 import { WatchSearches } from './watch/WatchSearches';
-import { WatchSummary } from './watch/WatchSummary';
 import { WatchTopChannel } from './watch/WatchTopChannel';
 import { WatchTopChannels } from './watch/WatchTopChannels';
 import { WatchTotal } from './watch/WatchTotal';
@@ -38,6 +43,7 @@ import { WatchWeekly } from './watch/WatchWeekly';
  * - sound: 0 lime, 1 pink, 2 blue, 3 orange, 4 deep green, 5 near-black
  * - watch: 0 player black, 1 dark grey, 2 white "page", 3 raised grey
  * - binge: 0 black, 1 near-black, 2 deep black with a brighter red
+ * - aurora: 0 deep indigo, 1 midnight blue, 2 violet night
  */
 export const CARDS: Record<string, CardDef> = {
   'spotify.opener': { Component: SoundOpener, backdrop: 0 },
@@ -51,7 +57,6 @@ export const CARDS: Record<string, CardDef> = {
   'spotify.discovery': { Component: SoundDiscovery, backdrop: 2 },
   'spotify.streak': { Component: SoundStreak, backdrop: 3 },
   'spotify.podcasts': { Component: SoundPodcasts, backdrop: 4 },
-  'spotify.summary': { Component: SoundSummary, backdrop: 5 },
 
   'youtube.opener': { Component: WatchOpener, backdrop: 0 },
   'youtube.total': { Component: WatchTotal, backdrop: 1 },
@@ -63,7 +68,6 @@ export const CARDS: Record<string, CardDef> = {
   'youtube.weekly': { Component: WatchWeekly, backdrop: 3 },
   'youtube.searches': { Component: WatchSearches, backdrop: 2 },
   'youtube.music': { Component: WatchMusic, backdrop: 1 },
-  'youtube.summary': { Component: WatchSummary, backdrop: 0 },
 
   'netflix.opener': { Component: BingeOpener, backdrop: 0 },
   'netflix.hours': { Component: BingeHours, backdrop: 0 },
@@ -74,5 +78,14 @@ export const CARDS: Record<string, CardDef> = {
   'netflix.lateNight': { Component: BingeLateNight, backdrop: 0 },
   'netflix.devices': { Component: BingeDevices, backdrop: 1 },
   'netflix.countries': { Component: BingeCountries, backdrop: 2 },
-  'netflix.summary': { Component: BingeSummary, backdrop: 0 },
+
+  'life.opener': { Component: LifeOpener, backdrop: 0 },
+  'life.total': { Component: LifeTotal, backdrop: 1 },
+  'life.split': { Component: LifeSplit, backdrop: 2 },
+  'life.rhythm': { Component: LifeRhythm, backdrop: 0 },
+  'life.busiestDay': { Component: LifeBusiestDay, backdrop: 1 },
+  'life.weekdayWeekend': { Component: LifeWeekdayWeekend, backdrop: 2 },
+  'life.personality': { Component: LifePersonality, backdrop: 0 },
+
+  ...SUMMARY_CARDS,
 };

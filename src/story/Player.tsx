@@ -41,6 +41,8 @@ export interface PlayerProps {
   onOptions: (patch: OptionsPatch) => void;
   onClear: () => void;
   onShare?: (result: InsightResult) => void;
+  /** Pauses the story while something outside the player (the share dialog) is open. */
+  externalPause?: boolean;
 }
 
 // Chrome reads its colours from the current card's ink/background pair, which the
@@ -61,6 +63,7 @@ export function Player({
   onOptions,
   onClear,
   onShare,
+  externalPause = false,
 }: PlayerProps) {
   const theme = THEMES[DECKS[deck].theme];
   const reduced = useReducedMotion();
@@ -81,7 +84,7 @@ export function Player({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const paused = userPaused || holding || settingsOpen || hidden || exporting;
+  const paused = userPaused || holding || settingsOpen || hidden || exporting || externalPause;
 
   const safeIndex = Math.min(index, slides.length - 1);
   const slide = slides[safeIndex]!;

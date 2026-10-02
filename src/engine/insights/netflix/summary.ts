@@ -58,7 +58,8 @@ export default define<NetflixSummary>({
     [
       `Summary: ${n(p.hours)} hours of Netflix.`,
       p.topSeries && `Top series ${p.topSeries}.`,
-      p.binge && `Binge record ${p.binge.count} episodes of ${p.binge.series}.`,
+      p.binge &&
+        `Binge record ${p.binge.count} episodes${p.binge.series ? ` of ${p.binge.series}` : ''} in one day.`,
       `You're a ${p.persona}.`,
     ]
       .filter(Boolean)

@@ -83,7 +83,12 @@ export function Headline({
   );
 
   return (
-    <Tag ref={ref} className={`t-display t-reveal ${className ?? ''}`} style={style}>
+    // Hidden only while it waits to be split; a still or reduced-motion card shows it at once.
+    <Tag
+      ref={ref}
+      className={`t-display ${reduced ? '' : 't-reveal'} ${className ?? ''}`}
+      style={style}
+    >
       {children}
     </Tag>
   );
