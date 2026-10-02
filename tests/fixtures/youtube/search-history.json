@@ -1,0 +1,25 @@
+[
+  {
+    "header": "YouTube",
+    "title": "Searched for easy pasta",
+    "titleUrl": "https://www.youtube.com/results?search_query=easy+pasta",
+    "time": "2025-03-14T22:59:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube search history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Searched for magnets explained",
+    "titleUrl": "https://www.youtube.com/results?search_query=magnets+explained",
+    "time": "2025-03-14T22:40:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube search history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Has buscado pasta fácil",
+    "titleUrl": "https://www.youtube.com/results?search_query=pasta+f%C3%A1cil",
+    "time": "2025-03-13T10:00:00.000Z",
+    "products": ["YouTube"]
+  }
+]

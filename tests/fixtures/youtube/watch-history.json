@@ -1,0 +1,53 @@
+[
+  {
+    "header": "YouTube",
+    "title": "Watched How do magnets work?",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureVid1",
+    "subtitles": [{ "name": "Brainlight Labs", "url": "https://www.youtube.com/channel/UCfixture0000000000000001" }],
+    "time": "2025-03-14T23:41:07.123Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube watch history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Watched Rain on a tin roof",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureVid2",
+    "subtitles": [{ "name": "Quiet Weather", "url": "https://www.youtube.com/channel/UCfixture0000000000000002" }],
+    "time": "2025-03-14T23:30:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube watch history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Watched Buy the best mattress today",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureAd01",
+    "time": "2025-03-14T23:20:00.000Z",
+    "products": ["YouTube"],
+    "details": [{ "name": "From Google Ads" }],
+    "activityControls": ["YouTube watch history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Watched a video that has been removed",
+    "time": "2025-03-14T22:00:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube watch history"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Watched https://www.youtube.com/watch?v=fixturePriv",
+    "titleUrl": "https://www.youtube.com/watch?v=fixturePriv",
+    "time": "2025-03-13T21:00:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube watch history"]
+  },
+  {
+    "header": "YouTube Music",
+    "title": "Watched Paper Moons",
+    "titleUrl": "https://music.youtube.com/watch?v=fixtureMus1",
+    "subtitles": [{ "name": "Nova Vale - Topic", "url": "https://www.youtube.com/channel/UCfixture0000000000000003" }],
+    "time": "2025-03-12T09:00:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["YouTube watch history"]
+  }
+]

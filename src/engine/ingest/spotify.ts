@@ -154,9 +154,13 @@ export function parseSpotifyAccount(data: unknown[]): ParseResult<SpotifyRow> {
   return { rows, skipped };
 }
 
+const DAY = 86_400_000;
+
 /**
- * Combines both Spotify formats. Where an Extended history covers a time range,
- * Account-data rows inside that range are dropped so nothing is double counted.
+ * Combines both Spotify formats. Where an Extended history covers a date range,
+ * Account-data rows on those dates are dropped so nothing is double counted.
+ * Whole UTC days are compared because Account data only has minute precision,
+ * so the same play can land seconds outside the Extended range.
  */
 export function mergeSpotify(extended: SpotifyRow[], account: SpotifyRow[]): SpotifyRow[] {
   if (extended.length === 0) return account;
@@ -164,10 +168,17 @@ export function mergeSpotify(extended: SpotifyRow[], account: SpotifyRow[]): Spo
   let min = Infinity;
   let max = -Infinity;
   for (const r of extended) {
-    if (r.ts < min) min = r.ts;
-    if (r.ts > max) max = r.ts;
+    const d = Math.floor(r.ts / DAY);
+    if (d < min) min = d;
+    if (d > max) max = d;
   }
-  return [...extended, ...account.filter((r) => r.ts < min || r.ts > max)];
+  return [
+    ...extended,
+    ...account.filter((r) => {
+      const d = Math.floor(r.ts / DAY);
+      return d < min || d > max;
+    }),
+  ];
 }
 
 export function spotifyKey(r: SpotifyRow): string {

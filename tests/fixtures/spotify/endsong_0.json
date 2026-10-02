@@ -1,0 +1,43 @@
+[
+  {
+    "ts": "2021-06-01T21:10:00Z",
+    "username": "fixture-user",
+    "platform": "Android OS 10 API 29 (Generic, Phone)",
+    "ms_played": 180000,
+    "conn_country": "GB",
+    "ip_addr_decrypted": "198.51.100.4",
+    "user_agent_decrypted": "unknown",
+    "master_metadata_track_name": "Golden Letters",
+    "master_metadata_album_artist_name": "Mirela Quist",
+    "master_metadata_album_album_name": "Field Notes",
+    "spotify_track_uri": "spotify:track:fixture000000000000010",
+    "episode_name": null,
+    "episode_show_name": null,
+    "spotify_episode_uri": null,
+    "reason_start": "trackdone",
+    "reason_end": "trackdone",
+    "shuffle": false,
+    "skipped": null,
+    "offline": false,
+    "offline_timestamp": 0,
+    "incognito_mode": false
+  },
+  {
+    "ts": "2021-06-01T21:13:30Z",
+    "username": "fixture-user",
+    "platform": "Android OS 10 API 29 (Generic, Phone)",
+    "ms_played": 8000,
+    "conn_country": "GB",
+    "ip_addr_decrypted": "198.51.100.4",
+    "master_metadata_track_name": "Cold Rivers",
+    "master_metadata_album_artist_name": "Mirela Quist",
+    "master_metadata_album_album_name": "Field Notes",
+    "spotify_track_uri": "spotify:track:fixture000000000000011",
+    "reason_start": "trackdone",
+    "reason_end": "fwdbtn",
+    "shuffle": false,
+    "skipped": null,
+    "offline": false,
+    "incognito_mode": false
+  }
+]

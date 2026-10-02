@@ -1,4 +1,5 @@
 import type { SourceKind } from '../types';
+import { stripBom } from './read';
 
 const SAMPLE_SIZE = 25;
 
@@ -50,7 +51,7 @@ export function detectJson(name: string, data: unknown): SourceKind {
 export const NETFLIX_REQUIRED_COLUMNS = ['Profile Name', 'Start Time', 'Duration', 'Title'];
 
 export function detectCsv(headers: string[]): SourceKind {
-  const set = new Set(headers.map((h) => h.trim().replace(/^﻿/, '')));
+  const set = new Set(headers.map((h) => stripBom(h).trim()));
   return NETFLIX_REQUIRED_COLUMNS.every((c) => set.has(c)) ? 'netflix_viewing' : 'unknown';
 }
 

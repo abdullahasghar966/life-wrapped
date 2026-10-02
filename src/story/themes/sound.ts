@@ -1,4 +1,4 @@
-﻿import type { ThemeTokens } from './tokens';
+import type { ThemeTokens } from './tokens';
 
 /** Spotify-inspired: bold duotones, chunky geometric type, bouncy motion. */
 export const sound: ThemeTokens = {

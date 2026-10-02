@@ -1,0 +1,44 @@
+[
+  {
+    "header": "YouTube",
+    "title": "Has visto Cómo funcionan los imanes",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureEs01",
+    "subtitles": [{ "name": "Laboratorio Brillante", "url": "https://www.youtube.com/channel/UCfixture0000000000000010" }],
+    "time": "2025-02-01T20:00:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["Historial de reproducciones de YouTube"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Has visto Pasta fácil en 10 minutos",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureEs02",
+    "subtitles": [{ "name": "Cocina Píxel", "url": "https://www.youtube.com/channel/UCfixture0000000000000011" }],
+    "time": "2025-02-01T20:12:00.000Z",
+    "products": ["YouTube"],
+    "activityControls": ["Historial de reproducciones de YouTube"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Du hast Regen auf dem Blechdach angesehen",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureDe01",
+    "subtitles": [{ "name": "Ruhiges Wetter", "url": "https://www.youtube.com/channel/UCfixture0000000000000012" }],
+    "time": "2025-02-02T20:00:00.000Z",
+    "products": ["YouTube"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Vous avez regardé La carte qui ment",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureFr01",
+    "subtitles": [{ "name": "Carte Quotidienne", "url": "https://www.youtube.com/channel/UCfixture0000000000000013" }],
+    "time": "2025-02-03T20:00:00.000Z",
+    "products": ["YouTube"]
+  },
+  {
+    "header": "YouTube",
+    "title": "Un vídeo sin verbo conocido",
+    "titleUrl": "https://www.youtube.com/watch?v=fixtureXx01",
+    "subtitles": [{ "name": "Somewhere" }],
+    "time": "2025-02-04T20:00:00Z",
+    "products": ["YouTube"]
+  }
+]
