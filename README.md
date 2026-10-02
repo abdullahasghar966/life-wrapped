@@ -1,6 +1,6 @@
 # Life, Wrapped
 
-[![CI](https://github.com/OWNER/life-wrapped/actions/workflows/ci.yml/badge.svg)](https://github.com/OWNER/life-wrapped/actions/workflows/ci.yml)
+[![CI](https://github.com/abdullahasghar966/life-wrapped/actions/workflows/ci.yml/badge.svg)](https://github.com/abdullahasghar966/life-wrapped/actions/workflows/ci.yml)
 
 **Your Spotify, YouTube and Netflix data exports, turned into animated story decks — without your data ever leaving your device.**
 
