@@ -20,7 +20,7 @@ test.use({
   viewport: { width: 1280, height: 900 },
 });
 
-const DECK_SIZES = { spotify: 12 } as const;
+const DECK_SIZES = { spotify: 12, youtube: 11, netflix: 10 } as const;
 
 for (const [deck, count] of Object.entries(DECK_SIZES)) {
   test(`${deck} deck`, async ({ page }) => {

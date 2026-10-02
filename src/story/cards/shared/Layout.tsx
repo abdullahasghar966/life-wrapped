@@ -1,4 +1,5 @@
 import { forwardRef, type CSSProperties, type ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 /** The content area of a card, clear of the progress chrome on top and actions below. */
 export const CardBody = forwardRef<
@@ -9,7 +10,7 @@ export const CardBody = forwardRef<
     <div
       ref={ref}
       style={style}
-      className={`absolute inset-0 flex flex-col px-[7cqw] pt-[24cqw] pb-[19cqw] ${className ?? ''}`}
+      className={cn('absolute inset-0 flex flex-col px-[7cqw] pt-[24cqw] pb-[19cqw]', className)}
     >
       {children}
     </div>

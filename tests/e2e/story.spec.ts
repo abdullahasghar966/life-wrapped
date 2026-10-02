@@ -106,25 +106,43 @@ test.describe('story player', () => {
       /Your year in sound: January 1, \d{4} to December 31, \d{4}/,
     );
   });
-
-  test('has no serious accessibility violations on any card', async ({ page }) => {
-    test.slow();
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await openDeck(page);
-    for (let i = 1; i <= 12; i++) {
-      await settled(page);
-      const results = await new AxeBuilder({ page }).analyze();
-      const serious = results.violations.filter(
-        (v) => v.impact === 'serious' || v.impact === 'critical',
-      );
-      expect(
-        serious,
-        `card ${i}: ${JSON.stringify(serious.map((v) => [v.id, v.nodes.map((n) => n.target)]))}`,
-      ).toEqual([]);
-      if (i < 12) {
-        await page.keyboard.press('ArrowRight');
-        await expect(slide(page)).toHaveAttribute('aria-label', new RegExp(`^${i + 1} of `));
-      }
-    }
-  });
 });
+
+const DECKS = [
+  ['spotify', 12, 'Next: your YouTube story →', '/story/youtube'],
+  ['youtube', 11, 'Next: your Netflix story →', '/story/netflix'],
+  ['netflix', 10, 'Next: your online life →', '/story/life'],
+] as const;
+
+for (const [deck, count, next, nextPath] of DECKS) {
+  test.describe(`${deck} deck`, () => {
+    test('plays to the end and chains to the next deck', async ({ page }) => {
+      await openDeck(page, deck);
+      await goToCard(page, count);
+      await expect(page.getByRole('link', { name: next })).toBeVisible();
+      await page.keyboard.press('ArrowRight');
+      await expect(page).toHaveURL(new RegExp(`${nextPath}\\?sample=1$`));
+    });
+
+    test('has no serious accessibility violations on any card', async ({ page }) => {
+      test.slow();
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await openDeck(page, deck);
+      for (let i = 1; i <= count; i++) {
+        await settled(page);
+        const results = await new AxeBuilder({ page }).analyze();
+        const serious = results.violations.filter(
+          (v) => v.impact === 'serious' || v.impact === 'critical',
+        );
+        expect(
+          serious,
+          `card ${i}: ${JSON.stringify(serious.map((v) => [v.id, v.nodes.map((n) => n.target)]))}`,
+        ).toEqual([]);
+        if (i < count) {
+          await page.keyboard.press('ArrowRight');
+          await expect(slide(page)).toHaveAttribute('aria-label', new RegExp(`^${i + 1} of `));
+        }
+      }
+    });
+  });
+}

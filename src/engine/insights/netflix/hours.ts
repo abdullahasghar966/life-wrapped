@@ -8,7 +8,9 @@ export interface NetflixHours {
   /** Hours ÷ a typical film's length: "about N movies' worth". */
   movieEquivalents: number;
   titles: number;
+  /** Days with any viewing, out of the days in the period. */
   days: number;
+  periodDays: number;
 }
 
 export default define<NetflixHours>({
@@ -34,6 +36,9 @@ export default define<NetflixHours>({
       movieEquivalents: Math.round(r.s / 3600 / NF_MOVIE_HOURS),
       titles: r.titles,
       days: r.days,
+      periodDays: Math.round(
+        (Date.parse(ctx.period.end) - Date.parse(ctx.period.start)) / 86_400_000,
+      ),
     };
   },
   a11yText: (p) =>

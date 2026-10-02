@@ -108,12 +108,18 @@ export function Thumbnail({
   name,
   label,
   progress = 0.6,
+  initials = true,
+  cover = false,
   className,
   style,
 }: {
   name: string;
   label?: string;
   progress?: number;
+  /** Show the big initials (off for purely decorative frames). */
+  initials?: boolean;
+  /** Fill any box like CSS object-fit: cover. */
+  cover?: boolean;
   className?: string;
   style?: CSSProperties;
 }) {
@@ -122,6 +128,7 @@ export function Thumbnail({
   return (
     <svg
       viewBox="0 0 160 90"
+      preserveAspectRatio={cover ? 'xMidYMid slice' : undefined}
       className={className}
       style={style}
       role="img"
@@ -139,16 +146,18 @@ export function Thumbnail({
       <g clipPath={`url(#${id}c)`}>
         <rect width="160" height="90" fill={`url(#${id}g)`} />
         <PatternLayer s={s} w={160} h={90} />
-        <text
-          x="12"
-          y="62"
-          fill={s.ink}
-          fontSize="40"
-          fontWeight="800"
-          style={{ fontFamily: 'var(--font-roboto-condensed), "Arial Narrow", sans-serif' }}
-        >
-          {s.initials}
-        </text>
+        {initials && (
+          <text
+            x="12"
+            y="62"
+            fill={s.ink}
+            fontSize="40"
+            fontWeight="800"
+            style={{ fontFamily: 'var(--font-roboto-condensed), "Arial Narrow", sans-serif' }}
+          >
+            {s.initials}
+          </text>
+        )}
         {label && (
           <g>
             <rect

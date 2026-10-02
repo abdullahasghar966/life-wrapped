@@ -458,6 +458,7 @@ exports[`netflix deck > netflix.hours 1`] = `
     "days": 122,
     "hours": 164,
     "movieEquivalents": 82,
+    "periodDays": 365,
     "titles": 18,
   },
   "share": undefined,

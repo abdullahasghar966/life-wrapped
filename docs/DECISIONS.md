@@ -241,3 +241,11 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 **Decision.** `/story/<deck>?sample=1&asOf=YYYY-MM-DD` generates the sample for a fixed date (it only affects the sample). Visual tests use it with a fixed time zone and reduced motion. Baselines are stored per OS; Linux ones are produced by the manual "Visual baselines" workflow and committed. Until a deck has Linux baselines, CI skips its visual test instead of silently writing new ones.
 
 **Consequences.** Visual tests are deterministic. A deliberate visual change needs one workflow run to refresh the Linux baselines.
+
+## ADR-029: Decorative visuals still show real data
+
+**Context.** Several card visuals in the spec are partly decorative: Netflix's "continue watching" bar, device silhouettes "filling with red", the YouTube scrubber chapters and the heatmap. A decorative fill that doesn't mean anything would quietly break the "never invent data" rule.
+
+**Decision.** Every fill, length and brightness encodes a number that is also printed next to it: the "continue watching" bar is days with viewing ÷ days in the period; device fills are each device's share relative to the most-used device (the true percentage is printed under each); scrubber chapters are shaded by each daypart's share; the 7 × 24 heatmap is transposed (hours down, weekdays across) so it fits a portrait card at a readable size.
+
+**Consequences.** Nothing on a card is "just for show", and screen-reader text carries the same numbers.
