@@ -12,7 +12,7 @@ export function SiteFooter() {
           <Link className="hover:text-foreground" href="/privacy">
             Privacy
           </Link>
-          <Link className="hover:text-foreground" href="/start">
+          <Link className="hover:text-foreground" href="/start" prefetch={false}>
             Use my data
           </Link>
         </nav>

@@ -119,6 +119,16 @@
   }
 }
 
+/* The landing preview's story progress (transform only). */
+@keyframes preview-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .t-reveal {
     visibility: visible;

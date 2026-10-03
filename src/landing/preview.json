@@ -1,0 +1,44 @@
+{
+  "spotify": {
+    "minutes": 90537,
+    "topArtist": "Nova Vale",
+    "topTrack": {
+      "track": "Paper Moons",
+      "artist": "Nova Vale"
+    },
+    "persona": "Night Owl",
+    "streak": 63
+  },
+  "youtube": {
+    "videos": 9403,
+    "hours": 1038,
+    "topChannel": "Pixel Kitchen",
+    "rabbitHole": {
+      "videos": 41,
+      "minutes": 248
+    },
+    "peakHour": 23
+  },
+  "netflix": {
+    "hours": 164,
+    "topSeries": "Midnight Harbor",
+    "binge": {
+      "series": "Midnight Harbor",
+      "count": 9
+    },
+    "persona": "Binger"
+  },
+  "life": {
+    "hours": 2777,
+    "days": 116,
+    "estimated": true,
+    "shares": {
+      "spotify": 0.567,
+      "youtube": 0.374,
+      "netflix": 0.059
+    },
+    "top": "spotify",
+    "archetype": "bingeMaster",
+    "label": "The Binge Master"
+  }
+}
