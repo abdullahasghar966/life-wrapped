@@ -309,9 +309,11 @@ function model(p: ValidSharePayload): Model {
     }
     case 'life.summary': {
       const { numbers: n, names: s } = p;
+      // YouTube time is estimated, so a total that includes it (and its days) is too.
+      const approx = (n.youtubeShare ?? 0) > 0;
       add('You’re', ogText(s.archetype));
       add('Mostly on', ogText(s.top));
-      if (n.days) add('That’s', `${fmt(n.days)} whole days`);
+      if (n.days) facts.push({ label: 'That’s', value: `${fmt(n.days)} whole days`, approx });
       const parts = [
         [PLATFORM_LABEL.spotify, n.spotifyShare ?? 0, PLATFORM_COLORS.spotify],
         [PLATFORM_LABEL.youtube, n.youtubeShare ?? 0, PLATFORM_COLORS.youtube],
@@ -341,8 +343,7 @@ function model(p: ValidSharePayload): Model {
       return {
         kicker,
         big: fmt(n.hours),
-        // YouTube time is estimated, so a total that includes it is too.
-        approx: (n.youtubeShare ?? 0) > 0,
+        approx,
         unit: 'hours online',
         facts,
         extra,

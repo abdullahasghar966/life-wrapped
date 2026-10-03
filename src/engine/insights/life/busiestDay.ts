@@ -8,6 +8,8 @@ const MERGE_GAP_MIN = 10;
 export interface LifeBusiestDay {
   date: string;
   hours: number;
+  /** True when YouTube time (always estimated) is part of the day. */
+  estimated: boolean;
   hoursByPlatform: PerPlatform;
   /** Blocks of activity in minutes since local midnight (end may exceed 1440 if it ran past midnight). */
   segments: Array<{ platform: Platform; start: number; end: number }>;
@@ -48,6 +50,7 @@ export default define<LifeBusiestDay>({
     return {
       date: best.date,
       hours: Math.round((best.s / 3600) * 10) / 10,
+      estimated: by.youtube > 0,
       hoursByPlatform: {
         spotify: Math.round(by.spotify * 10) / 10,
         youtube: Math.round(by.youtube * 10) / 10,
@@ -58,5 +61,6 @@ export default define<LifeBusiestDay>({
         .sort((a, b) => a.start - b.start),
     };
   },
-  a11yText: (p) => `Your busiest day was ${day(p.date)}: ${n(p.hours)} hours of everything.`,
+  a11yText: (p) =>
+    `Your busiest day was ${day(p.date)}: ${p.estimated ? 'about ' : ''}${n(p.hours)} hours of everything.`,
 });

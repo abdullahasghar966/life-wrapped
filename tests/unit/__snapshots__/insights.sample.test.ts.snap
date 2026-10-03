@@ -2,9 +2,10 @@
 
 exports[`life deck > life.busiestDay 1`] = `
 {
-  "a11y": "Your busiest day was March 28: 15 hours of everything.",
+  "a11y": "Your busiest day was March 28: about 15 hours of everything.",
   "props": {
     "date": "2026-03-28",
+    "estimated": true,
     "hours": 15.1,
     "hoursByPlatform": {
       "netflix": 7.6,

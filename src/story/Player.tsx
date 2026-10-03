@@ -10,7 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { OptionsPatch } from '@/engine/api';
 import type { InsightResult } from '@/engine/insights/types';
 import type { DeckId, IngestSummary } from '@/engine/types';
@@ -190,6 +190,13 @@ export function Player({
       ? theme.backdrops[(CARDS[slide.result.id]?.backdrop ?? safeIndex) % theme.backdrops.length]!
       : theme.backdrops[0]!;
 
+  // A deck's last card carries three actions (save, share, next deck), which wrap
+  // onto a second row, so its content leaves room for them.
+  const frameStyle = {
+    ...backdropStyle(backdrop),
+    ...(isLast && nextDeck ? { '--card-pb': '27cqw' } : {}),
+  } as CSSProperties;
+
   const label =
     slide.kind === 'insight'
       ? `${safeIndex + 1} of ${total}: ${slide.result.title}`
@@ -257,7 +264,7 @@ export function Player({
 
         <div
           data-testid="story-frame"
-          style={backdropStyle(backdrop)}
+          style={frameStyle}
           className="[container-type:size] relative h-dvh w-screen overflow-hidden sm:aspect-[9/16] sm:h-[min(90vh,920px)] sm:w-auto sm:rounded-(--t-radius-frame) sm:shadow-2xl"
         >
           <div

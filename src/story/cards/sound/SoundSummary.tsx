@@ -39,13 +39,13 @@ export function SoundSummary({ result }: CardProps<SpotifySummary>) {
       <Headline as="h2" split="chars" className="text-[14cqw] leading-[0.9]">
         Your year in sound.
       </Headline>
-      <dl className="mt-[6cqw] grid flex-1 grid-cols-2 gap-[2.5cqw]">
+      <dl className="mt-[4cqw] grid flex-1 grid-cols-2 gap-[2.5cqw]">
         {blocks.map((blk) => (
           <div
             key={blk.label}
             data-block
             style={blk.bd ? backdropStyle(blk.bd) : undefined}
-            className={`flex flex-col justify-between rounded-(--t-radius-frame) bg-(--c-bg) p-[4cqw] text-(--c-ink) ${blk.wide ? 'col-span-2' : ''}`}
+            className={`flex flex-col justify-between rounded-(--t-radius-frame) bg-(--c-bg) px-[4cqw] py-[3.2cqw] text-(--c-ink) ${blk.wide ? 'col-span-2' : ''}`}
           >
             <dt className="text-[3.4cqw] font-bold tracking-[0.1em] text-(--c-muted) uppercase">
               {blk.label}

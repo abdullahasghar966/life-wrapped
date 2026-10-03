@@ -75,6 +75,37 @@ Tests: `tests/unit/insights.sample.test.ts` snapshots every insight against the 
 - **Export:** `ExportStage` re-renders the current card off-screen at 1080 × 1920 with motion off and captures it with `html-to-image`.
 - **Chaining:** the last card links to the next available deck; the Life deck plays last.
 
+## Sharing
+
+The only server feature. It is opt-in per card, and works only when `DATABASE_URL` and `SHARE_SALT` are set.
+
+```mermaid
+sequenceDiagram
+  participant U as Story player
+  participant A as /api/share
+  participant DB as Postgres
+  U->>A: GET (is sharing configured?)
+  Note over U: Preview: the exact JSON
+  U->>A: POST { payload, isSample } (after Confirm)
+  A->>A: size ≤ 4 KB, Zod whitelist, rate limit
+  A->>DB: insert row + sha256(deleteToken)
+  A-->>U: { id, deleteToken } (token kept in localStorage)
+  Note over U,DB: Anyone: GET /s/[id] renders the card, /s/[id]/opengraph-image its preview
+  U->>A: DELETE /api/share/[id] (Bearer token)
+  A->>DB: delete if the hashes match
+```
+
+- **Whitelist:** `src/share/schema.ts` lists, per summary card type, the numbers and names that may be shared. The client builds the request with it (`buildShareRequest`), so the preview is exactly what the server will accept.
+- **Client:** `ShareDialog.tsx` (check → preview → confirm → link) and `tokens.ts` (delete tokens in `localStorage`).
+- **API:** `src/app/api/share/route.ts` (GET status, POST create) and `src/app/api/share/[id]/route.ts` (DELETE).
+- **Server modules:** in `src/server/`:
+  - `db.ts`: Neon over HTTP, or PGlite for `pglite://` URLs in tests
+  - `schema.ts`: the Drizzle tables; migrations live in `drizzle/`
+  - `shares.ts`: create, read and delete
+  - `rateLimit.ts`: 10 an hour, keyed by `sha256(ip + salt)`
+- **Shared page:** `src/app/s/[id]/page.tsx` loads and re-validates the row. `src/share/cards.ts` rebuilds the card's props, and `SharedCard.tsx` renders the summary component (`cards/summaries.ts`) in its still frame. `DeleteShare.tsx` shows Delete only in the browser that holds the token.
+- **Preview images:** `src/share/og.tsx` draws themed 1200 × 630 images with `next/og`, using only the fonts in `assets/fonts/` (ADR-033). The routes are `src/app/s/[id]/opengraph-image.tsx` and `src/app/opengraph-image.tsx`.
+
 ## Theme system
 
 Each theme is a typed token object (`src/story/themes/{sound,watch,binge,aurora}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.

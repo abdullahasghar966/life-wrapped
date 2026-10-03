@@ -1,7 +1,11 @@
 import { forwardRef, type CSSProperties, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/** The content area of a card, clear of the progress chrome on top and actions below. */
+/**
+ * The content area of a card, clear of the progress chrome on top and actions below.
+ * The player raises `--card-pb` on a deck's last card, where the actions wrap onto a
+ * second row; exports and the shared page keep the default.
+ */
 export const CardBody = forwardRef<
   HTMLDivElement,
   { children: ReactNode; className?: string; style?: CSSProperties }
@@ -10,7 +14,10 @@ export const CardBody = forwardRef<
     <div
       ref={ref}
       style={style}
-      className={cn('absolute inset-0 flex flex-col px-[7cqw] pt-[24cqw] pb-[19cqw]', className)}
+      className={cn(
+        'absolute inset-0 flex flex-col px-[7cqw] pt-[24cqw] pb-[var(--card-pb,19cqw)]',
+        className,
+      )}
     >
       {children}
     </div>

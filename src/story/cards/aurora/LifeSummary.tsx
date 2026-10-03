@@ -65,7 +65,10 @@ export function LifeSummary({ result }: CardProps<Props>) {
           <dt className="text-[3.2cqw] font-semibold tracking-[0.12em] text-(--c-muted) uppercase">
             That’s
           </dt>
-          <dd className="t-display text-[8cqw] leading-none">{fmtInt(p.days)} days</dd>
+          <dd className="t-display text-[8cqw] leading-none">
+            {p.estimated ? '≈ ' : ''}
+            {fmtInt(p.days)} days
+          </dd>
         </div>
         <div data-fact className="col-span-2">
           <dt className="text-[3.2cqw] font-semibold tracking-[0.12em] text-(--c-muted) uppercase">

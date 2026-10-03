@@ -68,6 +68,8 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 
 **Consequences.** The privacy promise is about exfiltration, and `connect-src 'self'` blocks it whether or not an injected script runs: a script can't `fetch`, `XHR`, `WebSocket` or `sendBeacon` anywhere but our own origin, and `img-src`/`font-src` are limited to self/data/blob. The app renders no user-supplied HTML (React escapes all text), so the residual XSS risk is low. Static pages keep the landing page fast and the app fully offline-capable.
 
+The policy in `next.config.ts` is the final one: sharing, the share page and the preview images needed no exceptions, because they only talk to our own origin. `tests/e2e/privacy.spec.ts` checks the header and that a cross-origin `fetch` is actually blocked.
+
 ## ADR-008: Postgres only for sharing
 
 **Context.** The only server feature is an optional share link for a summary card.
@@ -249,3 +251,37 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 **Decision.** Every fill, length and brightness encodes a number that is also printed next to it: the "continue watching" bar is days with viewing ÷ days in the period; device fills are each device's share relative to the most-used device (the true percentage is printed under each); scrubber chapters are shaded by each daypart's share; the 7 × 24 heatmap is transposed (hours down, weekdays across) so it fits a portrait card at a readable size.
 
 **Consequences.** Nothing on a card is "just for show", and screen-reader text carries the same numbers.
+
+## ADR-030: Shared cards are rebuilt from the whitelist and drawn by the story's own components
+
+**Context.** `/s/[id]` must show the card "rendered on the server in its theme". The stored payload is deliberately poorer than the card's full props (only whitelisted numbers and names).
+
+**Decision.** The page re-validates the stored row against the same Zod whitelist on every read (a row that no longer matches is treated as missing), rebuilds the summary card's props from it (`src/share/cards.ts`), and renders the real summary component in its still, final frame (`SharedCard.tsx`, `SUMMARY_CARDS`). Fields that weren't shared stay empty rather than being guessed. The page is dynamic and `noindex`, and a deleted card disappears immediately.
+
+**Alternatives.** A separate "share card" design (two layouts to keep in sync); a screenshot uploaded by the client (an image could carry anything, and it would bypass the whitelist).
+
+**Consequences.** A shared card looks exactly like the one in the story, and the whitelist is the single definition of what can be shown publicly.
+
+## ADR-031: PGlite stands in for Postgres in tests
+
+**Context.** Sharing must be tested end to end "against a real or test DB". A Postgres service in CI (Docker) adds setup and slows every run.
+
+**Decision.** `DATABASE_URL=pglite://memory` runs an in-memory Postgres (PGlite, Postgres compiled to WASM) with the same Drizzle migrations. Unit tests call the route handlers against it, and the Playwright server starts with it. PGlite is a server-external package and excluded from production file traces; production uses Neon over HTTP.
+
+**Consequences.** The share tests run real SQL, migrations included, with no services to start. The rare dialect differences between PGlite and Neon don't affect our three simple statements (insert, select by key, delete).
+
+## ADR-032: Rate limits live in Postgres, keyed by a salted hash
+
+**Context.** Serverless functions share no memory, so an in-process counter can't limit shares per IP. The spec forbids storing raw IPs.
+
+**Decision.** A `share_rate_limits` table holds `sha256(ip + SHARE_SALT)` and a timestamp per share. Each share deletes rows older than an hour, counts the caller's rows and, if under 10, records one more. The IP is the first `x-forwarded-for` entry (else `x-real-ip`), which Vercel sets and overwrites on every request.
+
+**Consequences.** No raw IPs, and nothing older than an hour. The count-then-insert isn't atomic, so a burst of parallel requests could slip one or two over the limit, which is acceptable for abuse prevention. Behind a proxy that passes client-supplied `x-forwarded-for` through unchanged, the limit could be dodged; deployments outside Vercel should make the proxy set that header.
+
+## ADR-033: Link-preview images use bundled fonts only
+
+**Context.** `next/og` draws Open Graph images with Satori. For any character its fonts don't cover, it downloads a fallback font from Google Fonts or an emoji image from jsDelivr, with the text itself in the request URL. Shared names are user data, so this would send them to third parties.
+
+**Decision.** The preview images embed six WOFF files from Fontsource (latin subsets of the theme fonts, in `assets/fonts/`). Every name is checked against the code points those fonts cover, and a name that doesn't fit is left off the image instead of being drawn. "≈" isn't in the subsets, so it is drawn as an SVG shape. `tests/unit/og.test.ts` renders every card type with `fetch` disabled and fails if anything other than Satori's own inlined WASM is requested.
+
+**Consequences.** Names in other scripts, or with emoji, are missing from the preview image (the card page itself still shows them, using the visitor's own fonts). The server never contacts a third party while drawing an image.

@@ -41,8 +41,40 @@ YouTube searches are off by default for real data, because search history is oft
 
 ## Sharing (optional)
 
-_Documented when sharing lands (M5)._
+Sharing a card is the only time anything is sent to a server, and it only happens when you ask.
+
+1. Only the last card of each story (the summary) has a **Share link** button.
+2. Pressing it shows "This is everything that will be shared:" followed by the exact JSON. Nothing is sent until you press **Confirm and share**, and the request carries exactly that text, character for character (an automated test checks this).
+3. You get a link such as `/s/Ab3dE5fG7h` that anyone can open.
+
+**What a shared card contains.** A fixed list of numbers and a few short names per card, plus whether it came from the sample data:
+
+| Card                  | Numbers                                                                     | Names                                 |
+| --------------------- | --------------------------------------------------------------------------- | ------------------------------------- |
+| Your year in sound    | minutes listened, longest streak                                            | top artist, top song, listening style |
+| Your year of watching | videos, hours (estimated), longest rabbit hole (videos, minutes), peak hour | top channel                           |
+| Your year on screen   | hours, binge record (episodes)                                              | top series, persona                   |
+| Your online life      | hours, days, share of time on each platform                                 | personality, most-used platform       |
+
+The server accepts nothing else: unknown fields are rejected (not ignored), there are at most 5 names of at most 80 characters each with control characters removed, and the whole request is at most 4 KB. No listening, watching or search history can be stored, because the server has nowhere to put it.
+
+**What the server stores.** An id, the time it was shared, the card type and theme, the sample flag, the numbers and names above, and a SHA-256 hash of a random delete token. The token itself stays in your browser's `localStorage`. That is the only thing Life, Wrapped ever writes to your browser, and only after you share.
+
+**Rate limiting.** Each address can share at most 10 cards an hour. The limit is counted with a salted SHA-256 hash of the IP address; the address itself is never stored, and the hashes are deleted after an hour.
+
+**Deleting.** Open your link in the browser you shared it from and press **Delete this card**. The row is removed at once, and both the page and its link-preview image stop working for everyone.
+
+**Link previews.** When a link is pasted into a chat app, the preview image is drawn on the server from the same numbers and names, using fonts that ship with the app. A name those fonts can't draw (for example in Japanese, or with an emoji) is left off the image, because drawing it would mean downloading a font from another company's server.
+
+If the site runs without a database, the Share button explains that sharing isn't set up, and everything else works the same.
 
 ## Verify it yourself
 
-_Step-by-step instructions land in M5/M6._ In short: open DevTools → Network, load your files, and watch that nothing is sent. The site's Content Security Policy (`connect-src 'self'`) also makes it impossible for the page to send data to any other website.
+You don't have to take our word for it.
+
+1. Open the site and your browser's developer tools (F12, or right-click → Inspect), then the **Network** tab. Tick **Preserve log**.
+2. Load your files, or the sample, and play every story.
+3. Look at the list of requests. Every one goes to this site's own address: the pages, scripts, fonts and the DuckDB engine files. Click any request: none carries a **Payload** with your data.
+4. Try to break it. In the **Console** tab, run `fetch('https://example.com', { method: 'POST', body: 'test' })`. The browser refuses with a Content Security Policy error: the page's `connect-src 'self'` rule only lets it talk to its own site, even if a script tried to send data elsewhere.
+
+The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site.

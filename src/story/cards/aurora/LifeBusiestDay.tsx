@@ -7,9 +7,11 @@ import { DayTimeline } from '../../charts/DayTimeline';
 import { PlatformTag } from '../../charts/platform';
 import { CountUp } from '../shared/CountUp';
 import { Headline } from '../shared/Headline';
+import { InfoTip } from '../shared/InfoTip';
 import { CardBody, Eyebrow } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
 import type { CardProps } from '../types';
+import { ESTIMATE_NOTE } from '../watch/WatchTotal';
 import { AuroraSky } from './AuroraSky';
 import { auroraDrift } from './useAuroraDrift';
 
@@ -32,12 +34,21 @@ export function LifeBusiestDay({ result }: CardProps<LifeBusiestDayProps>) {
     <CardBody ref={ref}>
       <AuroraSky />
       <Eyebrow className="relative">Busiest day · {fmtWeekday(p.date)}</Eyebrow>
-      <Headline className="relative mt-[2cqw] text-[11cqw] leading-[0.95]">
-        {`${day} was a lot: ${fmt1(p.hours)} hours of everything.`}
+      <Headline className="relative mt-[2cqw] text-[12cqw] leading-[0.95] text-balance">
+        {`${day} was a lot.`}
       </Headline>
-      <p className="t-display relative mt-[6cqw] text-[22cqw] leading-[0.85]">
-        <CountUp value={p.hours} format={(n) => fmt1(n)} />
-        <span className="ml-[2cqw] text-[8cqw] text-(--c-muted)">hours</span>
+      <p className="t-display relative mt-[6cqw] flex items-center gap-[3cqw] text-[22cqw] leading-[0.85]">
+        <span>
+          {p.estimated && <span aria-hidden>≈</span>}
+          {p.estimated && <span className="sr-only">About </span>}
+          <CountUp value={p.hours} format={(n) => fmt1(n)} />
+        </span>
+        {p.estimated && (
+          <InfoTip label="Why this is an estimate">{`Includes YouTube. ${ESTIMATE_NOTE}`}</InfoTip>
+        )}
+      </p>
+      <p className="t-display relative mt-[2cqw] text-[8cqw] leading-none text-(--c-muted)">
+        hours of everything
       </p>
       <div className="relative mt-auto">
         <DayTimeline

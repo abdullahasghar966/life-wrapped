@@ -13,7 +13,10 @@ import * as schema from './schema';
  */
 export type ShareDb = NeonHttpDatabase<typeof schema>;
 
-let dbPromise: Promise<ShareDb> | null = null;
+// Next bundles each route separately, so a module-level variable would give the
+// API and the /s/[id] page different connections, and with in-memory PGlite,
+// different databases. One instance per process lives on globalThis instead.
+const store = globalThis as typeof globalThis & { __lifeWrappedShareDb?: Promise<ShareDb> };
 
 export function shareConfig(): { enabled: boolean; url: string | null; salt: string | null } {
   const url = process.env.DATABASE_URL?.trim() || null;
@@ -40,13 +43,17 @@ async function connect(url: string): Promise<ShareDb> {
 export async function getDb(): Promise<ShareDb | null> {
   const { enabled, url } = shareConfig();
   if (!enabled || !url) return null;
-  dbPromise ??= connect(url);
-  return dbPromise;
+  store.__lifeWrappedShareDb ??= connect(url).catch((e: unknown) => {
+    // Don't cache a failed connection: the next request tries again.
+    delete store.__lifeWrappedShareDb;
+    throw e;
+  });
+  return store.__lifeWrappedShareDb;
 }
 
 /** Tests only: forget the connection so a new DATABASE_URL takes effect. */
 export function resetDbForTests(): void {
-  dbPromise = null;
+  delete store.__lifeWrappedShareDb;
 }
 
 export { schema };

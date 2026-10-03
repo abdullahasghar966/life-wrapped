@@ -112,6 +112,7 @@ const DECKS = [
   ['spotify', 12, 'Next: your YouTube story →', '/story/youtube'],
   ['youtube', 11, 'Next: your Netflix story →', '/story/netflix'],
   ['netflix', 10, 'Next: your online life →', '/story/life'],
+  ['life', 8, null, null],
 ] as const;
 
 for (const [deck, count, next, nextPath] of DECKS) {
@@ -119,9 +120,14 @@ for (const [deck, count, next, nextPath] of DECKS) {
     test('plays to the end and chains to the next deck', async ({ page }) => {
       await openDeck(page, deck);
       await goToCard(page, count);
-      await expect(page.getByRole('link', { name: next })).toBeVisible();
-      await page.keyboard.press('ArrowRight');
-      await expect(page).toHaveURL(new RegExp(`${nextPath}\\?sample=1$`));
+      if (next && nextPath) {
+        await expect(page.getByRole('link', { name: next })).toBeVisible();
+        await page.keyboard.press('ArrowRight');
+        await expect(page).toHaveURL(new RegExp(`${nextPath}\\?sample=1$`));
+      } else {
+        // The Life deck always plays last.
+        await expect(page.getByRole('button', { name: 'Next card' })).toBeDisabled();
+      }
     });
 
     test('has no serious accessibility violations on any card', async ({ page }) => {

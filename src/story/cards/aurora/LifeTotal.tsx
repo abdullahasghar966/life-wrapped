@@ -62,8 +62,8 @@ export function LifeTotal({ result }: CardProps<LifeTotalProps>) {
           </li>
         ))}
       </ul>
-      <Headline className="relative mt-auto text-[10cqw] leading-[0.98]" delay={1}>
-        {`${about}${fmtInt(p.hours)} hours. That’s ${fmtInt(p.days)} days.`}
+      <Headline className="relative mt-auto text-[12cqw] leading-[0.98]" delay={1}>
+        {`That’s ${about}${fmtInt(p.days)} days.`}
       </Headline>
     </CardBody>
   );
