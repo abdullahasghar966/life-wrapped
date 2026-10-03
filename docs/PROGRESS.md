@@ -17,16 +17,15 @@
 - offline support (Serwist; real data survives offline navigation) and its E2E test
 - `/privacy`, `/offline`, a global 404 and error pages
 - the full landing page with a mini story preview from static sample JSON
+- Linux visual baselines for all 41 cards, so CI compares every card
 - every §15 budget enforced in tests (500k rows in 7.2 s; landing → story 3.5–4 s)
 - Lighthouse 96 / 100 / 100 / 100 with 145 KB of landing JS
 - the README with a demo GIF, and `docs/DEPLOY.md`
 
 Left:
 
-1. Run the "Visual baselines" workflow on GitHub, download the `*-linux.png` artifact into `tests/e2e/visual.spec.ts-snapshots/`, commit, and check CI runs the visual spec green.
-2. Deploy to Vercel (the owner's account), then fill in the live URL in the README and walk through `docs/DEPLOY.md`.
+1. Deploy to Vercel (the owner's account), then fill in the live URL in the README and walk through `docs/DEPLOY.md`.
 
 ## Known issues
 
-- Linux visual baselines don't exist yet, so CI skips the visual spec until the "Visual baselines" workflow has been run and its PNGs committed (ADR-028).
 - Lighthouse's simulated mobile LCP is 2.8 s against a 2 s target. The headline paints in the first frame; the simulation charges it for the React and Next.js runtime (ADR-035).
