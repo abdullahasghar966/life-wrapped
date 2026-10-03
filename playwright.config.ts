@@ -20,7 +20,16 @@ export default defineConfig({
     // and privacy specs (which must see real behaviour) let it install.
     serviceWorkers: 'block',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] }, testIgnore: /perf\.spec\.ts/ },
+    // Timing budgets run last and alone, so parallel workers can't skew them (ADR-019).
+    {
+      name: 'perf',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /perf\.spec\.ts/,
+      dependencies: ['chromium'],
+    },
+  ],
   webServer: {
     // E2E runs against the production build so the CSP and service worker are the real ones.
     command: `pnpm start --port ${PORT}`,

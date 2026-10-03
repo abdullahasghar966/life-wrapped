@@ -22,7 +22,10 @@ export function minimise<T extends Record<string, unknown>>(
   record: T,
 ): T {
   for (const key of DROPPED_FIELDS[source]) {
-    if (key in record) delete record[key];
+    // Overwritten rather than deleted: the value is gone either way, and `delete`
+    // would switch every row object to V8's slow dictionary mode (it costs
+    // seconds on large exports). The Zod schemas drop the keys themselves.
+    if (key in record) (record as Record<string, unknown>)[key] = undefined;
   }
   return record;
 }

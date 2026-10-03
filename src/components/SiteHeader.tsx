@@ -21,7 +21,7 @@ export function SiteHeader({ children }: { children?: React.ReactNode }) {
         </Link>
         <nav aria-label="Main" className="text-muted-foreground flex items-center gap-5 text-sm">
           {children}
-          <Link className="hover:text-foreground" href="/privacy">
+          <Link className="hover:text-foreground" href="/privacy" prefetch={false}>
             Privacy
           </Link>
         </nav>

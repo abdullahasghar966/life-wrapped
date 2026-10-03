@@ -1,5 +1,4 @@
 'use client';
-import { Pause, Play } from 'lucide-react';
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
 import type { LifeSummary } from '@/engine/insights/life/summary';
 import type { NetflixSummary } from '@/engine/insights/netflix/summary';
@@ -213,7 +212,21 @@ export function HeroPreview() {
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [held, setHeld] = useState(false);
+  // Only the first card is drawn until the browser is idle: each card uses its
+  // theme's fonts, which would otherwise compete with the first paint.
+  const [allDrawn, setAllDrawn] = useState(false);
   const playing = !reduced && !paused && !held;
+
+  useEffect(() => {
+    const draw = () => setAllDrawn(true);
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(draw, { timeout: 2000 });
+      return () => cancelIdleCallback(id);
+    }
+    // Safari has no requestIdleCallback.
+    const id = setTimeout(draw, 500);
+    return () => clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (!playing) return;
@@ -247,7 +260,7 @@ export function HeroPreview() {
               i === index ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.04] opacity-0'
             }`}
           >
-            <Slide />
+            {(allDrawn || i === index) && <Slide />}
           </div>
         ))}
         <div aria-hidden className="absolute inset-x-[5cqw] top-[4cqw] z-10 flex gap-[1.5cqw]">
@@ -270,7 +283,7 @@ export function HeroPreview() {
           ))}
         </div>
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1">
         {SLIDES.map(({ theme, name }, i) => (
           <button
             key={theme}
@@ -278,8 +291,12 @@ export function HeroPreview() {
             onClick={() => setIndex(i)}
             aria-label={`Show the ${name} card`}
             aria-current={i === index}
-            className={`size-2.5 rounded-full transition-colors ${i === index ? 'bg-foreground' : 'bg-muted-foreground/40 hover:bg-muted-foreground'}`}
-          />
+            className="group flex size-6 items-center justify-center rounded-full"
+          >
+            <span
+              className={`size-2.5 rounded-full transition-colors ${i === index ? 'bg-foreground' : 'bg-muted-foreground/40 group-hover:bg-muted-foreground'}`}
+            />
+          </button>
         ))}
         {!reduced && (
           <button
@@ -289,7 +306,10 @@ export function HeroPreview() {
             aria-pressed={paused}
             className="text-muted-foreground hover:text-foreground ml-2 rounded-full p-1.5"
           >
-            {paused ? <Play className="size-4" /> : <Pause className="size-4" />}
+            {/* Inline icons keep an icon library out of the landing page's bundle. */}
+            <svg viewBox="0 0 16 16" aria-hidden className="size-4" fill="currentColor">
+              {paused ? <path d="M4 2.5v11l9-5.5z" /> : <path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" />}
+            </svg>
           </button>
         )}
       </div>

@@ -1,6 +1,8 @@
 import { expect, type Page } from '@playwright/test';
 
-export const slide = (page: Page) => page.locator('[aria-roledescription="slide"]');
+/** The current card of the story player (the landing preview has slides too). */
+export const slide = (page: Page) =>
+  page.getByTestId('story-player').locator('[aria-roledescription="slide"]');
 
 /**
  * Opens a sample deck and waits until its first card is on screen. Every page

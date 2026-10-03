@@ -9,18 +9,19 @@ import { Button } from '@/components/ui/button';
 import { engine, useEngineState } from '@/lib/engineStore';
 
 export function StartClient() {
-  const { status, summary, progress, error } = useEngineState();
+  const { status, warm, summary, progress, error } = useEngineState();
   const params = useSearchParams();
   const reloaded = params.get('reason') === 'reload';
 
   useEffect(() => {
-    void engine.restore();
+    // Booting DuckDB takes a moment, so it starts now rather than on the first click.
+    void engine.restore().then(() => engine.warmUp());
   }, []);
 
   const busy = status === 'ingesting' || status === 'loading-sample';
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-engine-warm={warm}>
       {reloaded && !summary && (
         <p role="status" className="bg-aurora-violet/15 rounded-2xl px-4 py-3 text-sm">
           Your data was cleared when the page reloaded. That&apos;s by design: nothing is saved

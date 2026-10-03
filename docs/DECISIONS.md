@@ -166,9 +166,12 @@ The policy in `next.config.ts` is the final one: sharing, the share page and the
 
 **Context.** Functional E2E tests run in parallel workers, each with its own DuckDB-WASM, which makes wall-clock timings noisy.
 
-**Decision.** Functional tests record timings as annotations; budgets (sample under 3 s, landing → story under 5 s) are asserted by a unit test in Node and a dedicated serial Playwright perf spec.
+**Decision.** Functional tests record timings as annotations. Budgets are asserted in two places that run alone:
 
-**Consequences.** No flaky timing failures, while the budgets are still enforced.
+- `tests/perf/budgets.test.ts` (Vitest, its own run): the sample in under 3 s, 500k real-format rows ingested in under 10 s, and each deck in under a second.
+- `tests/e2e/perf.spec.ts` (a Playwright project that depends on all the others, so it runs last): landing → first sample card in under 5 s, and the sample loaded in under 3 s once `/start` has warmed DuckDB up. Engine boot is covered by the landing → story budget.
+
+**Consequences.** No flaky timing failures, while every budget in §15 is enforced. Timings are taken with event-driven waits (`locator.waitFor`), not `expect` retries, whose back-off would round them up.
 
 ## ADR-020: What private sessions count towards
 
@@ -302,3 +305,24 @@ The policy in `next.config.ts` is the final one: sharing, the share page and the
 **Alternatives.** Runtime-caching DuckDB on first use instead of precaching it (smaller first visit, but the app would not work offline until the engine had been used once online); a single client-rendered page for the whole app (no RSC requests at all, but it gives up static pages and per-page code splitting).
 
 **Consequences.** `tests/e2e/offline.spec.ts` turns the network off after one visit, then adds a real-format Spotify export, plays it, goes back to `/start` with the data intact, and plays every sample deck. Other E2E specs block service workers so each test doesn't download the precache. The first visit downloads about 9 MB more in the background (the WASM compresses well).
+
+## ADR-035: Landing performance, measured
+
+**Context.** §15 asks for at most 150 KB of JavaScript (gzipped) before any interaction, LCP under 2 s on simulated 4G, and Lighthouse mobile scores of Performance ≥ 90, Accessibility 100 and Best Practices ≥ 95.
+
+**Decision.**
+
+- The landing page is a server component apart from the mini story preview. That preview is drawn from a committed JSON, so no engine, GSAP or player code loads.
+- Links into the app don't prefetch.
+- The preview draws its other cards only once the browser is idle, because each card's theme fonts would otherwise compete with the first paint.
+- `tests/e2e/pages.spec.ts` asserts the JavaScript budget; `scripts/lighthouse.mjs` (`pnpm lighthouse`) measures the rest.
+
+**What we tried and dropped.** Inlining CSS (`experimental.inlineCss`) duplicated the stylesheet into the HTML and the RSC payload (a 405 KB page) and made LCP worse. Not preloading the body font delayed FCP by 0.45 s without moving LCP.
+
+**Consequences.** Median of three Lighthouse mobile runs:
+
+- Performance 96, Accessibility 100, Best Practices 100, SEO 100
+- FCP 1.1 s, LCP 2.8 s, TBT 12 ms, CLS 0
+- 145 KB of JavaScript (gzipped)
+
+The LCP target is not met in Lighthouse's simulation. The headline paints with the first frame (160 ms unthrottled); the simulation charges it for the ~120 KB React and Next.js runtime downloading in parallel, which every App Router page needs.

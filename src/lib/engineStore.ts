@@ -11,12 +11,20 @@ export type EngineStatus =
 
 export interface EngineState {
   status: EngineStatus;
+  /** DuckDB has booted in the worker, so the first query won't wait for it. */
+  warm: boolean;
   summary: IngestSummary | null;
   progress: IngestProgress | null;
   error: string | null;
 }
 
-const INITIAL: EngineState = { status: 'idle', summary: null, progress: null, error: null };
+const INITIAL: EngineState = {
+  status: 'idle',
+  warm: false,
+  summary: null,
+  progress: null,
+  error: null,
+};
 
 let state: EngineState = INITIAL;
 const listeners = new Set<() => void>();
@@ -77,6 +85,19 @@ export const engine = {
     return restorePromise;
   },
 
+  /** Starts DuckDB in the worker ahead of the first real query. Sends nothing anywhere. */
+  warmUp(): void {
+    if (state.warm) return;
+    void getEngine()
+      .ping()
+      .then(
+        () => set({ warm: true }),
+        () => {
+          /* the first real call reports any problem */
+        },
+      );
+  },
+
   /** `asOf` pins the sample's "today" (YYYY-MM-DD) so it looks the same on every run. */
   async loadSample(asOf?: string): Promise<IngestSummary | null> {
     set({ status: 'loading-sample', error: null, progress: null });
@@ -132,6 +153,6 @@ export const engine = {
 
   async clear(): Promise<void> {
     await getEngine().clear();
-    set({ ...INITIAL });
+    set({ ...INITIAL, warm: state.warm });
   },
 };
