@@ -125,8 +125,11 @@ for (const [deck, count, next, nextPath] of DECKS) {
         await page.keyboard.press('ArrowRight');
         await expect(page).toHaveURL(new RegExp(`${nextPath}\\?sample=1$`));
       } else {
-        // The Life deck always plays last.
+        // The Life deck always plays last, and ends with a way back to every story.
         await expect(page.getByRole('button', { name: 'Next card' })).toBeDisabled();
+        await page.getByRole('button', { name: 'See all my stories →' }).click();
+        await expect(page).toHaveURL(/\/start$/);
+        await expect(page.getByTestId('deck-tiles').getByRole('link')).toHaveCount(4);
       }
     });
 

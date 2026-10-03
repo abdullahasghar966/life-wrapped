@@ -30,6 +30,13 @@ test.describe('app pages', () => {
     }
   }
 
+  test('an unknown address gets a friendly 404', async ({ page }) => {
+    const res = await page.goto('/no-such-page');
+    expect(res?.status()).toBe(404);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('There’s nothing here');
+    expect(await seriousViolations(page)).toEqual([]);
+  });
+
   test('the landing page stays within its JavaScript budget', async ({ page }) => {
     const bodies: Array<Promise<{ url: string; body: Buffer }>> = [];
     page.on('response', (res) => {

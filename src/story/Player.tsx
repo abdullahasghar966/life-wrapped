@@ -52,6 +52,8 @@ const iconButton =
 const actionPill =
   't-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--c-ink) px-[4cqw] py-[2cqw] text-[3.3cqw] font-semibold text-(--c-bg) transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)';
 const outsideChip = 't-body rounded-full bg-(--t-surface) px-3 py-1';
+const ctaPill =
+  't-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--t-cta) px-[4.5cqw] py-[2cqw] text-[3.4cqw] font-bold text-(--t-on-cta) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)';
 
 export function Player({
   deck,
@@ -190,11 +192,11 @@ export function Player({
       ? theme.backdrops[(CARDS[slide.result.id]?.backdrop ?? safeIndex) % theme.backdrops.length]!
       : theme.backdrops[0]!;
 
-  // A deck's last card carries three actions (save, share, next deck), which wrap
-  // onto a second row, so its content leaves room for them.
+  // A deck's last card carries three actions (save, share, and the next deck or
+  // the way out), which wrap onto a second row, so its content leaves room for them.
   const frameStyle = {
     ...backdropStyle(backdrop),
-    ...(isLast && nextDeck ? { '--card-pb': '27cqw' } : {}),
+    ...(isLast ? { '--card-pb': '27cqw' } : {}),
   } as CSSProperties;
 
   const label =
@@ -363,10 +365,15 @@ export function Player({
                     e.preventDefault();
                     onNextDeck();
                   }}
-                  className="t-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--t-cta) px-[4.5cqw] py-[2cqw] text-[3.4cqw] font-bold text-(--t-on-cta) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)"
+                  className={ctaPill}
                 >
                   Next: {DECKS[nextDeck!].next} →
                 </Link>
+              )}
+              {isLast && !nextHref && (
+                <button type="button" onClick={onClose} className={ctaPill}>
+                  See all my stories →
+                </button>
               )}
             </div>
             <button
