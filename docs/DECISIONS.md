@@ -285,3 +285,20 @@ The policy in `next.config.ts` is the final one: sharing, the share page and the
 **Decision.** The preview images embed six WOFF files from Fontsource (latin subsets of the theme fonts, in `assets/fonts/`). Every name is checked against the code points those fonts cover, and a name that doesn't fit is left off the image instead of being drawn. "≈" isn't in the subsets, so it is drawn as an SVG shape. `tests/unit/og.test.ts` renders every card type with `fetch` disabled and fails if anything other than Satori's own inlined WASM is requested.
 
 **Consequences.** Names in other scripts, or with emoji, are missing from the preview image (the card page itself still shows them, using the visitor's own fonts). The server never contacts a third party while drawing an image.
+
+## ADR-034: How the app works offline
+
+**Context.** The spec requires the app to be installable and work offline after the first visit, with real data, not just the sample. Real data lives only in the tab's worker, so anything that reloads the page loses it. Next.js turns a failed client-side navigation into a full page load, which offline would do exactly that.
+
+**Decision.**
+
+- Moving from one deck to the next only changes the URL (`history.pushState`): the story page reads the deck from the path and fetches nothing.
+- A service worker built with Serwist (`src/sw/sw.ts`, served from `/serwist/sw.js`) precaches this build's scripts, styles, `woff2` fonts, the DuckDB bundle and the app's pages.
+- Page loads for the app's own routes are answered from the precache whatever their query (`?sample=1` only matters in the browser).
+- At install, the worker also saves each route's RSC payload. When a client-side navigation request fails, the saved payload answers it instead of letting Next.js fall back to a page load.
+- Worker scripts are served as fresh responses. Turbopack passes a worker its bootstrap config in the URL fragment, and a response straight from the cache would carry the cached URL, without the fragment, and the worker would fail.
+- The worker is registered only after the page has loaded and the browser is idle: the precache is about 38 MB, almost all of it DuckDB's WASM, and it must never compete with the first paint.
+
+**Alternatives.** Runtime-caching DuckDB on first use instead of precaching it (smaller first visit, but the app would not work offline until the engine had been used once online); a single client-rendered page for the whole app (no RSC requests at all, but it gives up static pages and per-page code splitting).
+
+**Consequences.** `tests/e2e/offline.spec.ts` turns the network off after one visit, then adds a real-format Spotify export, plays it, goes back to `/start` with the data intact, and plays every sample deck. Other E2E specs block service workers so each test doesn't download the precache. The first visit downloads about 9 MB more in the background (the WASM compresses well).

@@ -7,7 +7,7 @@ Life, Wrapped turns your Spotify, YouTube and Netflix exports into stories **ins
 1. You choose files. The browser hands them to a Web Worker running in the same tab.
 2. The worker unzips only the entries that look like export files (see below), reads them, keeps the fields it needs and drops the rest.
 3. The rows go into an in-memory DuckDB database inside the worker. Every chart and number is a query against it.
-4. Nothing is written to disk, `localStorage`, IndexedDB or cookies. Close or reload the tab and it is gone. "Clear my data" wipes it immediately.
+4. Your data is never written to disk, `localStorage`, IndexedDB or cookies. Close or reload the tab and it is gone. "Clear my data" wipes it immediately.
 
 There are no analytics, no telemetry and no third-party scripts. Fonts and the DuckDB engine are served from this site.
 
@@ -60,7 +60,7 @@ The server accepts nothing else: unknown fields are rejected (not ignored), ther
 
 **What the server stores.** An id, the time it was shared, the card type and theme, the sample flag, the numbers and names above, and a SHA-256 hash of a random delete token. The token itself stays in your browser's `localStorage`. That is the only thing Life, Wrapped ever writes to your browser, and only after you share.
 
-**Rate limiting.** Each address can share at most 10 cards an hour. The limit is counted with a salted SHA-256 hash of the IP address; the address itself is never stored, and the hashes are deleted after an hour.
+**Rate limiting.** Each address can share at most 10 cards an hour. The limit is counted with a salted SHA-256 hash of the IP address; the address itself is never stored, and hashes older than an hour are removed whenever a card is shared.
 
 **Deleting.** Open your link in the browser you shared it from and press **Delete this card**. The row is removed at once, and both the page and its link-preview image stop working for everyone.
 
@@ -76,5 +76,13 @@ You don't have to take our word for it.
 2. Load your files, or the sample, and play every story.
 3. Look at the list of requests. Every one goes to this site's own address: the pages, scripts, fonts and the DuckDB engine files. Click any request: none carries a **Payload** with your data.
 4. Try to break it. In the **Console** tab, run `fetch('https://example.com', { method: 'POST', body: 'test' })`. The browser refuses with a Content Security Policy error: the page's `connect-src 'self'` rule only lets it talk to its own site, even if a script tried to send data elsewhere.
+5. Turn off your Wi-Fi. After one visit, the whole app keeps working: adding files, playing every story, saving images. Your browser keeps a copy of the app, including the database engine, so there is nothing to send and nowhere to send it. (Only opening someone else's shared link needs a connection.)
 
-The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site.
+The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site. [`tests/e2e/offline.spec.ts`](../tests/e2e/offline.spec.ts) does the Wi-Fi test.
+
+## What your browser stores
+
+- **The app itself**, for offline use: its pages, scripts, fonts and the DuckDB engine (about 38 MB), kept by a service worker in the browser's cache. None of it is your data.
+- **Delete tokens**, in `localStorage`, only after you share a card.
+
+Nothing else: no cookies, no history, no files.

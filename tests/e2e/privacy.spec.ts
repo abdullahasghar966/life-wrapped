@@ -11,6 +11,9 @@ function record(context: BrowserContext): Request[] {
   return all;
 }
 
+// Real behaviour, including the offline worker's precaching.
+test.use({ serviceWorkers: 'allow' });
+
 const DECKS = [
   ['spotify', 12],
   ['youtube', 11],

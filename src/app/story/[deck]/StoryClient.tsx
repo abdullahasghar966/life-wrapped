@@ -1,17 +1,21 @@
 'use client';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import type { OptionsPatch } from '@/engine/api';
 import type { InsightResult } from '@/engine/insights/types';
 import type { DeckId } from '@/engine/types';
 import { engine, useEngineState } from '@/lib/engineStore';
 import { ShareDialog } from '@/share/ShareDialog';
-import { DECK_ORDER, DECKS } from '@/story/decks';
+import { DECK_ORDER, DECKS, isDeckId } from '@/story/decks';
 import { Player } from '@/story/Player';
 import { THEMES, themeStyle } from '@/story/themes';
 
-export function StoryClient({ deck }: { deck: DeckId }) {
+export function StoryClient({ deck: initialDeck }: { deck: DeckId }) {
+  // Moving to the next deck only changes the URL (history.pushState): the data
+  // lives in this tab's worker, so a page load (say, offline) would lose it.
+  const segment = usePathname().split('/')[2];
+  const deck = segment && isDeckId(segment) ? segment : initialDeck;
   const params = useSearchParams();
   const sample = params.get('sample') === '1';
   const asOf = params.get('asOf') ?? undefined;
@@ -55,6 +59,10 @@ export function StoryClient({ deck }: { deck: DeckId }) {
     },
     [deck, setCards],
   );
+
+  useEffect(() => {
+    document.title = `${DECKS[deck].title} · Life, Wrapped`;
+  }, [deck]);
 
   const theme = THEMES[DECKS[deck].theme];
   const available = summary?.availableDecks ?? [];
@@ -111,7 +119,7 @@ export function StoryClient({ deck }: { deck: DeckId }) {
         summary={summary}
         nextDeck={nextDeck}
         onClose={() => router.push('/start')}
-        onNextDeck={() => nextDeck && router.push(`/story/${nextDeck}${q}`)}
+        onNextDeck={() => nextDeck && window.history.pushState(null, '', `/story/${nextDeck}${q}`)}
         onOptions={(p) => void onOptions(p)}
         onClear={() => {
           void engine.clear().then(() => router.push('/start'));

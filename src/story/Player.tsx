@@ -357,6 +357,12 @@ export function Player({
               {isLast && nextHref && (
                 <Link
                   href={nextHref}
+                  onClick={(e) => {
+                    // Same in-page switch as the arrow keys; the href serves new tabs.
+                    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                    e.preventDefault();
+                    onNextDeck();
+                  }}
                   className="t-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--t-cta) px-[4.5cqw] py-[2cqw] text-[3.4cqw] font-bold text-(--t-on-cta) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)"
                 >
                   Next: {DECKS[nextDeck!].next} →

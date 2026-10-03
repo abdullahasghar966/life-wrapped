@@ -32,5 +32,5 @@
     ".next/dev/types/**/*.ts",
     "**/*.mts"
   ],
-  "exclude": ["node_modules", "public"]
+  "exclude": ["node_modules", "public", "src/sw/sw.ts"]
 }

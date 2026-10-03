@@ -106,6 +106,15 @@ sequenceDiagram
 - **Shared page:** `src/app/s/[id]/page.tsx` loads and re-validates the row. `src/share/cards.ts` rebuilds the card's props, and `SharedCard.tsx` renders the summary component (`cards/summaries.ts`) in its still frame. `DeleteShare.tsx` shows Delete only in the browser that holds the token.
 - **Preview images:** `src/share/og.tsx` draws themed 1200 × 630 images with `next/og`, using only the fonts in `assets/fonts/` (ADR-033). The routes are `src/app/s/[id]/opengraph-image.tsx` and `src/app/opengraph-image.tsx`.
 
+## Offline
+
+`src/sw/sw.ts` is the service worker (Serwist). `src/app/serwist/[path]/route.ts` bundles it with esbuild at build time and serves it at `/serwist/sw.js`. `src/components/ServiceWorker.tsx` registers it in production, once the page is loaded and idle (ADR-034).
+
+- **Precache:** this build's `/_next/static` files (scripts, styles, `woff2` fonts), everything in `public/` (DuckDB's worker and WASM, icons), the manifest and the pages listed in `src/sw/routes.ts`. `tests/unit/offline.test.ts` checks that list covers every static page and deck.
+- **Page loads:** the app's own pages come from the precache whatever their query string. Other pages come from the network, or `/offline` when there is none.
+- **Client navigation:** RSC requests go to the network first; when that fails, the payload saved at install answers, so Next.js never falls back to a page load that would lose the tab's data. Deck-to-deck moves use `history.pushState` and need nothing at all.
+- **Workers:** worker scripts are served as fresh responses so the engine worker keeps the bootstrap config Turbopack puts in its URL fragment.
+
 ## Theme system
 
 Each theme is a typed token object (`src/story/themes/{sound,watch,binge,aurora}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.

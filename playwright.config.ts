@@ -16,6 +16,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: 'retain-on-failure',
+    // The offline worker precaches ~38 MB per browser context; only the offline
+    // and privacy specs (which must see real behaviour) let it install.
+    serviceWorkers: 'block',
   },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: {
@@ -25,6 +28,6 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     // Sharing runs against an in-memory Postgres (PGlite) with the real migrations.
-    env: { DATABASE_URL: 'pglite://memory', SHARE_SALT: 'e2e-only-salt' },
+    env: { DATABASE_URL: 'pglite://memory', SHARE_SALT: 'e2e-only-salt', ENABLE_DEBUG_PAGE: '1' },
   },
 });
