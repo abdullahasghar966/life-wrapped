@@ -141,6 +141,21 @@
   animation: hero-sway 7s ease-in-out infinite alternate;
 }
 
+/*
+ * Headline reveal masks (SplitText adds "-mask" to the class names set in Headline).
+ * Extra room above and below, cancelled by negative margins, so descenders and accents
+ * aren't clipped while the layout stays the same. Line masks are blocks, where negative
+ * margins would collapse, so they get a clip margin instead where browsers support it.
+ */
+.hl-word-mask,
+.hl-char-mask {
+  padding-block: 0.2em;
+  margin-block: -0.2em;
+}
+.hl-line-mask {
+  overflow-clip-margin: 0.2em;
+}
+
 /* The landing preview's story progress (transform only). */
 @keyframes preview-progress {
   from {

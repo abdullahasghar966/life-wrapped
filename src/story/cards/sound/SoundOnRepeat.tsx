@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { SpotifyOnRepeat } from '@/engine/insights/spotify/onRepeat';
-import { fmtDayMonth, fmtShortDayMonth } from '@/lib/format';
+import { fmtDayMonth, fmtShortDayMonth, shorten } from '@/lib/format';
 import { Cover } from '../../art/Art';
 import { variant } from '../../runtime';
 import { CountUp } from '../shared/CountUp';
@@ -45,12 +45,14 @@ export function SoundOnRepeat({ result }: CardProps<SpotifyOnRepeat>) {
           <Cover name={`${p.track} · ${p.artist}`} className="size-full" />
         </div>
         <p className="min-w-0 text-[5.4cqw] leading-tight font-extrabold">
-          “{p.track}”
-          <span className="block text-[4cqw] font-semibold text-(--c-muted)">{p.artist}</span>
+          <span className="line-clamp-2 break-words">“{p.track}”</span>
+          <span className="block truncate text-[4cqw] font-semibold text-(--c-muted)">
+            {p.artist}
+          </span>
         </p>
       </div>
       <Headline className="mt-auto text-[8cqw] leading-[1]" delay={1.2}>
-        {`${fmtDayMonth(p.date)}: “${p.track}” ×${p.plays}. ${variant(result.seed, TAGS)}`}
+        {`${fmtDayMonth(p.date)}: “${shorten(p.track, 28)}” ×${p.plays}. ${variant(result.seed, TAGS)}`}
       </Headline>
     </CardBody>
   );

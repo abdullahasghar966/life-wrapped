@@ -41,18 +41,21 @@ export function WatchSummary({ result }: CardProps<YoutubeSummary>) {
       <div className="relative mt-[6cqw] flex-1 overflow-hidden rounded-(--t-radius-frame)">
         <Thumbnail
           name="Your year on YouTube"
-          progress={1}
           initials={false}
+          bar={false}
           cover
           className="absolute inset-0 size-full"
         />
         <div data-dim aria-hidden className="absolute inset-0 bg-(--t-bg)/75" />
-        <dl className="absolute inset-0 grid grid-cols-2 grid-rows-2 gap-[2.4cqw] p-[3cqw]">
-          {tiles.map((t) => (
+        <dl
+          className={`absolute inset-0 grid grid-cols-2 gap-[2.4cqw] p-[3cqw] ${tiles.length > 2 ? 'grid-rows-2' : 'grid-rows-1'}`}
+        >
+          {tiles.map((t, i) => (
             <div
               key={t.label}
               data-tile
-              className="flex flex-col justify-end overflow-hidden rounded-(--t-radius-tile) bg-(--t-surface) p-[3.4cqw]"
+              // With an odd number of tiles the first one spans the row, so no cell is left empty.
+              className={`flex flex-col justify-end overflow-hidden rounded-(--t-radius-tile) bg-(--t-surface) p-[3.4cqw] ${tiles.length % 2 === 1 && i === 0 ? 'col-span-2' : ''}`}
             >
               <dt className="text-[3cqw] font-semibold tracking-wide text-(--t-muted) uppercase">
                 {t.label}

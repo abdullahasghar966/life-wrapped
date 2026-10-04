@@ -52,6 +52,11 @@ export function Headline({
           SplitText.create(el, {
             type: split === 'lines' ? 'lines' : split === 'chars' ? 'words,chars' : 'words',
             mask: split,
+            // Named so globals.css can widen the masks: display type is set tight, and a
+            // mask the height of the line box cut off descenders and accents.
+            wordsClass: 'hl-word',
+            charsClass: 'hl-char',
+            linesClass: 'hl-line',
             autoSplit: true,
             // Returning the timeline lets autoSplit rebuild it at the same progress.
             onSplit(self) {
@@ -61,7 +66,7 @@ export function Headline({
                 split === 'chars' ? self.chars : split === 'lines' ? self.lines : self.words;
               tl = gsap.timeline({ delay });
               tl.from(targets, {
-                yPercent: 115,
+                yPercent: 130,
                 rotate: theme.id === 'sound' ? 6 : 0,
                 transformOrigin: '0% 100%',
                 duration: theme.motion.duration * 1.4,

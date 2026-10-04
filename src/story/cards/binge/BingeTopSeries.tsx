@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { NetflixTopSeries } from '@/engine/insights/netflix/topSeries';
-import { fmt1, fmtInt } from '@/lib/format';
+import { fmt1, fmtInt, shorten } from '@/lib/format';
 import { Poster } from '../../art/Art';
 import { gsap } from '../../gsap';
 import { variant } from '../../runtime';
@@ -66,7 +66,7 @@ export function BingeTopSeries({ result }: CardProps<NetflixTopSeries>) {
         ))}
       </dl>
       <Headline className="relative mt-auto text-[10cqw] leading-[0.92]" delay={0.9}>
-        {variant(result.seed, LINES)(p.series, fmtInt(p.episodes))}
+        {variant(result.seed, LINES)(shorten(p.series, 28), fmtInt(p.episodes))}
       </Headline>
     </CardBody>
   );

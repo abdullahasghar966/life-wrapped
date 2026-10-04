@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { BingeRecord as BingeRecordProps } from '@/engine/insights/netflix/shared';
-import { fmtShortDayMonth } from '@/lib/format';
+import { fmtShortDayMonth, shorten } from '@/lib/format';
 import { variant } from '../../runtime';
 import { CountUp } from '../shared/CountUp';
 import { Headline } from '../shared/Headline';
@@ -80,7 +80,7 @@ export function BingeRecord({ result }: CardProps<BingeRecordProps>) {
         ))}
       </ol>
       <Headline className="relative mt-auto text-[8.4cqw] leading-[0.95]" delay={1.2}>
-        {`${date}: ${p.count} episodes of ${p.series}. ${variant(result.seed, TAGS)}`}
+        {`${date}: ${p.count} episodes of ${shorten(p.series, 28)}. ${variant(result.seed, TAGS)}`}
       </Headline>
     </CardBody>
   );

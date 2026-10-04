@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { YoutubeMusic } from '@/engine/insights/youtube/music';
-import { fmtInt } from '@/lib/format';
+import { fmtInt, shorten } from '@/lib/format';
 import { Thumbnail } from '../../art/Art';
 import { gsap } from '../../gsap';
 import { Headline } from '../shared/Headline';
@@ -53,7 +53,7 @@ export function WatchMusic({ result }: CardProps<YoutubeMusic>) {
         ))}
       </ol>
       <Headline className="mt-auto text-[8.6cqw] leading-[1]" delay={0.6}>
-        {`Your YouTube Music favourite: ${p.channel}.`}
+        {`Your YouTube Music favourite: ${shorten(p.channel, 28)}.`}
       </Headline>
     </CardBody>
   );

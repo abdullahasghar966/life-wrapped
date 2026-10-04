@@ -38,22 +38,25 @@ export function WatchRewatched({ result }: CardProps<YoutubeRewatched>) {
   return (
     <CardBody ref={ref}>
       <Eyebrow>Most rewatched</Eyebrow>
-      <div data-thumb className="mt-[6cqw]">
-        <Thumbnail name={p.title} label="Watched again" progress={1} className="w-full" />
-        <p className="mt-[3cqw] text-[5cqw] leading-tight font-bold">{p.title}</p>
-        {p.channel && <p className="text-[3.8cqw] text-(--c-muted)">{p.channel}</p>}
+      <div data-thumb className="mt-[5cqw]">
+        <Thumbnail name={p.title} label="Watched again" progress={1} className="w-[78%]" />
+        <p className="mt-[3cqw] line-clamp-2 text-[5cqw] leading-tight font-bold break-words">
+          {p.title}
+        </p>
+        {p.channel && <p className="truncate text-[3.8cqw] text-(--c-muted)">{p.channel}</p>}
       </div>
-      <div className="mt-[8cqw] flex items-center gap-[5cqw]">
-        <span data-replay className="text-(--t-accent)">
-          <ReplayIcon className="size-[26cqw]" />
+      <div className="mt-[5cqw] flex shrink-0 items-center gap-[5cqw]">
+        <span data-replay className="text-(--c-accent)">
+          <ReplayIcon className="size-[20cqw]" />
         </span>
-        <p data-times className="t-display text-[30cqw] leading-none">
+        <p data-times className="t-display text-[24cqw] leading-none">
           <span aria-hidden>×</span>
           <CountUp value={p.times} duration={1.1} />
         </p>
       </div>
-      <Headline className="mt-auto text-[8cqw] leading-[1]" delay={0.7}>
-        {`You watched “${p.title}” ${p.times} times. ${variant(result.seed, TAGS)}`}
+      {/* The title is right above, so the headline doesn't repeat it. */}
+      <Headline className="mt-auto shrink-0 pt-[3cqw] text-[8cqw] leading-[1]" delay={0.7}>
+        {`You watched it ${p.times} times. ${variant(result.seed, TAGS)}`}
       </Headline>
     </CardBody>
   );
