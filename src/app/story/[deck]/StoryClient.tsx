@@ -6,7 +6,6 @@ import type { OptionsPatch } from '@/engine/api';
 import type { InsightResult } from '@/engine/insights/types';
 import type { DeckId } from '@/engine/types';
 import { engine, useEngineState } from '@/lib/engineStore';
-import { ShareDialog } from '@/share/ShareDialog';
 import { DECK_ORDER, DECKS, isDeckId } from '@/story/decks';
 import { Player } from '@/story/Player';
 import { THEMES, themeStyle } from '@/story/themes';
@@ -24,7 +23,6 @@ export function StoryClient({ deck: initialDeck }: { deck: DeckId }) {
   // Cards are tagged with their deck, so moving to the next deck shows a loading state.
   const [loaded, setLoaded] = useState<{ deck: DeckId; cards: InsightResult[] } | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [sharing, setSharing] = useState<InsightResult | null>(null);
   const cards = loaded?.deck === deck ? loaded.cards : null;
   const setCards = useCallback((c: InsightResult[]) => setLoaded({ deck, cards: c }), [deck]);
 
@@ -111,29 +109,18 @@ export function StoryClient({ deck: initialDeck }: { deck: DeckId }) {
   }
 
   return (
-    <>
-      <Player
-        key={`${deck}-${summary.options.timeZone}-${summary.options.periodId}`}
-        deck={deck}
-        cards={cards}
-        summary={summary}
-        nextDeck={nextDeck}
-        onClose={() => router.push('/start')}
-        onNextDeck={() => nextDeck && window.history.pushState(null, '', `/story/${nextDeck}${q}`)}
-        onOptions={(p) => void onOptions(p)}
-        onClear={() => {
-          void engine.clear().then(() => router.push('/start'));
-        }}
-        onShare={setSharing}
-        externalPause={!!sharing}
-      />
-      <ShareDialog
-        result={sharing}
-        isSample={summary.isSample}
-        onOpenChange={(open) => {
-          if (!open) setSharing(null);
-        }}
-      />
-    </>
+    <Player
+      key={`${deck}-${summary.options.timeZone}-${summary.options.periodId}`}
+      deck={deck}
+      cards={cards}
+      summary={summary}
+      nextDeck={nextDeck}
+      onClose={() => router.push('/start')}
+      onNextDeck={() => nextDeck && window.history.pushState(null, '', `/story/${nextDeck}${q}`)}
+      onOptions={(p) => void onOptions(p)}
+      onClear={() => {
+        void engine.clear().then(() => router.push('/start'));
+      }}
+    />
   );
 }

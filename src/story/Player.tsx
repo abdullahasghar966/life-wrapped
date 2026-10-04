@@ -15,6 +15,8 @@ import type { OptionsPatch } from '@/engine/api';
 import type { InsightResult } from '@/engine/insights/types';
 import type { DeckId, IngestSummary } from '@/engine/types';
 import { downloadBlob } from '@/share/capture';
+import { cardImageName } from '@/share/nativeShare';
+import { ShareSheet, type CardImage } from '@/share/ShareSheet';
 import { CARDS } from './cards';
 import { UnlockCard } from './cards/UnlockCard';
 import { CARD_MS } from './constants';
@@ -40,9 +42,6 @@ export interface PlayerProps {
   onNextDeck: () => void;
   onOptions: (patch: OptionsPatch) => void;
   onClear: () => void;
-  onShare?: (result: InsightResult) => void;
-  /** Pauses the story while something outside the player (the share dialog) is open. */
-  externalPause?: boolean;
 }
 
 // Chrome reads its colours from the current card's ink/background pair, which the
@@ -64,8 +63,6 @@ export function Player({
   onNextDeck,
   onOptions,
   onClear,
-  onShare,
-  externalPause = false,
 }: PlayerProps) {
   const theme = THEMES[DECKS[deck].theme];
   const reduced = useReducedMotion();
@@ -85,8 +82,12 @@ export function Player({
   const [holding, setHolding] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const paused = userPaused || holding || settingsOpen || hidden || exporting || externalPause;
+  // The off-screen 1080 × 1920 render, for "Save image" or for the share sheet.
+  const [capture, setCapture] = useState<{ purpose: 'save' | 'share'; n: number } | null>(null);
+  const [sharing, setSharing] = useState<InsightResult | null>(null);
+  const [shareImage, setShareImage] = useState<CardImage>({ state: 'rendering' });
+  const exporting = capture?.purpose === 'save';
+  const paused = userPaused || holding || settingsOpen || hidden || !!capture || !!sharing;
 
   const safeIndex = Math.min(index, slides.length - 1);
   const slide = slides[safeIndex]!;
@@ -165,7 +166,8 @@ export function Player({
   // and when focus is on a control that uses the key itself.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (settingsOpen || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (settingsOpen || sharing || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey)
+        return;
       const t = e.target as Element | null;
       if (t?.closest('[role=dialog], input, select, textarea')) return;
       if (e.key === 'ArrowRight') {
@@ -185,7 +187,7 @@ export function Player({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, onClose, settingsOpen]);
+  }, [next, prev, onClose, settingsOpen, sharing]);
 
   const backdrop =
     slide.kind === 'insight'
@@ -209,15 +211,26 @@ export function Player({
       : `${label}. Add another platform to unlock your online life story.`;
 
   const [exportError, setExportError] = useState(false);
+  const startCapture = (purpose: 'save' | 'share') =>
+    setCapture((c) => ({ purpose, n: (c?.n ?? 0) + 1 }));
   function saveImage() {
     if (slide.kind !== 'insight') return;
     setExportError(false);
-    setExporting(true);
+    startCapture('save');
+  }
+  function openShare() {
+    if (slide.kind !== 'insight') return;
+    setSharing(slide.result);
+    setShareImage({ state: 'rendering' });
+    startCapture('share');
   }
   function onExported(blob: Blob | null) {
-    setExporting(false);
-    if (blob && slide.kind === 'insight') {
-      downloadBlob(blob, `life-wrapped-${slide.result.id.replace('.', '-')}.png`);
+    const purpose = capture?.purpose;
+    setCapture(null);
+    if (purpose === 'share') {
+      setShareImage(blob ? { state: 'ready', blob } : { state: 'error' });
+    } else if (blob && slide.kind === 'insight') {
+      downloadBlob(blob, cardImageName(slide.result.id));
     } else setExportError(true);
   }
 
@@ -351,9 +364,14 @@ export function Player({
                   {exporting ? 'Saving…' : 'Save image'}
                 </button>
               )}
-              {slide.kind === 'insight' && slide.result.shareable && onShare && (
-                <button type="button" onClick={() => onShare(slide.result)} className={actionPill}>
-                  <Share2 className="size-[4cqw] max-h-4 max-w-4" /> Share link
+              {slide.kind === 'insight' && (
+                <button
+                  type="button"
+                  onClick={openShare}
+                  className={actionPill}
+                  aria-haspopup="dialog"
+                >
+                  <Share2 className="size-[4cqw] max-h-4 max-w-4" /> Share
                 </button>
               )}
               {isLast && nextHref && (
@@ -414,11 +432,35 @@ export function Player({
         </p>
       )}
 
-      {exporting && slide.kind === 'insight' && Card && (
-        <ExportStage theme={theme} backdrop={backdrop} seed={slide.result.seed} onDone={onExported}>
+      {capture && slide.kind === 'insight' && Card && (
+        <ExportStage
+          key={capture.n}
+          theme={theme}
+          backdrop={backdrop}
+          seed={slide.result.seed}
+          onDone={onExported}
+        >
           <Card result={slide.result} />
         </ExportStage>
       )}
+
+      <ShareSheet
+        result={sharing}
+        isSample={summary.isSample}
+        image={shareImage}
+        onSaveImage={() => {
+          if (sharing && shareImage.state === 'ready') {
+            downloadBlob(shareImage.blob, cardImageName(sharing.id));
+          }
+        }}
+        onRetryImage={() => {
+          setShareImage({ state: 'rendering' });
+          startCapture('share');
+        }}
+        onOpenChange={(open) => {
+          if (!open) setSharing(null);
+        }}
+      />
 
       <SettingsSheet
         open={settingsOpen}

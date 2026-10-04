@@ -12,6 +12,7 @@ import { SHARE_TITLES, toInsightResult } from '@/share/cards';
 import { DeleteShare } from '@/share/DeleteShare';
 import type { ShareCardType } from '@/share/schema';
 import { SharedCard } from '@/share/SharedCard';
+import { ShareLinkButton } from '@/share/ShareLinkButton';
 
 const HEADINGS: Record<ShareCardType, string> = {
   'spotify.summary': 'Someone’s year in sound',
@@ -97,6 +98,7 @@ export default async function SharedCardPage({ params }: PageProps<'/s/[id]'>) {
             >
               Try it with sample data
             </Link>
+            <ShareLinkButton title={SHARE_TITLES[payload.cardType]} />
           </div>
           <p className="text-muted-foreground mt-6 inline-flex items-center gap-2 text-xs">
             <ShieldCheck aria-hidden className="size-3.5 shrink-0" />

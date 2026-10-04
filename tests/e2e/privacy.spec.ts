@@ -1,6 +1,6 @@
 import { expect, test, type BrowserContext, type Request } from '@playwright/test';
 import path from 'node:path';
-import { goToCard, slide } from './helpers';
+import { goToCard, sharedData, slide, stubShareSheet } from './helpers';
 
 const fx = (p: string) => path.join(__dirname, '..', 'fixtures', p);
 
@@ -23,11 +23,13 @@ const DECKS = [
 
 /**
  * The privacy proof (§14): ingest real-format exports and the sample, play every
- * deck to the end and save an image, while recording all network traffic.
+ * deck to the end, save an image and pass one to the share sheet, while recording
+ * all network traffic.
  */
 test('nothing leaves the device while you use the app', async ({ page, context, baseURL }) => {
   test.slow();
   const requests = record(context);
+  await stubShareSheet(context);
 
   await page.goto('/');
   await page.goto('/start');
@@ -59,6 +61,13 @@ test('nothing leaves the device while you use the app', async ({ page, context, 
       const download = page.waitForEvent('download');
       await page.getByRole('button', { name: 'Save image' }).click();
       await download;
+      // The share sheet gets the image from the tab itself; nothing is uploaded.
+      await page.getByRole('button', { name: 'Share', exact: true }).click();
+      const sheet = page.getByRole('dialog', { name: 'Share this card' });
+      await sheet.getByRole('button', { name: 'Share image…' }).click();
+      await expect.poll(async () => (await sharedData(page)).length).toBe(1);
+      await page.keyboard.press('Escape');
+      await expect(sheet).toBeHidden();
     }
     await goToCard(page, count);
     if (deck !== 'life') await page.keyboard.press('ArrowRight');
