@@ -380,5 +380,5 @@ The LCP target is not met in Lighthouse's simulation. The headline paints with t
 
 - Nothing about what leaves the device through Life, Wrapped changes: the privacy E2E now also passes an image to a stubbed share sheet and still sees no request with a body.
 - What happens after the share sheet is between the person and the app they choose, like any photo they share; the sheet says so.
-- Every card's chrome gained a pill, so all visual baselines were regenerated.
+- Every card's chrome gained a pill, so the visual baselines changed. The Linux ones were rendered in a Linux container with Chromium's headless shell, the renderer CI uses, because the workflow from ADR-028 could not be started from that session. That setup first reproduced CI's own baselines for main on every card. The workflow stays the normal route. The Windows baselines still have to be regenerated on Windows.
 - Headless Chromium has no share sheet, so the E2E tests stub `navigator.share` and check what it received (a 1080 × 1920 PNG with the card's name).
