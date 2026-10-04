@@ -4,6 +4,7 @@ import type { SpotifyTopTracks } from '@/engine/insights/spotify/topTracks';
 import { fmtInt } from '@/lib/format';
 import { Cover } from '../../art/Art';
 import { gsap } from '../../gsap';
+import { flipIn, hingeIn } from '../../depth';
 import { Headline } from '../shared/Headline';
 import { CardBody, Eyebrow } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
@@ -14,7 +15,8 @@ export function SoundTopTracks({ result }: CardProps<SpotifyTopTracks>) {
   const { tracks } = result.props;
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl, { loop }) => {
-    tl.from('[data-row]', { y: '8cqw', opacity: 0, duration: 0.5, stagger: 0.09 }, 0.35);
+    hingeIn(tl, '[data-row]', { at: 0.35 });
+    flipIn(tl, '[data-row] svg[role=img]', { at: 0.5, stagger: 0.09 });
     loop(
       gsap.to('[data-eq-bar]', {
         scaleY: () => gsap.utils.random(0.25, 1),

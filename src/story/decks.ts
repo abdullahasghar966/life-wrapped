@@ -8,6 +8,8 @@ export interface DeckMeta {
   title: string;
   /** "your Spotify story" for "Next: …" links. */
   next: string;
+  /** One or two words, for the list of stories around the player. */
+  short: string;
   theme: ThemeId;
   tagline: string;
 }
@@ -19,6 +21,7 @@ export const DECKS: Record<DeckId, DeckMeta> = {
     id: 'spotify',
     title: 'Your Spotify story',
     next: 'your Spotify story',
+    short: 'Spotify',
     theme: DECK_THEME.spotify,
     tagline: 'Minutes, top artists, repeats and streaks',
   },
@@ -26,6 +29,7 @@ export const DECKS: Record<DeckId, DeckMeta> = {
     id: 'youtube',
     title: 'Your YouTube story',
     next: 'your YouTube story',
+    short: 'YouTube',
     theme: DECK_THEME.youtube,
     tagline: 'Channels, rabbit holes and late nights',
   },
@@ -33,6 +37,7 @@ export const DECKS: Record<DeckId, DeckMeta> = {
     id: 'netflix',
     title: 'Your Netflix story',
     next: 'your Netflix story',
+    short: 'Netflix',
     theme: DECK_THEME.netflix,
     tagline: 'Hours, binges and favourite series',
   },
@@ -40,6 +45,7 @@ export const DECKS: Record<DeckId, DeckMeta> = {
     id: 'life',
     title: 'Your online life',
     next: 'your online life',
+    short: 'Online life',
     theme: DECK_THEME.life,
     tagline: 'All of it together, and what it says about you',
   },

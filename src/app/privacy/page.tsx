@@ -71,7 +71,9 @@ export default function PrivacyPage() {
           </ol>
           <p>
             There are no analytics, no tracking and no third-party scripts. The fonts and the
-            database engine are served from this site.
+            database engine are served from this site. The one exception is yours to choose: if you
+            pick a song or video to play, Spotify’s or YouTube’s own player loads in a frame (see
+            below).
           </p>
         </Section>
 
@@ -109,9 +111,15 @@ export default function PrivacyPage() {
 
         <Section id="sharing" title="Sharing a card (optional)">
           <p>
-            Sharing is the only time anything is sent to a server, and only when you ask. Only the
-            last card of each story can be shared. Before anything is sent, you see the exact text
-            that will be uploaded, and nothing leaves until you press “Confirm and share”.
+            Every card can go to Instagram, Snapchat, WhatsApp or any other app as a picture: your
+            browser makes the image and hands it to your device’s share sheet, and you post it from
+            the app you pick. Nothing is uploaded by Life, Wrapped for that.
+          </p>
+          <p>
+            A share link is the only time anything is sent to this site’s server, and only when you
+            ask. Only the last card of each story can become a link. Before anything is sent, you
+            see the exact text that will be uploaded, and nothing leaves until you press “Confirm
+            and share”.
           </p>
           <dl className="divide-border/60 divide-y rounded-2xl border">
             {SHARED.map(([card, fields]) => (
@@ -130,11 +138,36 @@ export default function PrivacyPage() {
           </p>
         </Section>
 
+        <Section id="playing" title="Playing a song or video (optional)">
+          <p>
+            With your own Spotify or YouTube data, a story can offer your five most-played songs or
+            most-watched videos to play while you watch. Nothing is loaded from Spotify or YouTube
+            until you pick one. Then:
+          </p>
+          <ul className="list-disc space-y-2 pl-5">
+            <li>
+              The player is Spotify’s own, or YouTube’s in its privacy-enhanced mode, in a frame on
+              the page.
+            </li>
+            <li>
+              That company learns which song or video you picked and sees your IP address, and like
+              any website it may set its own cookies. YouTube is also told this site’s address (not
+              the page you’re on), because its player won’t play without it.
+            </li>
+            <li>
+              Nothing else from your files is sent, and the player can’t read this page. The page’s
+              security policy allows frames from exactly those two players, and still lets the page
+              send data only to this site.
+            </li>
+          </ul>
+          <p>The sample data never offers anything to play: its songs and videos are made up.</p>
+        </Section>
+
         <Section id="offline" title="It works offline">
           <p>
             After your first visit, your browser keeps a copy of the app, including the database
             engine. Turn off your Wi-Fi and it still works: there is nothing to send, and nowhere it
-            could send it.
+            could send it. (Only playing a song or video needs a connection.)
           </p>
         </Section>
 

@@ -19,7 +19,19 @@ export function LifeSummary({ result }: CardProps<Props>) {
   const shown = ORDER.filter((pl) => p.shares[pl] > 0);
   const about = p.estimated ? '≈ ' : '';
   useCardAnim(ref, (tl) => {
-    tl.from('[data-print]', { yPercent: -18, opacity: 0, duration: 0.9, ease: 'steps(9)' }, 0.5)
+    tl.from(
+      '[data-print]',
+      {
+        yPercent: -18,
+        rotationX: 40,
+        transformOrigin: '50% 0%',
+        transformPerspective: 900,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'steps(9)',
+      },
+      0.5,
+    )
       .from('[data-line]', { opacity: 0, duration: 0.01, stagger: 0.09 }, 0.8)
       .from(
         '[data-seg]',

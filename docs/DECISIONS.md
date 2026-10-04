@@ -356,3 +356,87 @@ The LCP target is not met in Lighthouse's simulation. The headline paints with t
 - The brand components avoid `cn` (tailwind-merge). The site header is part of the client error boundary, which ships with every page, and tailwind-merge would have pushed the landing past its 150 KB budget.
 - The Life deck's visual baselines were regenerated.
 - Link-preview images use Plex for body text in every theme.
+
+## ADR-037: Sharing to social apps goes through the device's share sheet
+
+**Context.** After the rebrand, the owner asked for cards to be shareable to Instagram, Snapchat, Facebook and other social apps, not only as a link. Posting directly would mean signing in with each platform (OAuth) and calling its API. The spec rules both out: there are no user accounts (§3, ADR-003) and no platform APIs. Those integrations would also need app review, server-side tokens and uploads that leave the browser. Instagram and Snapchat don't let a web app post to a story at all.
+
+**Decision.**
+
+- Every card has a **Share** button next to **Save image**. It opens a sheet that renders the card's 1080 × 1920 PNG on the device (the same `ExportStage` as Save image) and shows it.
+- **Share image…** passes the PNG to the Web Share API (`navigator.share({ files })`). The operating system shows its own share sheet, and the person posts from the app they pick, already signed in there. The browser hands the file over locally, and Life, Wrapped sends no request.
+- The image is rendered _before_ the button is shown, because browsers only allow `share()` straight after a tap, and rendering takes longer than that window.
+- Where files can't be shared (most desktop browsers, Firefox), the sheet says so and offers **Save image**, so the person can post it from the app themselves.
+- On summary cards, the same sheet holds the opt-in link from §13 (exact JSON, then Confirm). A created link can also go to the share sheet, and `/s/[id]` has **Share this card**, which copies the link where there is no share sheet.
+- On summary cards, Share replaces the old "Share link" button, so the last card still has three actions.
+
+**Alternatives.**
+
+- Per-platform "Share to X" buttons with intent URLs: they share links only, not images, and they show brand marks, which §3 forbids.
+- Platform logins and APIs: ruled out by §3, and Instagram and Snapchat stories can't be posted from the web anyway.
+- Uploading the image to make an image link: it would put pictures of personal data on a server, against the whitelist design of §13.
+
+**Consequences.**
+
+- Nothing about what leaves the device through Life, Wrapped changes: the privacy E2E now also passes an image to a stubbed share sheet and still sees no request with a body.
+- What happens after the share sheet is between the person and the app they choose, like any photo they share; the sheet says so.
+- Every card's chrome gained a pill, so the visual baselines changed. The Linux ones were rendered in a Linux container with Chromium's headless shell, the renderer CI uses, because the workflow from ADR-028 could not be started from that session. That setup first reproduced CI's own baselines for main on every card. The workflow stays the normal route. The Windows baselines still have to be regenerated on Windows.
+- Headless Chromium has no share sheet, so the E2E tests stub `navigator.share` and check what it received (a 1080 × 1920 PNG with the card's name).
+
+## ADR-038: The app's own brand frames every story
+
+**Context.** The player used to take on the current deck's theme everywhere: on a computer, the whole page around the story turned Spotify-dark, YouTube-dark, Netflix-black or receipt paper as the decks went by. The owner asked for the look to stay consistent from the landing page to the end, with only the stories themselves looking like the platforms.
+
+**Decision.**
+
+- The player's root, the loading and error screens and every dialog use the receipt brand (ADR-036). On a computer, the page around the story shows the logo, the list of stories (the current one marked red), a sample-data chip, square ink buttons and mono hints.
+- Only the 9:16 story frame carries the deck's theme: its variables are set on the frame, and the frame gets the theme's background. That background shows through during card transitions, as the page behind used to.
+- On phones the story fills the screen, so nothing changes there.
+
+**Consequences.** Cards render exactly as before. The visual baselines change only at the frame's rounded corners, which now show paper instead of the theme's page colour.
+
+## ADR-039: 3D motion with CSS transforms, not WebGL
+
+**Context.** The owner asked for "complex 3D animations". The spec allows only `transform` and `opacity` animations, 60 fps on mid-range phones, all text as real DOM (§11), images saved with `html-to-image`, and 150 KB of landing JavaScript.
+
+**Decision.** All 3D is CSS 3D transforms (`perspective`, `rotateX/Y`, `translateZ`, `preserve-3d`) driven by GSAP, or CSS alone on the landing page. `src/story/depth.ts` holds the moves:
+
+- **Between decks, a cube.** The current face turns away around the cube's centre (a transform origin half a frame behind it) while a shade darkens it, then the next deck turns in from the right, like moving to the next person's stories in a story app. The next deck's cards are fetched while the current one plays, so the turn never stops on a loading screen.
+- **Inside cards, one move per platform, in its own style.** Spotify's rows swing down on a hinge while their sleeves flip over, the top artist's record tilts up off the turntable, and the summary tiles fall into place. YouTube's player rises out of the screen and its channel list swings in like a turning wall. Netflix's opener pushes in like a camera, its posters turn in on a carousel and its credits roll up a tilted plane. The Life receipt feeds out of the printer curled towards you, and the personality stamp slams down from above the paper.
+- **On the landing page, the mini story is a turning cube** with one face per deck, swaying gently, in CSS only. **The deck tiles on /start tilt** towards the pointer in 3D.
+- Perspective is set only while a move plays. Cards only animate _from_ a 3D pose to their flat final state, and reduced motion builds no animations at all. So a still card, a saved image and every visual snapshot look exactly as they would without 3D.
+
+**Alternatives.** three.js or another WebGL scene: about 150 KB more on the story page, text drawn on a canvas instead of in the DOM, and images that `html-to-image` can't capture reliably.
+
+**Consequences.** No new dependency. Every 3D move runs on the compositor. Reduced motion gets the 200 ms fades it had before, and the landing cube doesn't turn at all.
+
+## ADR-040: Playing a top song or video in the platforms' own players (an owner-approved exception)
+
+**Context.** The owner asked for this: when someone brings their own Spotify data, the app finds their five most-played songs and pops up a choice of one to play while they watch the stories; with YouTube data, the same for videos. Playing a song or a video is only possible from Spotify or YouTube themselves. That conflicts with three rules in §3:
+
+- **Privacy:** no third-party content, and parsed rows never leave the browser. A track or video id comes from the person's history.
+- **Brand safety:** the platforms' players show their logos.
+- **Honesty:** no real artwork. The players show the real cover or thumbnail.
+
+The owner accepted these trade-offs. The decision is about keeping them as small as possible.
+
+**Decision.**
+
+- **Own data only.** `topMedia()` in the worker returns nothing for the sample, whose ids are made up. The songs are the same list, filters and order as the "Top 5 songs" card, so private sessions stay out unless the person includes them. Videos are the most-watched in the period, with ads, removed videos and titles that are only URLs left out.
+- **Checked ids.** Only ids in the platforms' own formats leave the worker (22 base-62 characters for a track, 11 URL-safe characters for a video), and the UI checks them again before building a player URL.
+- **Nothing loads until a pick.** The Spotify story offers songs and the YouTube story offers videos, once per tab and not when offline. A music button in the story's controls opens the choice again. The dialog shows generated art, not real artwork, and says exactly what playing sends.
+- **The players.** Spotify's embed (`open.spotify.com/embed/track/<id>`) and YouTube's privacy-enhanced embed (`www.youtube-nocookie.com/embed/<id>`), in a sandboxed frame without `allow-top-navigation`. YouTube gets only this site's origin as the referrer, because its player refuses to play without one. Spotify gets none.
+- **CSP:** `frame-src` lists exactly those two origins. `connect-src 'self'` is unchanged, so the page itself still can't send anything elsewhere.
+- **The player lives outside the story.** It sits in a receipt-style "Now playing" ticket outside the Player, so it keeps playing between decks. On phones it floats over the story, can move between the bottom and the top, and keeps YouTube's 200 px minimum height.
+- **Account data fallback.** Spotify's Account data export has no track ids. Its songs get a "Find on Spotify" link that opens a search in a new tab instead of a player.
+
+**Alternatives.**
+
+- "Open in Spotify" or "Open in YouTube" links only. No third-party frame at all, but nothing plays alongside the story, which was the point.
+- Spotify's Web Playback SDK. It needs a Spotify login and Premium, and a third-party script in the page.
+
+**Consequences.**
+
+- The privacy promise now reads "your files never leave your device, and nothing loads from Spotify or YouTube unless you pick something to play". The landing page, /privacy and PRIVACY.md say so.
+- The privacy E2E test still sees no foreign request with the sample. `tests/e2e/media.spec.ts` stubs both players and checks that nothing loads before a pick, that the right player loads after one, that it plays on into the next deck, and that only the two player origins are ever contacted, without a body.
+- Spotify's embed plays 30-second previews to people who aren't logged in to Spotify in that browser.

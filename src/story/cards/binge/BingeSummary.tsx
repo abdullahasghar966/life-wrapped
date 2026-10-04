@@ -5,6 +5,7 @@ import { fmtInt } from '@/lib/format';
 import { Headline } from '../shared/Headline';
 import { CardBody } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
+import { creditsIn } from '../../depth';
 import type { CardProps } from '../types';
 import { CinemaLayers, RedGlow } from './Cinema';
 
@@ -13,11 +14,7 @@ export function BingeSummary({ result }: CardProps<NetflixSummary>) {
   const p = result.props;
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl) => {
-    tl.from(
-      '[data-credit]',
-      { opacity: 0, y: '3cqw', duration: 1, ease: 'expo.out', stagger: 0.12 },
-      0.8,
-    );
+    creditsIn(tl, '[data-credit]', { at: 0.8 });
   });
   const credits = [
     ['Starring', 'You', false],

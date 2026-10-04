@@ -9,7 +9,7 @@ Life, Wrapped turns your Spotify, YouTube and Netflix exports into stories **ins
 3. The rows go into an in-memory DuckDB database inside the worker. Every chart and number is a query against it.
 4. Your data is never written to disk, `localStorage`, IndexedDB or cookies. Close or reload the tab and it is gone. "Clear my data" wipes it immediately.
 
-There are no analytics, no telemetry and no third-party scripts. Fonts and the DuckDB engine are served from this site.
+There are no analytics, no telemetry and no third-party scripts. Fonts and the DuckDB engine are served from this site. The one exception is optional and yours to choose: playing one of your top songs or videos loads Spotify's or YouTube's own player (see [Playing a song or video](#playing-a-song-or-video-optional)).
 
 ## Which files are opened inside a zip
 
@@ -39,13 +39,19 @@ Spotify private sessions count towards your totals, but they are left out of top
 
 YouTube searches are off by default for real data, because search history is often more personal than watch history.
 
-## Sharing (optional)
+## Sharing the image to other apps
 
-Sharing a card is the only time anything is sent to a server, and it only happens when you ask.
+Every card has a **Share** button. It makes a picture of the card inside your browser, shows it to you, and, when you press **Share image…**, hands it to your device's own share sheet. You pick the app (Instagram, Snapchat, WhatsApp, Messages…) and post from there, signed in as you already are. Life, Wrapped never signs in to those apps, has no access to your accounts, and makes no request of its own: your browser passes the picture to the app on your device. What the app then does with the picture is up to you and that app, as with any photo you share.
 
-1. Only the last card of each story (the summary) has a **Share link** button.
-2. Pressing it shows "This is everything that will be shared:" followed by the exact JSON. Nothing is sent until you press **Confirm and share**, and the request carries exactly that text, character for character (an automated test checks this).
-3. You get a link such as `/s/Ab3dE5fG7h` that anyone can open.
+If your browser can't pass pictures to other apps (most desktop browsers can't), the sheet offers **Save image** instead.
+
+## Sharing a link (optional)
+
+Sharing a link is the only time anything is sent to a server, and it only happens when you ask.
+
+1. Only the last card of each story (the summary) can become a link: in its **Share** sheet, press **Create a link…**.
+2. That shows "This is everything that will be shared:" followed by the exact JSON. Nothing is sent until you press **Confirm and share**, and the request carries exactly that text, character for character (an automated test checks this).
+3. You get a link such as `/s/Ab3dE5fG7h` that anyone can open. You can copy it or pass it to your device's share sheet; the shared page has a **Share this card** button too.
 
 **What a shared card contains.** A fixed list of numbers and a few short names per card, plus whether it came from the sample data:
 
@@ -68,21 +74,33 @@ The server accepts nothing else: unknown fields are rejected (not ignored), ther
 
 If the site runs without a database, the Share button explains that sharing isn't set up, and everything else works the same.
 
+## Playing a song or video (optional)
+
+With your own Spotify or YouTube data, the Spotify story offers your five most-played songs, and the YouTube story your five most-watched videos, to play while you watch (ADR-040). Each offer pops up once per tab, never when you're offline, and the music button in the story's controls brings it back.
+
+- **Nothing is loaded from Spotify or YouTube until you pick one.** The list uses generated art, not real covers or thumbnails.
+- **What the platform learns.** Your pick loads that platform's own player in a frame on the page: Spotify's player (`open.spotify.com`), or YouTube's in its privacy-enhanced mode (`www.youtube-nocookie.com`). That company learns which song or video you picked and sees your IP address, and like any website it may set its own cookies. YouTube is also told this site's address, but not the page, because its player won't play without it.
+- **What it can't do.** Nothing else from your files is sent. The frame can't read this page or navigate it away.
+- **The security policy.** The page's Content Security Policy allows frames from exactly those two players (`frame-src`), and `connect-src 'self'` still stops the page from sending data anywhere else.
+- **Which songs.** The songs are the same list as the "Top 5 songs" card, so private sessions stay out unless you include them. Ads and removed videos are never offered.
+- **The sample.** It never offers anything to play: its songs and videos are made up.
+- **Spotify's Account data export** has no track ids. Its songs get a "Find on Spotify" link that opens a search in a new tab instead.
+
 ## Verify it yourself
 
 You don't have to take our word for it.
 
 1. Open the site and your browser's developer tools (F12, or right-click → Inspect), then the **Network** tab. Tick **Preserve log**.
-2. Load your files, or the sample, and play every story.
-3. Look at the list of requests. Every one goes to this site's own address: the pages, scripts, fonts and the DuckDB engine files. Click any request: none carries a **Payload** with your data.
+2. Load your files, or the sample, and play every story. Save an image, or share one to another app.
+3. Look at the list of requests. Every one goes to this site's own address: the pages, scripts, fonts and the DuckDB engine files. Click any request: none carries a **Payload** with your data. (If you picked a song or video to play, its player's frame also talks to Spotify or YouTube, and only after your pick.)
 4. Try to break it. In the **Console** tab, run `fetch('https://example.com', { method: 'POST', body: 'test' })`. The browser refuses with a Content Security Policy error: the page's `connect-src 'self'` rule only lets it talk to its own site, even if a script tried to send data elsewhere.
-5. Turn off your Wi-Fi. After one visit, the whole app keeps working: adding files, playing every story, saving images. Your browser keeps a copy of the app, including the database engine, so there is nothing to send and nowhere to send it. (Only opening someone else's shared link needs a connection.)
+5. Turn off your Wi-Fi. After one visit, the whole app keeps working: adding files, playing every story, saving images. Your browser keeps a copy of the app, including the database engine, so there is nothing to send and nowhere to send it. (Only opening someone else's shared link, or playing a song or video, needs a connection.)
 
-The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site. [`tests/e2e/offline.spec.ts`](../tests/e2e/offline.spec.ts) does the Wi-Fi test.
+The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image and passes one to the share sheet, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site. [`tests/e2e/offline.spec.ts`](../tests/e2e/offline.spec.ts) does the Wi-Fi test, and [`tests/e2e/media.spec.ts`](../tests/e2e/media.spec.ts) checks that nothing loads from Spotify or YouTube until you pick something to play.
 
 ## What your browser stores
 
 - **The app itself**, for offline use: its pages, scripts, fonts and the DuckDB engine (about 38 MB), kept by a service worker in the browser's cache. None of it is your data.
 - **Delete tokens**, in `localStorage`, only after you share a card.
 
-Nothing else: no cookies, no history, no files.
+Nothing else: no cookies, no history, no files. (If you play a song or video, Spotify's or YouTube's player may store cookies for its own site, as it would anywhere.)

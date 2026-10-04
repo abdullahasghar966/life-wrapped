@@ -12,7 +12,7 @@ export function DeckTile({ deck, href, sample }: { deck: DeckId; href: string; s
       href={href}
       data-theme={t.id}
       style={themeStyle(t)}
-      className="group border-ink relative flex aspect-[9/16] w-full flex-col justify-end overflow-hidden rounded-(--t-radius-frame) border-[1.5px] bg-(--t-bg) p-4 shadow-[4px_4px_0_0_var(--color-ink)] transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1"
+      className="group border-ink relative flex aspect-[9/16] w-full flex-col justify-end overflow-hidden rounded-(--t-radius-frame) border-[1.5px] bg-(--t-bg) p-4 shadow-[4px_4px_0_0_var(--color-ink)] transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1 motion-safe:hover:[transform:perspective(700px)_rotateX(7deg)_rotateY(-11deg)_translateY(-4px)] motion-safe:focus-visible:[transform:perspective(700px)_rotateX(7deg)_rotateY(-11deg)_translateY(-4px)]"
       aria-label={`${meta.title}${sample ? ' (sample data)' : ''}`}
     >
       <TileArt deck={deck} t={t} />

@@ -5,6 +5,7 @@ import { ARCHETYPE_LABEL } from '@/engine/insights/life/personality';
 import { Headline } from '../shared/Headline';
 import { CardBody, Eyebrow } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
+import { stampIn } from '../../depth';
 import type { CardProps } from '../types';
 import { Line, Stamp } from './parts';
 
@@ -35,7 +36,7 @@ export function LifePersonality({ result }: CardProps<Props>) {
   const ref = useRef<HTMLDivElement>(null);
   const best = Math.max(...p.why.map((w) => w.score), 1);
   useCardAnim(ref, (tl) => {
-    tl.from('[data-stamp]', { scale: 2.4, opacity: 0, duration: 0.42, ease: 'power4.in' }, 0.3)
+    stampIn(tl, '[data-stamp]', { at: 0.3 })
       .to('[data-stamp]', { x: '0.6cqw', duration: 0.05, yoyo: true, repeat: 3 }, '>')
       .from('[data-tagline]', { opacity: 0, duration: 0.01 }, 0.95)
       .from('[data-line]', { opacity: 0, duration: 0.01, stagger: 0.1 }, 1.3)

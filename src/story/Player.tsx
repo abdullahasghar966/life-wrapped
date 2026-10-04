@@ -3,6 +3,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  Music2,
   Pause,
   Play,
   Settings2,
@@ -14,14 +15,18 @@ import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties }
 import type { OptionsPatch } from '@/engine/api';
 import type { InsightResult } from '@/engine/insights/types';
 import type { DeckId, IngestSummary } from '@/engine/types';
+import { BrandMark } from '@/components/brand';
 import { downloadBlob } from '@/share/capture';
+import { cardImageName } from '@/share/nativeShare';
+import { ShareSheet, type CardImage } from '@/share/ShareSheet';
 import { CARDS } from './cards';
 import { UnlockCard } from './cards/UnlockCard';
 import { CARD_MS } from './constants';
 import { DECKS } from './decks';
+import { cubeIn, cubeOut } from './depth';
 import { ExportStage } from './ExportStage';
 import { useStoryGestures } from './gestures';
-import { gsap } from './gsap';
+import { gsap, useGSAP } from './gsap';
 import { Progress, type ProgressSubscribe } from './progress/Progress';
 import { useReducedMotion } from './runtime';
 import { SettingsSheet } from './SettingsSheet';
@@ -40,8 +45,13 @@ export interface PlayerProps {
   onNextDeck: () => void;
   onOptions: (patch: OptionsPatch) => void;
   onClear: () => void;
-  onShare?: (result: InsightResult) => void;
-  /** Pauses the story while something outside the player (the share dialog) is open. */
+  /** This deck was reached from the previous one, so it turns in like a cube. */
+  enterCube?: boolean;
+  onEntered?: () => void;
+  /** Opens the picker for a song or video to play alongside (own data only). */
+  onOpenMedia?: () => void;
+  mediaLabel?: string;
+  /** Pauses the story while something outside the player (the media picker) is open. */
   externalPause?: boolean;
 }
 
@@ -51,7 +61,10 @@ const iconButton =
   'pointer-events-auto inline-flex size-[10cqw] max-h-11 max-w-11 items-center justify-center rounded-full bg-(--c-ink)/15 text-(--c-ink) transition-colors hover:bg-(--c-ink)/25 focus-visible:outline-2 focus-visible:outline-(--c-ink) disabled:opacity-40 [&_svg]:size-[5cqw] [&_svg]:max-h-5 [&_svg]:max-w-5';
 const actionPill =
   't-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--c-ink) px-[4cqw] py-[2cqw] text-[3.3cqw] font-semibold text-(--c-bg) transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)';
-const outsideChip = 't-body rounded-full bg-(--t-surface) px-3 py-1';
+// Around the frame, the app's own receipt brand (ADR-038): paper, ink, mono labels.
+const outsideChip = 'border-ink bg-paper-2 border-[1.5px] px-3 py-1 font-mono uppercase';
+const outsideNav =
+  'border-ink bg-paper-2 text-ink hover:bg-ink hover:text-paper hidden size-12 items-center justify-center border-[1.5px] shadow-[3px_3px_0_0_var(--color-ink)] transition-colors disabled:opacity-30 disabled:hover:bg-paper-2 disabled:hover:text-ink sm:flex';
 const ctaPill =
   't-body pointer-events-auto inline-flex items-center gap-2 rounded-full bg-(--t-cta) px-[4.5cqw] py-[2cqw] text-[3.4cqw] font-bold text-(--t-on-cta) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--c-ink)';
 
@@ -64,10 +77,14 @@ export function Player({
   onNextDeck,
   onOptions,
   onClear,
-  onShare,
+  enterCube = false,
+  onEntered,
+  onOpenMedia,
+  mediaLabel,
   externalPause = false,
 }: PlayerProps) {
   const theme = THEMES[DECKS[deck].theme];
+  const shell = THEMES.receipt;
   const reduced = useReducedMotion();
 
   const slides = useMemo<SlideItem[]>(() => {
@@ -85,8 +102,25 @@ export function Player({
   const [holding, setHolding] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
-  const [exporting, setExporting] = useState(false);
-  const paused = userPaused || holding || settingsOpen || hidden || exporting || externalPause;
+  // The off-screen 1080 × 1920 render, for "Save image" or for the share sheet.
+  const [capture, setCapture] = useState<{ purpose: 'save' | 'share'; n: number } | null>(null);
+  const [sharing, setSharing] = useState<InsightResult | null>(null);
+  const [shareImage, setShareImage] = useState<CardImage>({ state: 'rendering' });
+  const exporting = capture?.purpose === 'save';
+  // The deck-to-deck cube: entering holds the story still until the turn has finished.
+  const [entering, setEntering] = useState(() => enterCube && !reduced);
+  const [leaving, setLeaving] = useState(false);
+  const leavingRef = useRef(false);
+  const paused =
+    userPaused ||
+    holding ||
+    settingsOpen ||
+    hidden ||
+    !!capture ||
+    !!sharing ||
+    entering ||
+    leaving ||
+    externalPause;
 
   const safeIndex = Math.min(index, slides.length - 1);
   const slide = slides[safeIndex]!;
@@ -96,6 +130,31 @@ export function Player({
 
   const slideRef = useRef<SlideHandle>(null);
   const stageRef = useRef<HTMLDivElement>(null);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const shadeRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (!entering || !sceneRef.current || !frameRef.current) return;
+      cubeIn(sceneRef.current, frameRef.current, shadeRef.current).call(() => {
+        setEntering(false);
+        onEntered?.();
+      });
+    },
+    { dependencies: [] },
+  );
+
+  const leaveDeck = useCallback(() => {
+    if (!nextDeck || leavingRef.current) return;
+    if (reduced || !sceneRef.current || !frameRef.current) {
+      onNextDeck();
+      return;
+    }
+    leavingRef.current = true;
+    setLeaving(true);
+    void cubeOut(sceneRef.current, frameRef.current, shadeRef.current).then(onNextDeck);
+  }, [nextDeck, reduced, onNextDeck]);
 
   // Progress chrome listens to the current card's elapsed fraction.
   const listeners = useRef(new Set<(p: number) => void>());
@@ -107,15 +166,15 @@ export function Player({
 
   const go = useCallback(
     (to: number) => {
-      if (to < 0) return;
+      if (to < 0 || leavingRef.current) return;
       if (to >= total) {
-        if (nextDeck) onNextDeck();
+        leaveDeck();
         return;
       }
       setDirection(to >= safeIndex ? 1 : -1);
       setIndex(to);
     },
-    [total, nextDeck, onNextDeck, safeIndex],
+    [total, leaveDeck, safeIndex],
   );
   const next = useCallback(() => go(safeIndex + 1), [go, safeIndex]);
   const prev = useCallback(() => go(safeIndex - 1), [go, safeIndex]);
@@ -165,7 +224,16 @@ export function Player({
   // and when focus is on a control that uses the key itself.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (settingsOpen || e.defaultPrevented || e.metaKey || e.ctrlKey || e.altKey) return;
+      if (
+        settingsOpen ||
+        sharing ||
+        externalPause ||
+        e.defaultPrevented ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.altKey
+      )
+        return;
       const t = e.target as Element | null;
       if (t?.closest('[role=dialog], input, select, textarea')) return;
       if (e.key === 'ArrowRight') {
@@ -185,7 +253,7 @@ export function Player({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [next, prev, onClose, settingsOpen]);
+  }, [next, prev, onClose, settingsOpen, sharing, externalPause]);
 
   const backdrop =
     slide.kind === 'insight'
@@ -194,7 +262,9 @@ export function Player({
 
   // A deck's last card carries three actions (save, share, and the next deck or
   // the way out), which wrap onto a second row, so its content leaves room for them.
+  // The frame carries the deck's platform theme; everything around it stays in the app's own.
   const frameStyle = {
+    ...themeStyle(theme),
     ...backdropStyle(backdrop),
     ...(isLast ? { '--card-pb': '27cqw' } : {}),
   } as CSSProperties;
@@ -209,15 +279,26 @@ export function Player({
       : `${label}. Add another platform to unlock your online life story.`;
 
   const [exportError, setExportError] = useState(false);
+  const startCapture = (purpose: 'save' | 'share') =>
+    setCapture((c) => ({ purpose, n: (c?.n ?? 0) + 1 }));
   function saveImage() {
     if (slide.kind !== 'insight') return;
     setExportError(false);
-    setExporting(true);
+    startCapture('save');
+  }
+  function openShare() {
+    if (slide.kind !== 'insight') return;
+    setSharing(slide.result);
+    setShareImage({ state: 'rendering' });
+    startCapture('share');
   }
   function onExported(blob: Blob | null) {
-    setExporting(false);
-    if (blob && slide.kind === 'insight') {
-      downloadBlob(blob, `life-wrapped-${slide.result.id.replace('.', '-')}.png`);
+    const purpose = capture?.purpose;
+    setCapture(null);
+    if (purpose === 'share') {
+      setShareImage(blob ? { state: 'ready', blob } : { state: 'error' });
+    } else if (blob && slide.kind === 'insight') {
+      downloadBlob(blob, cardImageName(slide.result.id));
     } else setExportError(true);
   }
 
@@ -227,25 +308,46 @@ export function Player({
 
   return (
     <div
-      data-theme={theme.id}
+      data-theme={shell.id}
       data-testid="story-player"
-      style={themeStyle(theme)}
+      style={themeStyle(shell)}
       className="fixed inset-0 z-50 overflow-hidden bg-(--t-bg) text-(--t-text)"
     >
-      {/* Desktop: a soft wash of the current card's colour behind the frame (a gradient, not a costly blur). */}
-      <div
-        aria-hidden
-        className="absolute inset-0 hidden bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--c-bg)_30%,var(--t-bg))_0%,var(--t-bg)_70%)] sm:block"
-        style={backdropStyle(backdrop)}
-      />
+      {/* Desktop: the same receipt brand as the landing page frames every story. */}
+      <Link
+        href="/"
+        prefetch={false}
+        aria-label="Life, Wrapped home"
+        className="absolute top-4 left-6 z-10 hidden sm:flex"
+      >
+        <BrandMark />
+      </Link>
+      <ol
+        aria-label="Your stories"
+        className="bg-paper absolute top-16 left-6 z-10 hidden flex-col gap-2 font-mono text-[0.7rem] tracking-[0.08em] uppercase lg:flex"
+      >
+        {summary.availableDecks.map((d, i) => (
+          <li
+            key={d}
+            aria-current={d === deck ? 'step' : undefined}
+            className={`flex items-center gap-1.5 ${d === deck ? 'text-ink font-semibold' : 'text-ink-2'}`}
+          >
+            <span
+              aria-hidden
+              className={`size-2 ${d === deck ? 'bg-red' : 'border-ink-2 border'}`}
+            />
+            {String(i + 1).padStart(2, '0')} {DECKS[d].short}
+          </li>
+        ))}
+      </ol>
 
       {sample && (
         <p className="absolute inset-x-0 top-3 z-10 hidden justify-center sm:flex">
-          <span className={`${outsideChip} text-sm text-(--t-muted)`}>
+          <span className={`${outsideChip} text-ink-2 text-[0.7rem] tracking-[0.06em]`}>
             You&apos;re viewing sample data for Alex ·{' '}
             <Link
               href="/start"
-              className="font-semibold text-(--t-text) underline underline-offset-4"
+              className="text-ink decoration-red font-semibold underline decoration-2 underline-offset-4"
             >
               Use your own data →
             </Link>
@@ -253,21 +355,23 @@ export function Player({
         </p>
       )}
 
-      <div className="relative flex h-full items-center justify-center gap-6">
+      <div ref={sceneRef} className="relative flex h-full items-center justify-center gap-6">
         <button
           type="button"
           onClick={prev}
           disabled={safeIndex === 0}
           aria-label="Previous card"
-          className="hidden size-12 items-center justify-center rounded-full bg-(--t-text)/10 text-(--t-text) transition hover:bg-(--t-text)/20 disabled:opacity-30 sm:flex"
+          className={outsideNav}
         >
           <ChevronLeft className="size-6" />
         </button>
 
         <div
+          ref={frameRef}
           data-testid="story-frame"
+          data-theme={theme.id}
           style={frameStyle}
-          className="[container-type:size] relative h-dvh w-screen overflow-hidden sm:aspect-[9/16] sm:h-[min(90vh,920px)] sm:w-auto sm:rounded-(--t-radius-frame) sm:shadow-2xl"
+          className="sm:ring-ink [container-type:size] relative h-dvh w-screen overflow-hidden bg-(--t-bg) sm:aspect-[9/16] sm:h-[min(90vh,920px)] sm:w-auto sm:rounded-(--t-radius-frame) sm:shadow-[8px_8px_0_0_var(--color-ink)] sm:ring-[1.5px]"
         >
           <div
             ref={stageRef}
@@ -299,6 +403,17 @@ export function Player({
                 {sample && <span className="ml-2 text-(--c-muted) sm:hidden">· sample</span>}
               </span>
               <div className="flex items-center gap-[2cqw]">
+                {onOpenMedia && (
+                  <button
+                    type="button"
+                    className={iconButton}
+                    onClick={onOpenMedia}
+                    aria-label={mediaLabel ?? 'Play something while you watch'}
+                    aria-haspopup="dialog"
+                  >
+                    <Music2 />
+                  </button>
+                )}
                 <button
                   type="button"
                   className={iconButton}
@@ -351,9 +466,14 @@ export function Player({
                   {exporting ? 'Saving…' : 'Save image'}
                 </button>
               )}
-              {slide.kind === 'insight' && slide.result.shareable && onShare && (
-                <button type="button" onClick={() => onShare(slide.result)} className={actionPill}>
-                  <Share2 className="size-[4cqw] max-h-4 max-w-4" /> Share link
+              {slide.kind === 'insight' && (
+                <button
+                  type="button"
+                  onClick={openShare}
+                  className={actionPill}
+                  aria-haspopup="dialog"
+                >
+                  <Share2 className="size-[4cqw] max-h-4 max-w-4" /> Share
                 </button>
               )}
               {isLast && nextHref && (
@@ -363,7 +483,7 @@ export function Player({
                     // Same in-page switch as the arrow keys; the href serves new tabs.
                     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
                     e.preventDefault();
-                    onNextDeck();
+                    leaveDeck();
                   }}
                   className={ctaPill}
                 >
@@ -386,6 +506,13 @@ export function Player({
               <ChevronRight />
             </button>
           </div>
+
+          {/* Darkens the face as it turns away during the deck-to-deck cube. */}
+          <div
+            ref={shadeRef}
+            aria-hidden
+            className="pointer-events-none absolute inset-0 z-30 bg-black opacity-0"
+          />
         </div>
 
         <button
@@ -393,14 +520,15 @@ export function Player({
           onClick={next}
           disabled={isLast && !nextDeck}
           aria-label="Next card"
-          className="hidden size-12 items-center justify-center rounded-full bg-(--t-text)/10 text-(--t-text) transition hover:bg-(--t-text)/20 disabled:opacity-30 sm:flex"
+          className={outsideNav}
         >
           <ChevronRight className="size-6" />
         </button>
       </div>
 
       <p className="absolute inset-x-0 bottom-3 hidden justify-center sm:flex">
-        <span className={`${outsideChip} text-xs text-(--t-muted)`}>
+        {/* An explicit paper background: the Spotify wipe blob, clipped by the frame, would otherwise confuse contrast checkers. */}
+        <span className="text-ink-2 bg-paper px-2 font-mono text-[0.68rem] tracking-[0.08em] uppercase">
           ← → to move · Space to pause · Esc to close · hold the card to pause
         </span>
       </p>
@@ -414,11 +542,35 @@ export function Player({
         </p>
       )}
 
-      {exporting && slide.kind === 'insight' && Card && (
-        <ExportStage theme={theme} backdrop={backdrop} seed={slide.result.seed} onDone={onExported}>
+      {capture && slide.kind === 'insight' && Card && (
+        <ExportStage
+          key={capture.n}
+          theme={theme}
+          backdrop={backdrop}
+          seed={slide.result.seed}
+          onDone={onExported}
+        >
           <Card result={slide.result} />
         </ExportStage>
       )}
+
+      <ShareSheet
+        result={sharing}
+        isSample={summary.isSample}
+        image={shareImage}
+        onSaveImage={() => {
+          if (sharing && shareImage.state === 'ready') {
+            downloadBlob(shareImage.blob, cardImageName(sharing.id));
+          }
+        }}
+        onRetryImage={() => {
+          setShareImage({ state: 'rendering' });
+          startCapture('share');
+        }}
+        onOpenChange={(open) => {
+          if (!open) setSharing(null);
+        }}
+      />
 
       <SettingsSheet
         open={settingsOpen}

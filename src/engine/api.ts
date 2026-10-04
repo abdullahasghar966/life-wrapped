@@ -8,6 +8,7 @@ import type { DataCtx, InsightResult, QueryFn } from './insights/types';
 import { Dataset, ingestFiles } from './ingest/pipeline';
 import { addDays, addMonths, defaultTimeZone, isValidTimeZone, TimeConverter } from './ingest/time';
 import { CancelledError } from './ingest/unzip';
+import { EMPTY_MEDIA, topMedia } from './media';
 import { DEFAULT_SEED, generateSample } from './sample/generator';
 import type {
   DateRange,
@@ -18,6 +19,7 @@ import type {
   IngestSummary,
   NetflixProfile,
   Period,
+  TopMedia,
 } from './types';
 
 export interface EngineDeps {
@@ -49,6 +51,8 @@ export interface EngineApi {
   summary(): Promise<IngestSummary | null>;
   availableDecks(): Promise<DeckId[]>;
   getDeck(deck: DeckId): Promise<InsightResult[]>;
+  /** Songs and videos to offer alongside the stories; empty for the sample (ADR-040). */
+  topMedia(): Promise<TopMedia>;
   clear(): Promise<void>;
 }
 
@@ -314,6 +318,13 @@ export function createEngine(deps: EngineDeps): EngineApi {
       if (!loaded) return [];
       const c = await ctx();
       return c ? decksFor(c.availablePlatforms) : [];
+    },
+
+    async topMedia() {
+      // The sample's ids are made up: they would point at nothing, or at a stranger's upload.
+      if (!loaded || isSample) return EMPTY_MEDIA;
+      const c = await ctx();
+      return c ? topMedia(q, c) : EMPTY_MEDIA;
     },
 
     async getDeck(deck) {

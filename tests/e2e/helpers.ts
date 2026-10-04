@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type BrowserContext, type Page } from '@playwright/test';
 
 /** The current card of the story player (the landing preview has slides too). */
 export const slide = (page: Page) =>
@@ -29,3 +29,48 @@ export async function goToCard(page: Page, n: number): Promise<void> {
     await expect(slide(page)).toHaveAttribute('aria-label', new RegExp(`^${i} of `));
   }
 }
+
+/** What the stubbed share sheet received (see stubShareSheet). */
+export interface SharedData {
+  title?: string;
+  text?: string;
+  url?: string;
+  files: { name: string; type: string; width: number; height: number }[];
+}
+
+/**
+ * Replaces the device share sheet (headless Chromium has none) with a stub that
+ * records what it was handed, or, with `supported: false`, removes it the way
+ * most desktop browsers lack it.
+ */
+export async function stubShareSheet(
+  target: Page | BrowserContext,
+  { supported = true } = {},
+): Promise<void> {
+  await target.addInitScript((supported: boolean) => {
+    if (!supported) {
+      Object.defineProperty(navigator, 'share', { value: undefined, configurable: true });
+      Object.defineProperty(navigator, 'canShare', { value: undefined, configurable: true });
+      return;
+    }
+    const w = window as unknown as { __shared: unknown[] };
+    w.__shared = [];
+    Object.defineProperty(navigator, 'canShare', { value: () => true, configurable: true });
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: async (data: ShareData) => {
+        const files = await Promise.all(
+          (data.files ?? []).map(async (f) => {
+            const bitmap = await createImageBitmap(f);
+            return { name: f.name, type: f.type, width: bitmap.width, height: bitmap.height };
+          }),
+        );
+        w.__shared.push({ title: data.title, text: data.text, url: data.url, files });
+      },
+    });
+  }, supported);
+}
+
+/** Everything the stubbed share sheet has received so far. */
+export const sharedData = (page: Page) =>
+  page.evaluate(() => (window as unknown as { __shared: SharedData[] }).__shared);
