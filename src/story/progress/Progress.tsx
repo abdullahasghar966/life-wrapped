@@ -84,7 +84,8 @@ function Scrubber({ total, index, subscribe }: Props) {
       <span className="absolute inset-x-0 top-1/2 h-[0.8cqw] -translate-y-1/2 overflow-hidden bg-(--c-ink)/25">
         <span
           ref={played}
-          className="absolute inset-0 origin-left bg-(--t-accent)"
+          // The card's own accent: red on dark and white cards, yellow on the red ones.
+          className="absolute inset-0 origin-left bg-(--c-accent)"
           style={{ transform: `scaleX(${index / total})` }}
         />
         {Array.from({ length: total - 1 }, (_, i) => (
@@ -100,7 +101,7 @@ function Scrubber({ total, index, subscribe }: Props) {
         className="absolute inset-0"
         style={{ transform: `translateX(${(index / total) * 100}%)` }}
       >
-        <span className="absolute top-1/2 left-0 size-[3cqw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--t-accent)" />
+        <span className="absolute top-1/2 left-0 size-[3cqw] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--c-accent)" />
       </span>
     </div>
   );

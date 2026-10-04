@@ -40,7 +40,7 @@ export function WatchTopChannels({ result }: CardProps<YoutubeTopChannels>) {
               className="w-[28cqw] shrink-0"
             />
             <span className="min-w-0">
-              <span className="block text-[4.6cqw] leading-tight font-bold">
+              <span className="line-clamp-2 text-[4.6cqw] leading-tight font-bold break-words">
                 <span className="sr-only">Number {i + 1}: </span>
                 {c.channel}
               </span>

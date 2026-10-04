@@ -77,6 +77,21 @@ test.describe('story player', () => {
     await expect(page.getByText(/nothing is saved/)).toBeVisible();
   });
 
+  test('a Spotify card keeps its colour once the wipe has grown', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await openDeck(page);
+    await goToCard(page, 2);
+    // Some GPUs fail to draw the large wipe circle; the plain fill must take over.
+    const fill = page.locator('[data-card-surface] [data-wipe-fill]').first();
+    await expect.poll(() => fill.evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    const colours = await fill.evaluate((el) => [
+      getComputedStyle(el).backgroundColor,
+      getComputedStyle(el.closest('[data-card-surface]')!).getPropertyValue('--c-bg').trim(),
+    ]);
+    expect(colours[0]).not.toBe('rgba(0, 0, 0, 0)');
+    expect(colours[1]).not.toBe('');
+  });
+
   test('saves a 1080 × 1920 PNG of the card', async ({ page }) => {
     await openDeck(page);
     await goToCard(page, 2);

@@ -110,12 +110,15 @@ export function Thumbnail({
   progress = 0.6,
   initials = true,
   cover = false,
+  bar = true,
   className,
   style,
 }: {
   name: string;
   label?: string;
   progress?: number;
+  /** Draw the progress bar along the bottom. */
+  bar?: boolean;
   /** Show the big initials (off for purely decorative frames). */
   initials?: boolean;
   /** Fill any box like CSS object-fit: cover. */
@@ -181,8 +184,12 @@ export function Thumbnail({
             </text>
           </g>
         )}
-        <rect x="0" y="86.5" width="160" height="3.5" fill="rgba(255,255,255,.3)" />
-        <rect x="0" y="86.5" width={160 * progress} height="3.5" fill="#FF0033" />
+        {bar && (
+          <>
+            <rect x="0" y="86.5" width="160" height="3.5" fill="rgba(255,255,255,.3)" />
+            <rect x="0" y="86.5" width={160 * progress} height="3.5" fill="#FF0033" />
+          </>
+        )}
       </g>
     </svg>
   );

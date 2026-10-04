@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { SpotifyTopArtist } from '@/engine/insights/spotify/topArtist';
-import { fmtDate, fmtInt } from '@/lib/format';
+import { fmtDate, fmtInt, isLongName, shorten } from '@/lib/format';
 import { Cover } from '../../art/Art';
 import { gsap } from '../../gsap';
 import { variant } from '../../runtime';
@@ -79,9 +79,13 @@ export function SoundTopArtist({ result }: CardProps<SpotifyTopArtist>) {
           <Cover name={p.artist} className="size-full" />
         </div>
       </div>
-      <p className="t-display mt-[6cqw] text-[11cqw] leading-[0.95]">{p.artist}</p>
+      <p
+        className={`t-display mt-[6cqw] line-clamp-2 leading-[0.95] break-words ${isLongName(p.artist) ? 'text-[8cqw]' : 'text-[11cqw]'}`}
+      >
+        {p.artist}
+      </p>
       <Headline className="mt-[3cqw] text-[6.4cqw] leading-[1.05] font-extrabold" delay={0.6}>
-        {variant(result.seed, LINES)(p.artist)}
+        {variant(result.seed, LINES)(shorten(p.artist, 28))}
       </Headline>
       <div className="mt-auto flex flex-wrap gap-[2.5cqw]">
         <Sticker filled tilt={-5}>

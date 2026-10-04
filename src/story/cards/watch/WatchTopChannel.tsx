@@ -1,7 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import type { YoutubeTopChannel } from '@/engine/insights/youtube/topChannel';
-import { fmtDate, fmtInt, fmtPct } from '@/lib/format';
+import { fmtDate, fmtInt, fmtPct, isLongName, shorten } from '@/lib/format';
 import { Avatar } from '../../art/Art';
 import { thumbArt } from '../../art/generatedArt';
 import { variant } from '../../runtime';
@@ -44,7 +44,10 @@ export function WatchTopChannel({ result }: CardProps<YoutubeTopChannel>) {
         </div>
       </div>
       <div className="mt-[14cqw]">
-        <p data-line className="t-display text-[11cqw] leading-[0.95]">
+        <p
+          data-line
+          className={`t-display line-clamp-2 leading-[0.95] break-words ${isLongName(p.channel) ? 'text-[8cqw]' : 'text-[11cqw]'}`}
+        >
           {p.channel}
         </p>
         <p data-line className="mt-[2cqw] text-[4cqw] text-(--c-muted)">
@@ -59,7 +62,7 @@ export function WatchTopChannel({ result }: CardProps<YoutubeTopChannel>) {
         </span>
       </div>
       <Headline className="mt-auto text-[8.4cqw] leading-[1]" delay={0.5}>
-        {`${p.channel}: ${fmtInt(p.videos)} videos. ${variant(result.seed, TAGS)}`}
+        {`${shorten(p.channel, 28)}: ${fmtInt(p.videos)} videos. ${variant(result.seed, TAGS)}`}
       </Headline>
     </CardBody>
   );

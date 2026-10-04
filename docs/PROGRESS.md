@@ -26,11 +26,21 @@
   - Nothing loads from them until a pick; ids are checked twice; `frame-src` allows exactly the two players; the sample offers nothing.
   - The landing page, /privacy and PRIVACY.md say all of this, and `tests/e2e/media.spec.ts` checks it with the players stubbed.
 
+- [x] **Built for real exports (ADR-041).** After the owner tried their own exports:
+  - long names are shortened in headlines and capped elsewhere;
+  - layouts can't overlap;
+  - headline letters are no longer clipped;
+  - Spotify cards keep their colour on GPUs that fail to draw the wipe circle;
+  - the song and video picker fits long titles;
+  - the YouTube story has red and purple cards.
+
+  A long-names E2E test guards every deck on a phone and a desktop.
+
 ## Next session starts here
 
-Everything in the spec is built, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. The share sheet, the consistent brand, the 3D motion and the soundtrack are committed on `claude/focused-cray-sbemly`, with new Linux visual baselines. The branch is on GitHub. Next:
+Everything in the spec is built, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. The share sheet, the consistent brand, the 3D motion and the soundtrack are merged into `main` (pull request #1) and deployed, with CI green. The real-export fixes (ADR-041) are on `claude/focused-cray-sbemly` and need merging. Next:
 
-1. **Merge it into `main`** through a pull request, so CI runs first and Vercel deploys it (see HANDOFF.md). Then try the soundtrack with a real export on the live site, since tests stub the players.
+1. **Try the soundtrack with a real export on the live site**, since tests stub the players.
 2. **Regenerate the Windows visual baselines** on Windows: run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`. CI doesn't use them.
 3. **Finish the post-deploy checklist** in `docs/DEPLOY.md` (the share database and the checks after it).
 4. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.

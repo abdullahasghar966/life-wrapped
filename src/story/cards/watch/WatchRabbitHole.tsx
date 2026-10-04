@@ -2,7 +2,7 @@
 import { useRef } from 'react';
 import { UNAVAILABLE_TITLE } from '@/engine/insights/youtube/rabbitHole';
 import type { RabbitHole } from '@/engine/insights/youtube/shared';
-import { fmtClock, fmtDayMonth } from '@/lib/format';
+import { fmtClock, fmtDayMonth, shorten } from '@/lib/format';
 import { Thumbnail } from '../../art/Art';
 import { CountUp } from '../shared/CountUp';
 import { Headline } from '../shared/Headline';
@@ -28,40 +28,41 @@ export function WatchRabbitHole({ result }: CardProps<RabbitHole>) {
   return (
     <CardBody ref={ref}>
       <Eyebrow>Rabbit hole · {fmtDayMonth(p.date)}</Eyebrow>
-      <div className="relative mt-[5cqw] flex-1">
+      {/* The chain, then the count below it, in normal flow: they can't overlap, however long the titles. */}
+      <div className="relative mt-[4cqw] min-h-0 shrink overflow-hidden">
         <span
           data-line
           aria-hidden
-          className="absolute top-[4cqw] bottom-[10cqw] left-[5cqw] w-[1.2cqw] rounded-full bg-(--t-accent)"
+          className="absolute top-[2cqw] bottom-[2cqw] left-[4.5cqw] w-[1.2cqw] rounded-full bg-(--t-accent)"
         />
-        <ol className="relative flex flex-col gap-[2.6cqw]">
+        <ol className="relative flex flex-col gap-[2cqw]">
           {shown.map((v, i) => (
             <li key={i} data-hop className="flex items-center gap-[3cqw]">
-              <span className="relative z-10 flex size-[11cqw] shrink-0 items-center justify-center rounded-full bg-(--t-cta) text-[3.6cqw] font-bold text-(--t-on-cta)">
+              <span className="relative z-10 flex size-[10cqw] shrink-0 items-center justify-center rounded-full bg-(--t-cta) text-[3.4cqw] font-bold text-(--t-on-cta)">
                 {i + 1}
               </span>
               <Thumbnail
                 name={v.title ?? `removed-${i}`}
-                className="w-[24cqw] shrink-0"
+                className="w-[20cqw] shrink-0"
                 progress={1}
               />
-              <span className="line-clamp-2 min-w-0 text-[3.8cqw] leading-tight font-semibold">
+              <span className="line-clamp-2 min-w-0 text-[3.6cqw] leading-tight font-semibold break-words">
                 {v.title ?? UNAVAILABLE_TITLE}
               </span>
             </li>
           ))}
         </ol>
-        <p data-end className="absolute bottom-0 left-0 flex items-baseline gap-[2.4cqw]">
-          <span className="t-display text-[15cqw] leading-none">
-            <CountUp value={p.videos} />
-          </span>
-          <span className="text-[4.4cqw] font-semibold text-(--c-muted)">
-            videos • {fmtClock(p.startMinute)} → {fmtClock(p.endMinute)}
-          </span>
-        </p>
       </div>
-      <Headline className="mt-[5cqw] text-[7.4cqw] leading-[1.02]" delay={1}>
-        {`It started with “${first}”. ${p.videos} videos later it was ${fmtClock(p.endMinute)}.`}
+      <p data-end className="mt-[3cqw] flex shrink-0 items-baseline gap-[2.4cqw]">
+        <span className="t-display text-[14cqw] leading-none">
+          <CountUp value={p.videos} />
+        </span>
+        <span className="text-[4.2cqw] font-semibold text-(--c-muted)">
+          videos • {fmtClock(p.startMinute)} → {fmtClock(p.endMinute)}
+        </span>
+      </p>
+      <Headline className="mt-auto shrink-0 pt-[3cqw] text-[7cqw] leading-[1.05]" delay={1}>
+        {`It started with “${shorten(first, 40)}”. ${p.videos} videos later it was ${fmtClock(p.endMinute)}.`}
       </Headline>
     </CardBody>
   );

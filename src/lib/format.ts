@@ -59,3 +59,20 @@ export function fmtClock(minutes: number): string {
 export function plural(n: number, one: string, many = `${one}s`): string {
   return `${fmtInt(n)} ${n === 1 ? one : many}`;
 }
+
+/**
+ * Real exports carry long names (100-character video titles are common). Headlines
+ * get them shortened at a word boundary; lists and a11y text keep the full name.
+ * Counts code points, so an emoji is never cut in half.
+ */
+export function shorten(text: string, max = 30): string {
+  const chars = Array.from(text.trim());
+  if (chars.length <= max) return text.trim();
+  const cut = chars.slice(0, max - 1).join('');
+  const space = cut.lastIndexOf(' ');
+  const base = space > max / 2 ? cut.slice(0, space) : cut;
+  return `${base.replace(/[\s,.;:!?|–—([{“"'-]+$/u, '')}…`;
+}
+
+/** Whether a name is long enough to need the smaller of two display sizes. */
+export const isLongName = (text: string, max = 22) => Array.from(text).length > max;

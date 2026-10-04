@@ -1,7 +1,7 @@
 'use client';
 import { useMemo, useRef } from 'react';
 import type { SpotifyPodcasts } from '@/engine/insights/spotify/podcasts';
-import { fmtInt } from '@/lib/format';
+import { fmtInt, shorten } from '@/lib/format';
 import { Cover } from '../../art/Art';
 import { nameRandom } from '../../art/generatedArt';
 import { gsap } from '../../gsap';
@@ -55,7 +55,7 @@ export function SoundPodcasts({ result }: CardProps<SpotifyPodcasts>) {
         </div>
       </div>
       <Headline className="mt-[6cqw] text-[9.5cqw] leading-[0.98]" delay={0.6}>
-        {`Your favourite voice: ${p.show}.`}
+        {`Your favourite voice: ${shorten(p.show, 28)}.`}
       </Headline>
       <div className="mt-auto flex flex-wrap gap-[2.5cqw]">
         <Sticker filled tilt={-4}>
