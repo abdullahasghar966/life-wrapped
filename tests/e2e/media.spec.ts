@@ -30,7 +30,7 @@ function foreignRequests(page: Page): Array<{ url: string; body: boolean }> {
   return out;
 }
 
-async function playOwnData(page: Page) {
+async function playOwnData(page: Page, youtube = youtubeWatchExport()) {
   await page.goto('/start');
   await page.getByTestId('file-input').setInputFiles([
     {
@@ -38,7 +38,7 @@ async function playOwnData(page: Page) {
       mimeType: 'application/json',
       buffer: spotifyExtendedExport(),
     },
-    { name: 'watch-history.json', mimeType: 'application/json', buffer: youtubeWatchExport() },
+    { name: 'watch-history.json', mimeType: 'application/json', buffer: youtube },
   ]);
   await expect(page.getByRole('heading', { name: 'Here’s what we found' })).toBeVisible();
   await page.getByRole('link', { name: 'Play my story' }).click();
@@ -108,6 +108,35 @@ test.describe('playing a top song or video alongside the stories', () => {
       expect(r.url).toMatch(PLAYERS);
       expect(r.body).toBe(false);
     }
+  });
+
+  test('long titles stay inside the picker, with every Play button in reach', async ({ page }) => {
+    test.slow();
+    await stubPlayers(page);
+    const long = (n: number) =>
+      `${'COMEDIAN TRAINS AT THE MOST DANGEROUS GYM IN THE WORLD '.repeat(3)}${n}`;
+    await playOwnData(page, youtubeWatchExport({ title: long }));
+    await page
+      .getByRole('dialog', { name: 'Add a soundtrack?' })
+      .getByRole('button', { name: 'Not now' })
+      .click();
+    for (let i = 0; i < 25 && !page.url().includes('/story/youtube'); i++) {
+      await page.keyboard.press('ArrowRight');
+      await page.waitForTimeout(150);
+    }
+    const videos = page.getByRole('dialog', { name: 'Watch along?' });
+    await expect(videos).toBeVisible();
+    // No sideways scrolling: the content is never wider than the dialog.
+    expect(await videos.evaluate((el) => el.scrollWidth - el.clientWidth)).toBeLessThanOrEqual(0);
+    const box = (await videos.boundingBox())!;
+    const buttons = videos.getByRole('button', { name: /^Play / });
+    await expect(buttons).toHaveCount(5);
+    for (const b of await buttons.all()) {
+      const r = (await b.boundingBox())!;
+      expect(r.x + r.width).toBeLessThanOrEqual(box.x + box.width);
+    }
+    await buttons.first().click();
+    await expect(page.getByTestId('media-dock')).toBeVisible();
   });
 
   test('the sample offers nothing to play', async ({ page }) => {

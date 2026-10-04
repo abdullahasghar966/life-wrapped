@@ -74,7 +74,7 @@ export function MediaPicker({
 
   return (
     <Dialog open={kind !== null} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg">
+      <DialogContent className="max-h-[calc(100dvh-2rem)] grid-cols-[minmax(0,1fr)] overflow-x-hidden overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="font-display text-3xl uppercase">{copy.title}</DialogTitle>
           <DialogDescription>
@@ -101,7 +101,7 @@ export function MediaPicker({
                   className="size-11 shrink-0 rounded"
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">{song.track}</span>
+                  <span className="line-clamp-2 font-semibold break-words">{song.track}</span>
                   <span className="text-muted-foreground block truncate text-xs">
                     {song.artist} · {fmtInt(song.plays)} {song.plays === 1 ? 'play' : 'plays'}
                   </span>
@@ -109,6 +109,7 @@ export function MediaPicker({
                 {song.trackId ? (
                   <Button
                     size="sm"
+                    className="shrink-0"
                     disabled={!online}
                     onClick={() => onPick({ kind: 'song', song, rank: i + 1 })}
                     aria-label={`Play ${song.track} by ${song.artist}`}
@@ -141,7 +142,7 @@ export function MediaPicker({
                   className="h-11 w-[4.9rem] shrink-0 rounded"
                 />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">{video.title}</span>
+                  <span className="line-clamp-2 font-semibold break-words">{video.title}</span>
                   <span className="text-muted-foreground block truncate text-xs">
                     {video.channel ? `${video.channel} · ` : ''}
                     {fmtInt(video.views)} {video.views === 1 ? 'view' : 'views'}
@@ -149,6 +150,7 @@ export function MediaPicker({
                 </span>
                 <Button
                   size="sm"
+                  className="shrink-0"
                   disabled={!online}
                   onClick={() => onPick({ kind: 'video', video, rank: i + 1 })}
                   aria-label={`Play ${video.title}`}

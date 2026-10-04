@@ -39,14 +39,16 @@ export function spotifyExtendedExport(): Buffer {
 }
 
 /** YouTube Takeout watch history: 120 watches of 12 videos over the last 40 days. */
-export function youtubeWatchExport(): Buffer {
+export function youtubeWatchExport({
+  title = (n: number) => `Video number ${n}`,
+}: { title?: (n: number) => string } = {}): Buffer {
   const now = Date.now();
   const rows = Array.from({ length: 120 }, (_, i) => {
     // Later videos come up more and more often, so video 12 is the most watched.
     const v = Math.floor(Math.sqrt(i * 1.2)) % 12;
     return {
       header: 'YouTube',
-      title: `Watched Video number ${v + 1}`,
+      title: `Watched ${title(v + 1)}`,
       titleUrl: `https://www.youtube.com/watch?v=e2eVideo${String(v).padStart(3, '0')}`,
       subtitles: [
         {

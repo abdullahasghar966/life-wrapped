@@ -67,11 +67,15 @@ export const Slide = forwardRef<SlideHandle, Props>(function Slide(
         className="t-body [container-type:size] absolute inset-0 overflow-hidden text-(--c-ink)"
       >
         {theme.id === 'sound' ? (
-          <div
-            data-wipe
-            aria-hidden
-            className="absolute top-1/2 left-1/2 size-[300cqmax] -translate-x-1/2 -translate-y-1/2 rounded-full bg-(--c-bg)"
-          />
+          <>
+            {/* The plain fill keeps the card's colour wherever a browser fails to draw the large circle. */}
+            <div data-wipe-fill aria-hidden className="absolute inset-0 bg-(--c-bg)" />
+            <div
+              data-wipe
+              aria-hidden
+              className="absolute top-1/2 left-1/2 size-[130cqmax] -translate-x-1/2 -translate-y-1/2 rounded-[50%] bg-(--c-bg)"
+            />
+          </>
         ) : (
           <div aria-hidden className="absolute inset-0 bg-(--c-bg)" />
         )}

@@ -17,8 +17,14 @@ export function enterSlide(
   switch (theme) {
     case 'sound': {
       const blob = el.querySelector<HTMLElement>('[data-wipe]');
+      const fill = el.querySelector<HTMLElement>('[data-wipe-fill]');
       const content = el.querySelector<HTMLElement>('[data-card-content]');
       const tl = gsap.timeline();
+      // The plain fill waits under the circle and takes over once it has grown: some
+      // GPUs fail to draw a circle this large, and the card must never lose its colour.
+      if (fill) {
+        tl.fromTo(fill, { opacity: 0 }, { opacity: 1, duration: 0.01, ease: 'none' }, 0.55);
+      }
       if (blob) {
         // The blob grows from the side you tapped towards, then settles centred.
         tl.fromTo(
