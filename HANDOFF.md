@@ -9,7 +9,7 @@ Life, Wrapped is complete against the spec and live at <https://life-wrapped-jgp
 After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 - the receipt rebrand (ADR-036), on `main`;
-- on `claude/focused-cray-sbemly`, **pushed to GitHub but not yet merged into `main`** (see §5):
+- merged into `main` through pull request #1 and deployed (2026-10-04):
   - share to social apps (ADR-037);
   - one brand around every story (ADR-038);
   - 3D motion (ADR-039);
@@ -17,7 +17,7 @@ After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 ## 2. Progress (2026-10-04)
 
-- CI on `main` is green: run 19 for `bcc5972`, with landing → story at 4.1 s against the 5 s budget.
+- CI on `main` is green after the merge: run 21 for `34a94d6`, with all 55 E2E tests and landing → story at 4.1 s against the 5 s budget. Vercel deployed the merged code.
 - Everything in §1 is built, tested and committed on the branch, together with Linux visual baselines and docs: the ADRs, PRIVACY, README, ARCHITECTURE and PROGRESS. The landing page and /privacy now describe the optional players honestly.
 - Checks in the cloud container:
   - `typecheck`, `lint`, `format:check` and `test` (298 + 3) all pass.
@@ -68,13 +68,6 @@ After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 ## 5. Do next
 
-1. **Merge `claude/focused-cray-sbemly` into `main`.** The owner installed the Claude GitHub App and the branch is pushed. A session's auto-mode check blocks Claude from pushing to `main` itself, because that deploys to production. So the owner merges it:
-   - open a pull request at <https://github.com/abdullahasghar966/life-wrapped/compare/main...claude/focused-cray-sbemly>;
-   - wait for CI to pass on it;
-   - merge.
-
-   Vercel then deploys `main` automatically. Confirm CI is green on `main` too.
-
-2. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
-3. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
-4. Then continue with `docs/PROGRESS.md` → "Next session starts here".
+1. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
+2. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
+3. Then continue with `docs/PROGRESS.md` → "Next session starts here".
