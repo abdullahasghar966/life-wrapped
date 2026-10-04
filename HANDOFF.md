@@ -9,7 +9,7 @@ Life, Wrapped is complete against the spec and live at <https://life-wrapped-jgp
 After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 - the receipt rebrand (ADR-036), on `main`;
-- on `claude/focused-cray-sbemly`, **not yet on GitHub** (see §5):
+- on `claude/focused-cray-sbemly`, **pushed to GitHub but not yet merged into `main`** (see §5):
   - share to social apps (ADR-037);
   - one brand around every story (ADR-038);
   - 3D motion (ADR-039);
@@ -68,8 +68,13 @@ After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 ## 5. Do next
 
-1. **The owner grants GitHub write access** for Claude sessions. Both `git push` and the GitHub API returned `403 Resource not accessible by integration`: the Claude GitHub App isn't installed on this repository. Install it at <https://github.com/apps/claude/installations/select_target> and choose `life-wrapped`, or reconnect GitHub at <https://claude.ai/connect-github>.
-2. **Push `claude/focused-cray-sbemly`, then fast-forward `main` to it.** Vercel deploys `main` automatically. Confirm CI is green on `main`.
-3. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
-4. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
-5. Then continue with `docs/PROGRESS.md` → "Next session starts here".
+1. **Merge `claude/focused-cray-sbemly` into `main`.** The owner installed the Claude GitHub App and the branch is pushed. A session's auto-mode check blocks Claude from pushing to `main` itself, because that deploys to production. So the owner merges it:
+   - open a pull request at <https://github.com/abdullahasghar966/life-wrapped/compare/main...claude/focused-cray-sbemly>;
+   - wait for CI to pass on it;
+   - merge.
+
+   Vercel then deploys `main` automatically. Confirm CI is green on `main` too.
+
+2. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
+3. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
+4. Then continue with `docs/PROGRESS.md` → "Next session starts here".
