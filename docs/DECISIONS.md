@@ -440,3 +440,26 @@ The owner accepted these trade-offs. The decision is about keeping them as small
 - The privacy promise now reads "your files never leave your device, and nothing loads from Spotify or YouTube unless you pick something to play". The landing page, /privacy and PRIVACY.md say so.
 - The privacy E2E test still sees no foreign request with the sample. `tests/e2e/media.spec.ts` stubs both players and checks that nothing loads before a pick, that the right player loads after one, that it plays on into the next deck, and that only the two player origins are ever contacted, without a body.
 - Spotify's embed plays 30-second previews to people who aren't logged in to Spotify in that browser.
+
+## ADR-041: Built for real exports, not just the sample
+
+**Context.** Once the owner played their own exports on the live site, four problems showed up that the sample never triggered:
+
+- **Long names.** Real names are far longer than the sample's. Video titles of 100 characters with hashtags and emoji ran under the card actions or over other text.
+- **Clipped letters.** The headline reveal's masks clipped descenders.
+- **Black Spotify cards.** On the owner's GPU, the Spotify theme's huge wipe circle wasn't drawn, so its cards went black with unreadable ink text.
+- **Grey YouTube cards.** The owner also asked for colour in the mostly-grey YouTube story.
+
+**Decision.**
+
+- **Names in headlines are shortened** at a word boundary, by code points so an emoji is never split (`shorten()` in `lib/format.ts`). Single-name displays cap at two lines and drop a size for long names. Lists clamp to two lines. Accessibility text and share payloads keep the full names.
+- **Layouts can't overlap.** Cards that stacked a statistic over a list use normal flow. Grids share the space left above the actions.
+- **Headline masks get extra room** above and below, cancelled by negative margins, so no glyph is clipped. Line masks use `overflow-clip-margin`.
+- **The Spotify wipe has a plain fill underneath** that takes over once the circle has grown. The circle is smaller, with a finite 50% radius.
+- **Two of YouTube's grey backdrops become YouTube red and a deep purple.** On the red one the accent turns yellow, and the scrubber follows each card's accent. Every pair still passes the contrast test.
+
+**Consequences.**
+
+- `tests/e2e/long-names.spec.ts` plays every deck with long real-world names on a phone and a desktop. It fails on visible text under the actions, outside the frame, or on top of other text, and it caught the rabbit-hole and "Most rewatched" bugs before the fix.
+- `tests/e2e/media.spec.ts` checks that long titles keep the picker's Play buttons in reach.
+- The YouTube visual baselines changed. The other decks changed only at the frame's corners.

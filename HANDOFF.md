@@ -24,6 +24,15 @@ After launch, the owner asked for changes beyond the spec. Each has an ADR:
   - All 53 Chromium E2E tests pass: visual, accessibility, privacy, offline, sharing and media.
   - Only the perf budget "landing → first card in 5 s" fails there, at about 5.7 s. Old `main` takes 5.65 s in that container and 4.1 s on GitHub's runners, so it's the container's speed. The new work adds about 1.5%.
 
+- **Real-export fixes (ADR-041)** are on `claude/focused-cray-sbemly`, waiting for a pull request into `main`. Once the owner played their own data, these turned up:
+  - black Spotify cards on their GPU;
+  - a picker that scrolled sideways;
+  - long titles under the card actions, and the rabbit-hole count over its list;
+  - clipped letters;
+  - grey YouTube cards.
+
+  All fixed, with `tests/e2e/long-names.spec.ts` guarding every deck.
+
 ## 3. The owner's requests and the deviations they approved
 
 1. **Receipt rebrand** (ADR-036): this replaces the spec's `aurora` theme.
@@ -63,10 +72,13 @@ After launch, the owner asked for changes beyond the spec. Each has an ADR:
 - **`next dev` runs effects twice (Strict Mode).** The story page's sample loading can then race and bounce to /start. Review story pages on a production build (`pnpm build && pnpm start`).
 - **Axe and the Spotify wipe blob.** The colour-wipe blob is 300% of the frame and clipped by it. Axe still treats it as being behind text outside the frame. Text around the frame needs an explicit background (the keyboard hints and the story list have one).
 - **Tests stub the media players.** `tests/e2e/media.spec.ts` routes both origins to a stub page, and `tests/e2e/exports.ts` generates real-format exports big enough to unlock decks. The offline test uses them too.
+- **Real data is the real test.** The sample's names are short, and the visual tests use reduced motion. Look at layouts with `longNameExports()` (in `tests/e2e/exports.ts`) and with motion on.
 - **Playwright skips the `perf` project** when any Chromium spec fails, so a perf failure can hide behind another failure.
 - **If `next/font/google` fails in CI again:** self-host IBM Plex Sans and Mono like Archivo. Put the WOFF2 files in `src/fonts/` and load them with `next/font/local`.
 
 ## 5. Do next
+
+0. **Merge the real-export fixes:** open a pull request from `claude/focused-cray-sbemly` at <https://github.com/abdullahasghar966/life-wrapped/compare/main...claude/focused-cray-sbemly>, wait for CI, then merge.
 
 1. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
 2. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
