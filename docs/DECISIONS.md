@@ -356,3 +356,29 @@ The LCP target is not met in Lighthouse's simulation. The headline paints with t
 - The brand components avoid `cn` (tailwind-merge). The site header is part of the client error boundary, which ships with every page, and tailwind-merge would have pushed the landing past its 150 KB budget.
 - The Life deck's visual baselines were regenerated.
 - Link-preview images use Plex for body text in every theme.
+
+## ADR-037: Sharing to social apps goes through the device's share sheet
+
+**Context.** After the rebrand, the owner asked for cards to be shareable to Instagram, Snapchat, Facebook and other social apps, not only as a link. Posting directly would mean signing in with each platform (OAuth) and calling its API. The spec rules both out: there are no user accounts (§3, ADR-003) and no platform APIs. Those integrations would also need app review, server-side tokens and uploads that leave the browser. Instagram and Snapchat don't let a web app post to a story at all.
+
+**Decision.**
+
+- Every card has a **Share** button next to **Save image**. It opens a sheet that renders the card's 1080 × 1920 PNG on the device (the same `ExportStage` as Save image) and shows it.
+- **Share image…** passes the PNG to the Web Share API (`navigator.share({ files })`). The operating system shows its own share sheet, and the person posts from the app they pick, already signed in there. The browser hands the file over locally, and Life, Wrapped sends no request.
+- The image is rendered _before_ the button is shown, because browsers only allow `share()` straight after a tap, and rendering takes longer than that window.
+- Where files can't be shared (most desktop browsers, Firefox), the sheet says so and offers **Save image**, so the person can post it from the app themselves.
+- On summary cards, the same sheet holds the opt-in link from §13 (exact JSON, then Confirm). A created link can also go to the share sheet, and `/s/[id]` has **Share this card**, which copies the link where there is no share sheet.
+- On summary cards, Share replaces the old "Share link" button, so the last card still has three actions.
+
+**Alternatives.**
+
+- Per-platform "Share to X" buttons with intent URLs: they share links only, not images, and they show brand marks, which §3 forbids.
+- Platform logins and APIs: ruled out by §3, and Instagram and Snapchat stories can't be posted from the web anyway.
+- Uploading the image to make an image link: it would put pictures of personal data on a server, against the whitelist design of §13.
+
+**Consequences.**
+
+- Nothing about what leaves the device through Life, Wrapped changes: the privacy E2E now also passes an image to a stubbed share sheet and still sees no request with a body.
+- What happens after the share sheet is between the person and the app they choose, like any photo they share; the sheet says so.
+- Every card's chrome gained a pill, so all visual baselines were regenerated.
+- Headless Chromium has no share sheet, so the E2E tests stub `navigator.share` and check what it received (a 1080 × 1920 PNG with the card's name).

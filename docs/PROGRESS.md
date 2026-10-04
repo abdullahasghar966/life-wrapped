@@ -13,15 +13,16 @@
 ## After launch
 
 - [x] **Rebrand (ADR-036).** At the owner's request, the app's own look moved from the spec's `aurora` to a printed-receipt brand: paper, ink and one red, Archivo Extra Condensed with IBM Plex. The landing, start, privacy, error and share pages; the eight Life cards, now built like the platform decks' story cards; the Life share image and the site's preview image; the icons; and the demo GIF. Windows visual baselines regenerated.
-- [ ] **Share to social apps.** A native share sheet with the card as an image (Instagram, Snapchat, Facebook and others post it from the person's own app), plus share links for a created card.
+- [x] **Share to social apps (ADR-037).** Every card has a Share button: it renders the card's PNG on the device, previews it and hands it to the device's share sheet (Instagram, Snapchat, WhatsApp and others post it from the person's own app; nothing is uploaded, no platform logins). Without file sharing, the sheet offers Save image. Summary cards keep the opt-in link in the same sheet; a created link can go to the share sheet, and `/s/[id]` has Share this card. Unit tests for the share helpers; E2E for the image share, the fallback, link sharing and the shared page's button; the privacy E2E now shares an image too. **Visual baselines are still the old ones** (see Next session).
 
 ## Next session starts here
 
-Everything in the spec is built and green in CI, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. Next:
+Everything in the spec is built, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. The share-sheet feature is committed on `claude/focused-cray-sbemly`. Every card's chrome gained a Share pill, so the visual baselines are out of date. Next:
 
-1. **Share to social apps** (above).
-2. **Finish the post-deploy checklist** in `docs/DEPLOY.md` (the share database and the checks after it).
-3. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.
+1. **Regenerate the visual baselines.** For Linux, run the "Visual baselines" workflow on the branch, then commit the `*-linux.png` files from its artifact into `tests/e2e/visual.spec.ts-snapshots/`. For Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`. Until then, only `visual.spec.ts` fails; every other spec passes.
+2. **Merge the branch into main** once CI is green there.
+3. **Finish the post-deploy checklist** in `docs/DEPLOY.md` (the share database and the checks after it).
+4. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.
 
 ## Definition of done (§19)
 

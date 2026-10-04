@@ -72,10 +72,17 @@ Tests: `tests/unit/insights.sample.test.ts` snapshots every insight against the 
 - **Timing:** one GSAP tween per card drives auto-advance (7 s) and the progress chrome; summary cards don't auto-advance. Holding, the pause button, the settings sheet and a hidden tab all pause it.
 - **Motion:** each card builds one GSAP timeline with `useCardAnim`, registered with a `CardController` so pause/resume reaches every animation; `useGSAP` cleans up on unmount. Reduced motion builds no timelines at all, so the DOM already shows the final state; count-ups keep the real number in screen-reader text from the start.
 - **Announcements:** an `aria-live="polite"` region reads the card's `a11yText` on every change.
-- **Export:** `ExportStage` re-renders the current card off-screen at 1080 × 1920 with motion off and captures it with `html-to-image`.
+- **Export:** `ExportStage` re-renders the current card off-screen at 1080 × 1920 with motion off and captures it with `html-to-image`, for Save image and for the share sheet.
 - **Chaining:** the last card links to the next available deck; the Life deck plays last.
 
 ## Sharing
+
+Every card's **Share** button opens `ShareSheet.tsx`. The player renders the card's PNG with `ExportStage`, and the sheet shows it with two ways to share:
+
+- **The image**, through the device's share sheet (`nativeShare.ts`, the Web Share API). Nothing goes to a server, and there are no platform logins (ADR-037). Browsers without file sharing get Save image.
+- **A link**, on summary cards only: the server feature below.
+
+### Share links
 
 The only server feature. It is opt-in per card, and works only when `DATABASE_URL` and `SHARE_SALT` are set.
 
@@ -96,14 +103,14 @@ sequenceDiagram
 ```
 
 - **Whitelist:** `src/share/schema.ts` lists, per summary card type, the numbers and names that may be shared. The client builds the request with it (`buildShareRequest`), so the preview is exactly what the server will accept.
-- **Client:** `ShareDialog.tsx` (check → preview → confirm → link) and `tokens.ts` (delete tokens in `localStorage`).
+- **Client:** the link part of `ShareSheet.tsx` (check → preview → confirm → link, which can then go to the share sheet) and `tokens.ts` (delete tokens in `localStorage`).
 - **API:** `src/app/api/share/route.ts` (GET status, POST create) and `src/app/api/share/[id]/route.ts` (DELETE).
 - **Server modules:** in `src/server/`:
   - `db.ts`: Neon over HTTP, or PGlite for `pglite://` URLs in tests
   - `schema.ts`: the Drizzle tables; migrations live in `drizzle/`
   - `shares.ts`: create, read and delete
   - `rateLimit.ts`: 10 an hour, keyed by `sha256(ip + salt)`
-- **Shared page:** `src/app/s/[id]/page.tsx` loads and re-validates the row. `src/share/cards.ts` rebuilds the card's props, and `SharedCard.tsx` renders the summary component (`cards/summaries.ts`) in its still frame. `DeleteShare.tsx` shows Delete only in the browser that holds the token.
+- **Shared page:** `src/app/s/[id]/page.tsx` loads and re-validates the row. `src/share/cards.ts` rebuilds the card's props, and `SharedCard.tsx` renders the summary component (`cards/summaries.ts`) in its still frame. `DeleteShare.tsx` shows Delete only in the browser that holds the token, and `ShareLinkButton.tsx` passes the page's link to the share sheet or copies it.
 - **Preview images:** `src/share/og.tsx` draws themed 1200 × 630 images with `next/og`, using only the fonts in `assets/fonts/` (ADR-033). The routes are `src/app/s/[id]/opengraph-image.tsx` and `src/app/opengraph-image.tsx`.
 
 ## Offline

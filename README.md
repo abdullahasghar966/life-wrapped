@@ -23,7 +23,7 @@
 - **Honest numbers.** YouTube watch time is estimated from the gaps between videos and always marked "≈" with an explanation. Cards without enough data are hidden, never shown empty.
 - **A real story player.** Tap, hold to pause, swipe down to close, keyboard shortcuts, auto-advance, and a screen-reader announcement for every card.
 - **Reduced motion.** Fully supported: no movement, numbers at their final value.
-- **Save or share.** Any card exports as a 1080 × 1920 PNG, made in the browser. Summary cards can be shared as a link, after you've seen the exact JSON that will be uploaded, and deleted at any time.
+- **Save or share.** Any card exports as a 1080 × 1920 PNG, made in the browser, and can go straight to Instagram, Snapchat, WhatsApp or any other app through your device's share sheet, with nothing uploaded (ADR-037). Summary cards can also be shared as a link, after you've seen the exact JSON that will be uploaded, and deleted at any time.
 - **Works offline.** After the first visit, turn off your Wi-Fi: adding files and playing stories still work.
 
 ## Verify the privacy claim yourself

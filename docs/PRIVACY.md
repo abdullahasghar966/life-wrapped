@@ -39,13 +39,19 @@ Spotify private sessions count towards your totals, but they are left out of top
 
 YouTube searches are off by default for real data, because search history is often more personal than watch history.
 
-## Sharing (optional)
+## Sharing the image to other apps
 
-Sharing a card is the only time anything is sent to a server, and it only happens when you ask.
+Every card has a **Share** button. It makes a picture of the card inside your browser, shows it to you, and, when you press **Share image…**, hands it to your device's own share sheet. You pick the app (Instagram, Snapchat, WhatsApp, Messages…) and post from there, signed in as you already are. Life, Wrapped never signs in to those apps, has no access to your accounts, and makes no request of its own: your browser passes the picture to the app on your device. What the app then does with the picture is up to you and that app, as with any photo you share.
 
-1. Only the last card of each story (the summary) has a **Share link** button.
-2. Pressing it shows "This is everything that will be shared:" followed by the exact JSON. Nothing is sent until you press **Confirm and share**, and the request carries exactly that text, character for character (an automated test checks this).
-3. You get a link such as `/s/Ab3dE5fG7h` that anyone can open.
+If your browser can't pass pictures to other apps (most desktop browsers can't), the sheet offers **Save image** instead.
+
+## Sharing a link (optional)
+
+Sharing a link is the only time anything is sent to a server, and it only happens when you ask.
+
+1. Only the last card of each story (the summary) can become a link: in its **Share** sheet, press **Create a link…**.
+2. That shows "This is everything that will be shared:" followed by the exact JSON. Nothing is sent until you press **Confirm and share**, and the request carries exactly that text, character for character (an automated test checks this).
+3. You get a link such as `/s/Ab3dE5fG7h` that anyone can open. You can copy it or pass it to your device's share sheet; the shared page has a **Share this card** button too.
 
 **What a shared card contains.** A fixed list of numbers and a few short names per card, plus whether it came from the sample data:
 
@@ -73,12 +79,12 @@ If the site runs without a database, the Share button explains that sharing isn'
 You don't have to take our word for it.
 
 1. Open the site and your browser's developer tools (F12, or right-click → Inspect), then the **Network** tab. Tick **Preserve log**.
-2. Load your files, or the sample, and play every story.
+2. Load your files, or the sample, and play every story. Save an image, or share one to another app.
 3. Look at the list of requests. Every one goes to this site's own address: the pages, scripts, fonts and the DuckDB engine files. Click any request: none carries a **Payload** with your data.
 4. Try to break it. In the **Console** tab, run `fetch('https://example.com', { method: 'POST', body: 'test' })`. The browser refuses with a Content Security Policy error: the page's `connect-src 'self'` rule only lets it talk to its own site, even if a script tried to send data elsewhere.
 5. Turn off your Wi-Fi. After one visit, the whole app keeps working: adding files, playing every story, saving images. Your browser keeps a copy of the app, including the database engine, so there is nothing to send and nowhere to send it. (Only opening someone else's shared link needs a connection.)
 
-The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site. [`tests/e2e/offline.spec.ts`](../tests/e2e/offline.spec.ts) does the Wi-Fi test.
+The same checks run automatically on every change: [`tests/e2e/privacy.spec.ts`](../tests/e2e/privacy.spec.ts) loads real-format exports and the sample, plays all four stories, saves an image and passes one to the share sheet, and fails if any request goes to another website or carries data. It also checks that the policy blocks a request to another site. [`tests/e2e/offline.spec.ts`](../tests/e2e/offline.spec.ts) does the Wi-Fi test.
 
 ## What your browser stores
 
