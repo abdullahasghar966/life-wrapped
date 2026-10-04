@@ -12,7 +12,19 @@ export function WatchTopChannels({ result }: CardProps<YoutubeTopChannels>) {
   const { channels } = result.props;
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl) => {
-    tl.from('[data-row]', { x: '30cqw', opacity: 0, duration: 0.3, stagger: 0.06 }, 0.2);
+    tl.from(
+      '[data-row]',
+      {
+        x: '30cqw',
+        rotationY: 75,
+        transformOrigin: '100% 50%',
+        transformPerspective: 800,
+        opacity: 0,
+        duration: 0.45,
+        stagger: 0.06,
+      },
+      0.2,
+    );
   });
   return (
     <CardBody ref={ref}>

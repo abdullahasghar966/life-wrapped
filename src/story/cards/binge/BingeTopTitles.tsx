@@ -3,6 +3,7 @@ import { useRef } from 'react';
 import type { NetflixTopTitles } from '@/engine/insights/netflix/topTitles';
 import { fmt1, fmtInt } from '@/lib/format';
 import { Poster } from '../../art/Art';
+import { carouselIn } from '../../depth';
 import { Headline } from '../shared/Headline';
 import { CardBody, Eyebrow } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
@@ -18,11 +19,8 @@ export function BingeTopTitles({ result }: CardProps<NetflixTopTitles>) {
       '[data-rank]',
       { x: '-8cqw', opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12 },
       0.2,
-    ).from(
-      '[data-rank-poster]',
-      { opacity: 0, duration: 0.9, ease: 'expo.out', stagger: 0.12 },
-      0.35,
     );
+    carouselIn(tl, '[data-rank-poster]', { at: 0.35 });
   });
   return (
     <CardBody ref={ref}>

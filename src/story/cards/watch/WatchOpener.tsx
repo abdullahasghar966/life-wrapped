@@ -14,7 +14,11 @@ export function WatchOpener({ result }: CardProps<YoutubeOpener>) {
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl) => {
     // The play triangle pops, then shrinks away as the headline takes its place.
-    tl.from('[data-player]', { y: '6cqw', opacity: 0, duration: 0.35 }, 0)
+    tl.from(
+      '[data-player]',
+      { y: '6cqw', z: -380, rotationX: 28, transformPerspective: 900, opacity: 0, duration: 0.55 },
+      0,
+    )
       .from('[data-play]', { scale: 0, duration: 0.3, ease: 'back.out(2)' }, 0.25)
       .to('[data-play]', { scale: 0.2, opacity: 0, duration: 0.3, ease: 'power3.in' }, 0.8)
       .from('[data-scrub]', { scaleX: 0, duration: 3, ease: 'none' }, 0.6)

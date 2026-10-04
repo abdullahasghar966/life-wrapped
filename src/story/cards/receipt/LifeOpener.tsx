@@ -13,11 +13,18 @@ export function LifeOpener({ result }: CardProps<LifeOpenerProps>) {
   const { platforms } = result.props;
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl) => {
-    tl.from('[data-print]', { yPercent: -101, duration: 1.3, ease: 'steps(13)' }, 0.15).from(
-      '[data-line]',
-      { opacity: 0, duration: 0.01, stagger: 0.11 },
-      0.45,
-    );
+    tl.from(
+      '[data-print]',
+      {
+        yPercent: -101,
+        rotationX: 32,
+        transformOrigin: '50% 0%',
+        transformPerspective: 900,
+        duration: 1.3,
+        ease: 'steps(13)',
+      },
+      0.15,
+    ).from('[data-line]', { opacity: 0, duration: 0.01, stagger: 0.11 }, 0.45);
   });
   return (
     <CardBody ref={ref}>

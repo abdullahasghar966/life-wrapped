@@ -184,12 +184,16 @@ const SLIDES: Array<{ theme: ThemeId; name: string; Slide: () => ReactNode }> = 
 
 /**
  * The landing page's mini story: the four summary cards of the sample, each in
- * its deck's theme, drawn from a committed JSON (no engine, no GSAP). It moves
- * on by itself unless reduced motion is on, and can always be paused (WCAG 2.2.2).
+ * its deck's theme, drawn from a committed JSON (no engine, no GSAP). The cards
+ * are the faces of a turning 3D cube, the same move the player makes between
+ * decks, drawn with CSS transforms only. It moves on by itself unless reduced
+ * motion is on, and can always be paused (WCAG 2.2.2).
  */
 export function HeroPreview({ frameClassName }: { frameClassName?: string }) {
   const reduced = useReducedMotion();
-  const [index, setIndex] = useState(0);
+  // Quarter turns so far: always forward, so the cube never spins back the long way.
+  const [turns, setTurns] = useState(0);
+  const index = ((turns % SLIDES.length) + SLIDES.length) % SLIDES.length;
   const [paused, setPaused] = useState(false);
   const [held, setHeld] = useState(false);
   // Only the first card is drawn until the browser is idle: each card uses its
@@ -210,9 +214,17 @@ export function HeroPreview({ frameClassName }: { frameClassName?: string }) {
 
   useEffect(() => {
     if (!playing) return;
-    const id = window.setTimeout(() => setIndex((i) => (i + 1) % SLIDES.length), SLIDE_MS);
+    const id = window.setTimeout(() => setTurns((t) => t + 1), SLIDE_MS);
     return () => window.clearTimeout(id);
-  }, [playing, index]);
+  }, [playing, turns]);
+
+  // The shorter way round to card i: one step back rather than three forward.
+  const show = (i: number) =>
+    setTurns((t) => {
+      const n = SLIDES.length;
+      const forward = (i - (((t % n) + n) % n) + n) % n;
+      return t + (forward === n - 1 ? -1 : forward);
+    });
 
   return (
     <div className="flex flex-col items-center gap-4">
@@ -224,25 +236,39 @@ export function HeroPreview({ frameClassName }: { frameClassName?: string }) {
         onMouseLeave={() => setHeld(false)}
         onFocus={() => setHeld(true)}
         onBlur={() => setHeld(false)}
-        className={`[container-type:inline-size] relative aspect-[9/16] w-[min(72vw,290px)] overflow-hidden rounded-[18px] shadow-[0_24px_40px_-20px_rgb(22_19_15/0.55)] ${frameClassName ?? ''}`}
+        style={{ '--half': 'min(36vw, 145px)' } as CSSProperties}
+        className={`[container-type:inline-size] relative aspect-[9/16] w-[min(72vw,290px)] [perspective:1100px] ${frameClassName ?? ''}`}
       >
-        {SLIDES.map(({ theme, name, Slide }, i) => (
+        <div
+          aria-hidden
+          className="absolute inset-x-[8%] -bottom-6 h-8 rounded-[50%] bg-[radial-gradient(closest-side,rgb(22_19_15/0.35),transparent)]"
+        />
+        {/* The idle sway, then the cube itself: one face per deck, a quarter turn apart. */}
+        <div className="hero-sway absolute inset-0 [transform-style:preserve-3d] motion-reduce:animate-none">
           <div
-            key={theme}
-            role="group"
-            aria-roledescription="slide"
-            aria-label={`${i + 1} of ${SLIDES.length}: ${name}`}
-            aria-hidden={i !== index}
-            inert={i !== index}
-            data-theme={theme}
-            style={themeStyle(THEMES[theme])}
-            className={`absolute inset-0 transition-[opacity,transform] duration-700 ease-out motion-reduce:transition-none ${
-              i === index ? 'scale-100 opacity-100' : 'pointer-events-none scale-[1.04] opacity-0'
-            }`}
+            className="absolute inset-0 transition-transform duration-[900ms] ease-[cubic-bezier(0.65,0,0.25,1)] [transform-style:preserve-3d] motion-reduce:transition-none"
+            style={{ transform: `translateZ(calc(var(--half) * -1)) rotateY(${turns * -90}deg)` }}
           >
-            {(allDrawn || i === index) && <Slide />}
+            {SLIDES.map(({ theme, name, Slide }, i) => (
+              <div
+                key={theme}
+                role="group"
+                aria-roledescription="slide"
+                aria-label={`${i + 1} of ${SLIDES.length}: ${name}`}
+                aria-hidden={i !== index}
+                inert={i !== index}
+                data-theme={theme}
+                style={{
+                  ...themeStyle(THEMES[theme]),
+                  transform: `rotateY(${i * 90}deg) translateZ(var(--half))`,
+                }}
+                className="[container-type:inline-size] absolute inset-0 overflow-hidden rounded-[18px] [backface-visibility:hidden]"
+              >
+                {(allDrawn || i === index) && <Slide />}
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
         <div aria-hidden className="absolute inset-x-[5cqw] top-[4cqw] z-10 flex gap-[1.5cqw]">
           {SLIDES.map(({ theme }, i) => (
             <span key={theme} className="h-[1cqw] flex-1 overflow-hidden rounded-full bg-white/30">
@@ -268,7 +294,7 @@ export function HeroPreview({ frameClassName }: { frameClassName?: string }) {
           <button
             key={theme}
             type="button"
-            onClick={() => setIndex(i)}
+            onClick={() => show(i)}
             aria-label={`Show the ${name} card`}
             aria-current={i === index}
             className="group flex size-6 items-center justify-center rounded-full"

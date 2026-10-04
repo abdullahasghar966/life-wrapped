@@ -7,6 +7,7 @@ import { useCardRuntime } from '../../runtime';
 import { Headline } from '../shared/Headline';
 import { CardBody } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
+import { hingeIn } from '../../depth';
 import type { CardProps } from '../types';
 
 /** Bold multi-colour block poster: each block wears one of the theme's duotones. */
@@ -16,11 +17,7 @@ export function SoundSummary({ result }: CardProps<SpotifySummary>) {
   const { theme } = useCardRuntime();
   const b = theme.backdrops;
   useCardAnim(ref, (tl) => {
-    tl.from(
-      '[data-block]',
-      { scale: 0.6, opacity: 0, duration: 0.55, ease: 'back.out(1.7)', stagger: 0.1 },
-      0.3,
-    );
+    hingeIn(tl, '[data-block]', { at: 0.3, stagger: 0.1, duration: 0.65 });
   });
   const blocks = [
     p.topArtist && { label: 'Top artist', value: p.topArtist, wide: true, bd: b[0] },

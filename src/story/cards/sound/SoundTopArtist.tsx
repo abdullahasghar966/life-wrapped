@@ -20,10 +20,29 @@ export function SoundTopArtist({ result }: CardProps<SpotifyTopArtist>) {
   const p = result.props;
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl, { loop }) => {
-    tl.from('[data-record]', { x: '-40cqw', rotate: -120, duration: 1, ease: 'back.out(1.4)' }, 0.1)
+    tl.from(
+      '[data-record]',
+      {
+        x: '-40cqw',
+        rotate: -120,
+        rotationX: 70,
+        transformPerspective: 800,
+        duration: 1,
+        ease: 'back.out(1.4)',
+      },
+      0.1,
+    )
       .from(
         '[data-cover]',
-        { scale: 0.4, rotate: -12, opacity: 0, duration: 0.7, ease: 'back.out(1.8)' },
+        {
+          scale: 0.5,
+          rotationY: -180,
+          z: -200,
+          transformPerspective: 800,
+          opacity: 0,
+          duration: 0.9,
+          ease: 'back.out(1.6)',
+        },
         0.25,
       )
       .from(

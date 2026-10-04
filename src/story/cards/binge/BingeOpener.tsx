@@ -13,7 +13,11 @@ export function BingeOpener({ result }: CardProps<NetflixOpener>) {
   const ref = useRef<HTMLDivElement>(null);
   useCardAnim(ref, (tl) => {
     // Fade up from black, the letterbox opens, a red light sweeps across.
-    tl.from('[data-scene]', { opacity: 0, duration: 1.2, ease: 'expo.out' }, 0)
+    tl.from(
+      '[data-scene]',
+      { opacity: 0, z: -260, transformPerspective: 900, duration: 1.4, ease: 'expo.out' },
+      0,
+    )
       .from(
         '[data-bar-top]',
         { scaleY: 6, transformOrigin: '50% 0%', duration: 1.1, ease: 'expo.inOut' },

@@ -118,6 +118,29 @@
   }
 }
 
+/* The story loading slip: lines feed out of the printer (transform only). */
+@keyframes slip-print {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* The landing preview cube sways gently in 3D while it waits (transform only). */
+@keyframes hero-sway {
+  from {
+    transform: rotateX(5deg) rotateY(-12deg);
+  }
+  to {
+    transform: rotateX(-3deg) rotateY(10deg);
+  }
+}
+.hero-sway {
+  animation: hero-sway 7s ease-in-out infinite alternate;
+}
+
 /* The landing preview's story progress (transform only). */
 @keyframes preview-progress {
   from {
