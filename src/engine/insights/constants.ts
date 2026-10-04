@@ -128,6 +128,9 @@ export const ARCHETYPE_THRESHOLDS = {
 // ---------- Sharing ----------
 
 /** Max short names in a share payload, and their max length. */
+/** Songs and videos offered to play alongside the stories (own data only, ADR-040). */
+export const MEDIA_TOP_N = 5;
+
 export const SHARE_MAX_NAMES = 5;
 export const SHARE_MAX_NAME_LENGTH = 80;
 export const SHARE_MAX_BYTES = 4096;

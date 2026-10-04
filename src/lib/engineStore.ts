@@ -4,7 +4,7 @@ import { useSyncExternalStore } from 'react';
 import type { OptionsPatch } from '@/engine/api';
 import { getEngine } from '@/engine/client';
 import type { InsightResult } from '@/engine/insights/types';
-import type { DeckId, IngestProgress, IngestSummary } from '@/engine/types';
+import type { DeckId, IngestProgress, IngestSummary, TopMedia } from '@/engine/types';
 
 export type EngineStatus =
   'idle' | 'restoring' | 'loading-sample' | 'ingesting' | 'ready' | 'error';
@@ -149,6 +149,11 @@ export const engine = {
 
   getDeck(deck: DeckId): Promise<InsightResult[]> {
     return getEngine().getDeck(deck);
+  },
+
+  /** Top songs and videos to play alongside the stories; empty for the sample. */
+  topMedia(): Promise<TopMedia> {
+    return getEngine().topMedia();
   },
 
   async clear(): Promise<void> {

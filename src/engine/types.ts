@@ -21,6 +21,30 @@ export const SOURCE_LABEL: Record<SourceKind, string> = {
   unknown: 'Not a supported export file',
 };
 
+/**
+ * Something to play alongside the stories (ADR-040). Only for the person's own
+ * data; ids are checked against the platforms' formats before they leave the worker.
+ */
+export interface TopSong {
+  track: string;
+  artist: string;
+  plays: number;
+  /** Spotify track id, when the export has one (Extended history does, Account data doesn't). */
+  trackId: string | null;
+}
+
+export interface TopVideo {
+  videoId: string;
+  title: string;
+  channel: string | null;
+  views: number;
+}
+
+export interface TopMedia {
+  songs: TopSong[];
+  videos: TopVideo[];
+}
+
 /** A reporting period in local dates, half-open: [start, end). */
 export interface Period {
   id: string;

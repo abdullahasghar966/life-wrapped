@@ -8,6 +8,11 @@ const isDev = process.env.NODE_ENV === 'development';
  * privacy promise enforceable: the page cannot send data to any other origin.
  * Scripts use 'unsafe-inline' instead of a nonce so pages stay static and work
  * offline; see docs/DECISIONS.md (ADR-007) for the trade-off.
+ *
+ * `frame-src` allows exactly two players, Spotify's and YouTube's privacy-enhanced
+ * one, loaded only after the person picks a song or video to play (ADR-040,
+ * src/media/embed.ts). Frames can't read this page, and this page still can't
+ * send data anywhere but its own site.
  */
 const csp = [
   "default-src 'self'",
@@ -19,6 +24,7 @@ const csp = [
   "font-src 'self' data:",
   "manifest-src 'self'",
   "media-src 'self'",
+  'frame-src https://open.spotify.com https://www.youtube-nocookie.com',
   "object-src 'none'",
   "form-action 'self'",
   "frame-ancestors 'none'",
