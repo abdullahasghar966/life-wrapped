@@ -32,15 +32,16 @@ The parsed, minimised UTC rows stay in worker memory, so changing the time zone 
 
 `src/engine/api.ts` exports `createEngine({ createDb, now })`. It doesn't know whether it runs in a worker or in Node:
 
-| Method                                                                                      | What it does                                                           |
-| ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `ingest(files, { timeZone }, onProgress)`                                                   | Adds files to the dataset, rebuilds tables, returns an `IngestSummary` |
-| `cancelIngest()`                                                                            | Stops between files or zip chunks                                      |
-| `loadSample(seed?, { timeZone })`                                                           | Generates Alex's exports in raw formats and ingests them normally      |
-| `setOptions({ timeZone, period, includePrivateSessions, includeSearches, netflixProfile })` | Changes filters; only a time-zone change reloads tables                |
-| `summary()` / `availableDecks()`                                                            | What was found and which decks have enough data                        |
-| `getDeck(deck)`                                                                             | The deck's cards (cached until options change)                         |
-| `clear()`                                                                                   | Drops everything                                                       |
+| Method                                                                                      | What it does                                                                   |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `ingest(files, { timeZone }, onProgress)`                                                   | Adds files to the dataset, rebuilds tables, returns an `IngestSummary`         |
+| `cancelIngest()`                                                                            | Stops between files or zip chunks                                              |
+| `loadSample(seed?, { timeZone })`                                                           | Generates Alex's exports in raw formats and ingests them normally              |
+| `setOptions({ timeZone, period, includePrivateSessions, includeSearches, netflixProfile })` | Changes filters; only a time-zone change reloads tables                        |
+| `summary()` / `availableDecks()`                                                            | What was found and which decks have enough data                                |
+| `getDeck(deck)`                                                                             | The deck's cards (cached until options change)                                 |
+| `topMedia()`                                                                                | Top songs and videos to play alongside, with checked ids; empty for the sample |
+| `clear()`                                                                                   | Drops everything                                                               |
 
 `worker.ts` wraps it with Comlink; `src/lib/engineStore.ts` is the UI-side store (`useSyncExternalStore`). Tests call the same engine with DuckDB's Node build (`tests/helpers/engine.ts`).
 
@@ -73,7 +74,19 @@ Tests: `tests/unit/insights.sample.test.ts` snapshots every insight against the 
 - **Motion:** each card builds one GSAP timeline with `useCardAnim`, registered with a `CardController` so pause/resume reaches every animation; `useGSAP` cleans up on unmount. Reduced motion builds no timelines at all, so the DOM already shows the final state; count-ups keep the real number in screen-reader text from the start.
 - **Announcements:** an `aria-live="polite"` region reads the card's `a11yText` on every change.
 - **Export:** `ExportStage` re-renders the current card off-screen at 1080 × 1920 with motion off and captures it with `html-to-image`, for Save image and for the share sheet.
-- **Chaining:** the last card links to the next available deck; the Life deck plays last.
+- **Chaining:** the last card links to the next available deck; the Life deck plays last. The story page fetches the next deck while the current one plays, and the frame turns into it like a cube (`depth.ts`, ADR-039).
+- **Shell:** the player's root wears the app's receipt brand. Only the frame carries the deck's theme variables and background, so the page around the story stays the same from deck to deck (ADR-038).
+- **3D:** `src/story/depth.ts` holds the 3D moves (the deck cube, hinges, flips, carousels, credits, a stamp). They're CSS 3D transforms driven by GSAP. Cards only animate _from_ a 3D pose to their flat final state, so reduced motion and saved images are unaffected.
+
+## Playing a song or video
+
+`src/media/` (ADR-040). The story page asks the worker for `topMedia()` (own data only). `MediaPicker` pops up once per tab as the Spotify or YouTube story starts, and the music button in the player's controls opens it again. `MediaDock` frames the chosen track or video in the platform's own player:
+
+- the player URL comes from `embed.ts`, which checks the id again;
+- the frame is sandboxed, without top navigation;
+- the CSP's `frame-src` lists only the two player origins.
+
+The dock lives outside the Player, so it keeps playing through loading screens and from one deck to the next.
 
 ## Sharing
 
@@ -126,7 +139,7 @@ sequenceDiagram
 
 Each theme is a typed token object (`src/story/themes/{sound,watch,binge,receipt}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.
 
-- `themeStyle(theme)` turns tokens into CSS variables (`--t-*`) on the player root next to `data-theme`; `backdropStyle(backdrop)` sets the per-card `--c-*` variables. Cards read colours only through these variables.
+- `themeStyle(theme)` turns tokens into CSS variables (`--t-*`) next to `data-theme`: the receipt theme on the player root, the deck's theme on the story frame. `backdropStyle(backdrop)` sets the per-card `--c-*` variables. Cards read colours only through these variables.
 - Fonts are self-hosted through `next/font`: Google fonts are downloaded at build time, and Archivo (the display face of the app's own brand) is a local file in `src/fonts/`. Only the app-shell fonts are preloaded.
 - Theme-specific motion lives in `transitions.ts` (card-to-card), in each theme's `motion` tokens (eases, durations, staggers) and in the progress chrome (`progress/Progress.tsx`).
 - `tests/unit/themes.test.ts` checks every declared text/background pair against WCAG AA.

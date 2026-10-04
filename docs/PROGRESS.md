@@ -14,12 +14,23 @@
 
 - [x] **Rebrand (ADR-036).** At the owner's request, the app's own look moved from the spec's `aurora` to a printed-receipt brand: paper, ink and one red, Archivo Extra Condensed with IBM Plex. The landing, start, privacy, error and share pages; the eight Life cards, now built like the platform decks' story cards; the Life share image and the site's preview image; the icons; and the demo GIF. Windows visual baselines regenerated.
 - [x] **Share to social apps (ADR-037).** Every card has a Share button: it renders the card's PNG on the device, previews it and hands it to the device's share sheet (Instagram, Snapchat, WhatsApp and others post it from the person's own app; nothing is uploaded, no platform logins). Without file sharing, the sheet offers Save image. Summary cards keep the opt-in link in the same sheet; a created link can go to the share sheet, and `/s/[id]` has Share this card. Unit tests for the share helpers; E2E for the image share, the fallback, link sharing and the shared page's button; the privacy E2E now shares an image too. Linux visual baselines regenerated; the Windows ones are still the old ones (see Next session).
+- [x] **One brand around every story (ADR-038).** The player, its loading and error screens and its dialogs wear the receipt brand from the landing page. On a computer, the page around the story shows the logo, the list of stories and receipt-style controls. Only the story frame takes the platform's look.
+- [x] **3D motion (ADR-039).**
+  - Decks turn into each other like a cube, and the next deck is fetched ahead so the turn never stops on a loading screen.
+  - Eleven cards across the four decks have 3D entrances in their platform's style: hinges, flips, a record tilting up, a carousel, rolling credits, a curling receipt and a slamming stamp.
+  - The landing preview is a turning, swaying cube, and the /start tiles tilt in 3D.
+  - It's all CSS 3D with GSAP. Reduced motion and saved images are unaffected.
+- [x] **A top song or video alongside the stories (ADR-040, owner-approved exception to §3).**
+  - With your own data, the Spotify story offers your five most-played songs, and the YouTube story your five most-watched videos.
+  - The pick plays in Spotify's or YouTube's own player, in a "Now playing" ticket that keeps playing between decks.
+  - Nothing loads from them until a pick; ids are checked twice; `frame-src` allows exactly the two players; the sample offers nothing.
+  - The landing page, /privacy and PRIVACY.md say all of this, and `tests/e2e/media.spec.ts` checks it with the players stubbed.
 
 ## Next session starts here
 
-Everything in the spec is built, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. The share-sheet feature is committed on `claude/focused-cray-sbemly`, with new Linux visual baselines. It waits only on GitHub write access for Claude sessions (see HANDOFF.md). Next:
+Everything in the spec is built, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. The share sheet, the consistent brand, the 3D motion and the soundtrack are committed on `claude/focused-cray-sbemly`, with new Linux visual baselines. They wait only on GitHub write access for Claude sessions (see HANDOFF.md). Next:
 
-1. **Push it to `main`** so Vercel deploys it, and confirm CI is green there.
+1. **Push it to `main`** so Vercel deploys it, and confirm CI is green there. Then try the soundtrack with a real export on the live site, since tests stub the players.
 2. **Regenerate the Windows visual baselines** on Windows: run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`. CI doesn't use them.
 3. **Finish the post-deploy checklist** in `docs/DEPLOY.md` (the share database and the checks after it).
 4. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.

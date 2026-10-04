@@ -6,28 +6,38 @@ Read this first, then `MASTER_PROMPT.md` (the spec), `CLAUDE.md` and `AGENTS.md`
 
 Life, Wrapped is complete against the spec and live at <https://life-wrapped-jgpl.vercel.app>. Vercel deploys every push to `main`.
 
-After launch, the owner asked for two changes that go beyond the spec:
+After launch, the owner asked for changes beyond the spec. Each has an ADR:
 
 - the receipt rebrand (ADR-036), on `main`;
-- sharing to social apps (ADR-037), on `claude/focused-cray-sbemly`. It is ready to go live but **not yet on GitHub** (see §5).
+- on `claude/focused-cray-sbemly`, **not yet on GitHub** (see §5):
+  - share to social apps (ADR-037);
+  - one brand around every story (ADR-038);
+  - 3D motion (ADR-039);
+  - a top song or video alongside the stories (ADR-040).
 
 ## 2. Progress (2026-10-04)
 
-- CI on `main` is green: run 19 for `bcc5972`. The earlier `next/font/google` failure was transient, and the re-run passed. The Plex fonts are still downloaded from Google at build time; see §4 if that error comes back.
-- The share-sheet feature was **rebuilt from scratch**. The earlier uncommitted attempt and the first `HANDOFF.md` lived only on the owner's machine and never reached the repo.
-- Commits on `claude/focused-cray-sbemly`, on top of `main`:
-  - `feat(share)`: the share sheet, the shared card page's Share this card button, and unit and E2E tests;
-  - `docs`: ADR-037, plus updates to PRIVACY, README, ARCHITECTURE, PROGRESS and this file;
-  - `test(visual)`: new Linux baselines for all 41 cards (§4 explains how they were made);
-  - `docs`: this update.
-- Checks in the cloud container: `typecheck`, `lint`, `format:check` and `test` (294 + 3) all pass. All 50 Chromium E2E tests pass, visual included.
-- One perf budget fails there: "landing → first card in under 5 s" takes about 5.6 s. Old `main` takes the same time in that container, and it passed on GitHub's runners, so it's the container's speed, not this change.
+- CI on `main` is green: run 19 for `bcc5972`, with landing → story at 4.1 s against the 5 s budget.
+- Everything in §1 is built, tested and committed on the branch, together with Linux visual baselines and docs: the ADRs, PRIVACY, README, ARCHITECTURE and PROGRESS. The landing page and /privacy now describe the optional players honestly.
+- Checks in the cloud container:
+  - `typecheck`, `lint`, `format:check` and `test` (298 + 3) all pass.
+  - All 53 Chromium E2E tests pass: visual, accessibility, privacy, offline, sharing and media.
+  - Only the perf budget "landing → first card in 5 s" fails there, at about 5.7 s. Old `main` takes 5.65 s in that container and 4.1 s on GitHub's runners, so it's the container's speed. The new work adds about 1.5%.
 
 ## 3. The owner's requests and the deviations they approved
 
 1. **Receipt rebrand** (ADR-036): this replaces the spec's `aurora` theme.
-2. **Share to social apps** (ADR-037). The image goes to Instagram, Snapchat, WhatsApp, Facebook and other apps through the device's share sheet, using the Web Share API with files. There are **no platform logins**. The spec forbids user accounts and platform APIs, and Instagram and Snapchat stories can't be posted from the web anyway. The OS sheet hands the picture to the app where the person is already signed in, and Life, Wrapped sends nothing.
-3. **Deploy it** to the live site, which means pushing to `main`.
+2. **Share to social apps** (ADR-037). Cards go out as images through the device's share sheet, with no platform logins.
+3. **Consistent theme** (ADR-038). The landing page's look stays around the stories from start to end; only the stories look like the platforms.
+4. **3D animations** (ADR-039). These are CSS 3D with GSAP, not WebGL, so text stays in the DOM and saved images still work.
+5. **Play top songs and videos** (ADR-040). This is an exception to §3, accepted by the owner: the platforms' players are framed and show their logos and artwork. Mitigations:
+   - own data only;
+   - nothing loads until a pick;
+   - checked ids;
+   - `frame-src` allows exactly two origins, and `connect-src 'self'` is unchanged;
+   - sandboxed frames;
+   - honest copy everywhere.
+6. **Deploy it** to the live site, which means pushing to `main`.
 
 ## 4. Gotchas
 
@@ -47,17 +57,19 @@ After launch, the owner asked for two changes that go beyond the spec:
   });
   ```
 
-  This reproduced CI's own `main` baselines on all 41 cards. The remaining byte-level differences are ±1 rounding in translucent fills, far below Playwright's threshold. Don't run `playwright install` there; the pinned Playwright's own browser isn't available. The "Visual baselines" workflow (ADR-028) is still the normal route, but its artifacts are served from `*.blob.core.windows.net`, which a cloud session's network policy may block.
+  This reproduced CI's own `main` baselines on all 41 cards. The remaining byte-level differences are ±1 rounding, far below Playwright's threshold. Don't run `playwright install` there.
 
-- **Headless Chromium has no share sheet.** The E2E tests stub it with `stubShareSheet()` in `tests/e2e/helpers.ts` and check what it received.
-- **`navigator.share` needs a fresh user gesture.** That's why the PNG is rendered when the sheet opens and the Share image… button only appears once the image is ready.
-- **Playwright skips the `perf` project** when any Chromium spec fails. A perf failure can hide behind another failure.
+- **Workflow artifacts can't be downloaded** from a cloud session: `*.blob.core.windows.net` is blocked by its network policy.
+- **`next dev` runs effects twice (Strict Mode).** The story page's sample loading can then race and bounce to /start. Review story pages on a production build (`pnpm build && pnpm start`).
+- **Axe and the Spotify wipe blob.** The colour-wipe blob is 300% of the frame and clipped by it. Axe still treats it as being behind text outside the frame. Text around the frame needs an explicit background (the keyboard hints and the story list have one).
+- **Tests stub the media players.** `tests/e2e/media.spec.ts` routes both origins to a stub page, and `tests/e2e/exports.ts` generates real-format exports big enough to unlock decks. The offline test uses them too.
+- **Playwright skips the `perf` project** when any Chromium spec fails, so a perf failure can hide behind another failure.
 - **If `next/font/google` fails in CI again:** self-host IBM Plex Sans and Mono like Archivo. Put the WOFF2 files in `src/fonts/` and load them with `next/font/local`.
 
 ## 5. Do next
 
-1. **The owner grants GitHub write access** for Claude sessions. Both `git push` and the GitHub API returned `403 Resource not accessible by integration`, which means the Claude GitHub App isn't installed on this repository. Install it at <https://github.com/apps/claude/installations/select_target> and choose `life-wrapped`, or reconnect GitHub at <https://claude.ai/connect-github>.
-2. **Push `claude/focused-cray-sbemly`, then fast-forward `main` to it.** Vercel deploys `main` automatically. Confirm CI is green on `main` and that the live site shows the Share button.
-3. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
-4. Try the share sheet on a real phone against the live site.
+1. **The owner grants GitHub write access** for Claude sessions. Both `git push` and the GitHub API returned `403 Resource not accessible by integration`: the Claude GitHub App isn't installed on this repository. Install it at <https://github.com/apps/claude/installations/select_target> and choose `life-wrapped`, or reconnect GitHub at <https://claude.ai/connect-github>.
+2. **Push `claude/focused-cray-sbemly`, then fast-forward `main` to it.** Vercel deploys `main` automatically. Confirm CI is green on `main`.
+3. **On the live site, with a real export:** check that the soundtrack picker plays in Spotify's and YouTube's players (tests stub them), the cube between decks, and the share sheet on a phone.
+4. **Windows visual baselines:** on Windows, run `pnpm build`, then `pnpm exec playwright test tests/e2e/visual.spec.ts --update-snapshots=all`, look at a few, and commit the `*-win32.png` files. CI doesn't use them.
 5. Then continue with `docs/PROGRESS.md` → "Next session starts here".

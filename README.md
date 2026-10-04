@@ -15,7 +15,8 @@
   - Spotify-style: bold duotones and bouncy motion
   - YouTube-style: player chrome and a scrubber
   - Netflix-style: cinematic glows, posters and credits
-  - The app's own printed-receipt look for the combined deck
+  - The app's own printed-receipt look for the combined deck, which also frames every story from the landing page to the end (ADR-038)
+- **3D motion.** Decks turn into each other like a cube, cards have 3D entrances in each platform's style, and the landing page's preview is a turning cube. All of it is CSS 3D with GSAP: no WebGL, real DOM text (ADR-039).
 - **Your real exports.** Drop zips, folders or single files:
   - Spotify Extended streaming history (old and new formats) or Account data
   - Google Takeout YouTube history (in any language)
@@ -24,16 +25,17 @@
 - **A real story player.** Tap, hold to pause, swipe down to close, keyboard shortcuts, auto-advance, and a screen-reader announcement for every card.
 - **Reduced motion.** Fully supported: no movement, numbers at their final value.
 - **Save or share.** Any card exports as a 1080 × 1920 PNG, made in the browser, and can go straight to Instagram, Snapchat, WhatsApp or any other app through your device's share sheet, with nothing uploaded (ADR-037). Summary cards can also be shared as a link, after you've seen the exact JSON that will be uploaded, and deleted at any time.
+- **A soundtrack, if you want one.** With your own data, the Spotify story offers your five most-played songs, and the YouTube story your five most-watched videos, to play alongside in the platforms' own players. Nothing loads from them until you pick one (ADR-040).
 - **Works offline.** After the first visit, turn off your Wi-Fi: adding files and playing stories still work.
 
 ## Verify the privacy claim yourself
 
 1. Open the site, then your browser's developer tools (F12) → **Network**, and tick **Preserve log**.
-2. Load your files (or the sample) and play every story. Every request goes to the site itself (pages, scripts, fonts, the DuckDB engine); none carries your data.
-3. In the **Console**, run `fetch('https://example.com', { method: 'POST', body: 'x' })`. The Content Security Policy blocks it: `connect-src 'self'` only lets the page talk to its own origin.
+2. Load your files (or the sample) and play every story. Every request goes to the site itself (pages, scripts, fonts, the DuckDB engine); none carries your data. The one exception is yours to choose: picking a song or video to play loads Spotify's or YouTube's own player.
+3. In the **Console**, run `fetch('https://example.com', { method: 'POST', body: 'x' })`. The Content Security Policy blocks it: `connect-src 'self'` only lets the page talk to its own origin. `frame-src` allows exactly the two players.
 4. Turn your Wi-Fi off. It keeps working.
 
-The same checks run in CI on every push ([`privacy.spec.ts`](tests/e2e/privacy.spec.ts), [`offline.spec.ts`](tests/e2e/offline.spec.ts)). They ingest real-format exports and the sample, play all four decks, and fail on any request to another origin or any request with a body. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what is read, what is dropped, and what sharing sends.
+The same checks run in CI on every push ([`privacy.spec.ts`](tests/e2e/privacy.spec.ts), [`offline.spec.ts`](tests/e2e/offline.spec.ts), [`media.spec.ts`](tests/e2e/media.spec.ts)). They ingest real-format exports and the sample, play all four decks, and fail on any request to another origin or any request with a body. [docs/PRIVACY.md](docs/PRIVACY.md) lists exactly what is read, what is dropped, and what sharing sends.
 
 ## How it works
 
