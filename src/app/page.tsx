@@ -18,13 +18,13 @@ const STEPS = [
   },
   {
     title: 'Play your stories',
-    body: 'Music, videos, shows, and all of it together, each styled like the app it’s about. Save any card as an image, or share a summary card if you like.',
+    body: 'Music, videos, shows, and all of it together, each styled like the app it’s about. Play one of your top songs alongside, save any card as an image or send it to the apps you post on.',
   },
 ] as const;
 
 const PROMISES = [
   'No uploads. Your files are read in your browser and never sent anywhere.',
-  'No accounts, no analytics, no cookies, no third-party scripts.',
+  'No accounts, no analytics, no cookies, no third-party scripts. Spotify’s or YouTube’s player loads only if you pick a song or video to play.',
   'IP addresses, device details and other sensitive fields are dropped as files are read.',
   'Nothing is saved. Close the tab and it’s gone.',
   'Works offline after the first visit, even with your own files.',
@@ -54,7 +54,7 @@ const EXPORTS = [
 const FAQ: Array<[string, ReactNode]> = [
   [
     'Is my data uploaded anywhere?',
-    'No. Your files are read and analysed inside this browser tab. The only thing that can ever leave your device is a summary card you choose to share, after you’ve seen exactly what it contains.',
+    'No. Your files are read and analysed inside this browser tab and never sent anywhere. Only two things can ever leave your device, and only when you ask: a summary card you choose to share, after you’ve seen exactly what it contains, and, if you pick one of your top songs or videos to play, which one it is, which Spotify’s or YouTube’s own player needs to play it.',
   ],
   [
     'Do I need an account?',
@@ -66,7 +66,11 @@ const FAQ: Array<[string, ReactNode]> = [
   ],
   [
     'Is this made by Spotify, YouTube or Netflix?',
-    'No. It’s an independent project. Each story is styled to feel like the app it’s about, but uses no logos, artwork or brand fonts.',
+    'No. It’s an independent project. Each story is styled to feel like the app it’s about, but uses no logos, artwork or brand fonts. (A song or video you choose to play appears in that app’s own player.)',
+  ],
+  [
+    'Can I listen to my top songs while I watch?',
+    'Yes, with your own Spotify or YouTube data. As a story starts, you can pick one of your five most-played songs or most-watched videos, and it plays in Spotify’s or YouTube’s own player beside the story. Nothing loads from them until you pick one.',
   ],
   [
     'What if I only use one of these apps?',
