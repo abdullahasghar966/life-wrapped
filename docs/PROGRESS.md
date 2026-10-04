@@ -7,19 +7,25 @@
 - [x] **M2: Insight engine** — registry + constants, 41 insights across four decks (each with SQL, minimum-data rule and a11y text), share payloads for the four summaries, archetype scoring, snapshot tests for every insight against the sample, rule tests (thin data, private sessions, searches, profiles, periods), `/debug` lists every sample insight as JSON.
 - [x] **M3: Story player and the Spotify deck** — player (tap zones, hold, swipe down, keyboard, visible buttons, 7 s auto-advance, pause, live region, deck chaining, settings sheet), theme application, generated art, radial clock chart, all 12 Spotify cards with GSAP timelines, 1080 × 1920 PNG export, E2E (playthrough, gestures, auto-advance, export, settings, reload), axe on every card, visual snapshots (Windows baselines; Linux baselines pending, see known issues). Screenshots reviewed against the 1-second test.
 - [x] **M4: YouTube and Netflix decks** — 11 watch-theme cards (player frame, scrubber chrome, 16:9 thumbnails, round avatars, transposed 7 × 24 heatmap, typing search bar, ≈ estimate with ⓘ) and 10 binge-theme cards (letterbox opener, red glows, film grain, vignette, posters with Top-pick badge, outlined rank numerals, binge tiles, device silhouettes, credits-style summary). Both decks reviewed against the 1-second test, play end-to-end in E2E, pass axe on every card, and have visual snapshots.
-- [x] **M5: Life deck, sharing and the privacy proof** — 8 aurora cards (orb opener, ≈ total with days, donut split, stacked-area rhythm, busiest-day timeline, weekday/weekend bars, archetype badge with the three deciding metrics, three-palette summary); share whitelist + `POST/GET /api/share` + `DELETE /api/share/[id]` on Drizzle (Neon in production, PGlite in tests) with a salted-hash rate limit and hashed delete tokens; exact-JSON preview before upload; `/s/[id]` server-rendered still card with sample badge, Make your own and Delete; themed OG images drawn only with bundled fonts (no third-party font or emoji fetches); privacy E2E (no foreign requests, no request bodies, worker traffic included) and a CSP block test; share-flow E2E against PGlite.
+- [x] **M5: Life deck, sharing and the privacy proof** — 8 aurora cards, since restyled (ADR-036) (orb opener, ≈ total with days, donut split, stacked-area rhythm, busiest-day timeline, weekday/weekend bars, archetype badge with the three deciding metrics, three-palette summary); share whitelist + `POST/GET /api/share` + `DELETE /api/share/[id]` on Drizzle (Neon in production, PGlite in tests) with a salted-hash rate limit and hashed delete tokens; exact-JSON preview before upload; `/s/[id]` server-rendered still card with sample badge, Make your own and Delete; themed OG images drawn only with bundled fonts (no third-party font or emoji fetches); privacy E2E (no foreign requests, no request bodies, worker traffic included) and a CSP block test; share-flow E2E against PGlite.
 - [x] **M6: PWA, performance, polish and launch**: built and verified in CI, except two items that need the owner (see below). Serwist offline support with real data, an offline E2E test, `/privacy`, the full landing page, the §15 budgets enforced in tests, Lighthouse 96 / 100 / 100 / 100, 404 and error pages, the README with a demo GIF, `docs/DEPLOY.md`, and Linux visual baselines.
+
+## After launch
+
+- [x] **Rebrand (ADR-036).** At the owner's request, the app's own look moved from the spec's `aurora` to a printed-receipt brand: paper, ink and one red, Archivo Extra Condensed with IBM Plex. The landing, start, privacy, error and share pages; the eight Life cards, now built like the platform decks' story cards; the Life share image and the site's preview image; the icons; and the demo GIF. Windows visual baselines regenerated.
+- [ ] **Share to social apps.** A native share sheet with the card as an image (Instagram, Snapchat, Facebook and others post it from the person's own app), plus share links for a created card.
 
 ## Next session starts here
 
-Everything in the spec is built and green in CI. What's left needs the repository owner:
+Everything in the spec is built and green in CI, and the owner has deployed it to <https://life-wrapped-jgpl.vercel.app>. Next:
 
-1. **Deploy to Vercel.** Import the repo, set the optional environment variables and run the migration, as in `docs/DEPLOY.md`. Then add the live URL to the README and walk through the post-deploy checklist.
-2. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.
+1. **Share to social apps** (above).
+2. **Finish the post-deploy checklist** in `docs/DEPLOY.md` (the share database and the checks after it).
+3. **Decide on the LCP target.** Lighthouse's simulated LCP is 2.8 s against 2 s (ADR-035). Getting below it would mean dropping App Router's client runtime on the landing page, for example by serving it as plain static HTML.
 
 ## Definition of done (§19)
 
-- [ ] Live on Vercel, with the sample story reachable in at most two clicks and through a direct `?sample=1` link. The flow is done and tested; the deployment needs the owner's account.
+- [x] Live on Vercel (<https://life-wrapped-jgpl.vercel.app>), with the sample story reachable in at most two clicks and through a direct `?sample=1` link.
 - [x] All four decks pass the 1-second theme test, with no logos or proprietary fonts anywhere.
 - [x] Real exports from all three platforms work, including old and new Spotify formats.
 - [x] The privacy and offline tests pass in CI, and the CSP is active.

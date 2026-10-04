@@ -14,6 +14,8 @@ const OUT = 'docs/media/story.gif';
 const SIZE = { width: 360, height: 640 };
 const FPS = 10;
 const ENTRANCE_MS = 1300;
+// The tour ends on the personality card, which prints its list for longer.
+const LAST_ENTRANCE_MS = 2600;
 const HOLD_MS = 700;
 
 // Which cards to show from each deck (1-based), in order.
@@ -45,9 +47,9 @@ async function still(ms) {
   shots.push({ png: await page.screenshot(), at: performance.now(), hold: ms });
 }
 
-async function capture() {
+async function capture(ms = ENTRANCE_MS) {
   const start = performance.now();
-  while (performance.now() - start < ENTRANCE_MS) {
+  while (performance.now() - start < ms) {
     const t = performance.now();
     shots.push({ png: await page.screenshot(), at: t });
     const wait = 1000 / FPS - (performance.now() - t);
@@ -68,7 +70,7 @@ for (const [deck, count, cards] of TOUR) {
     }
     await page.waitForTimeout(40);
     if (shots.length === 0) await still(1200);
-    else await capture();
+    else await capture(deck === 'life' && n === cards.at(-1) ? LAST_ENTRANCE_MS : ENTRANCE_MS);
     console.log(`captured ${await label()}`);
   }
   if (deck !== 'life') {

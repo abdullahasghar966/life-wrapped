@@ -4,9 +4,9 @@
 
 **Your Spotify, YouTube and Netflix data exports, turned into animated story decks, without your data ever leaving your device.**
 
-![A story playing: the Spotify, YouTube and Netflix decks, each in its own style, with sample data](docs/media/story.gif)
+![A story playing with sample data: the Spotify, YouTube and Netflix decks, each in its own style, then the combined deck as a printed receipt](docs/media/story.gif)
 
-- **Try it:** open `/story/spotify?sample=1` on any deployment for an instant story with sample data (one click from the landing page).
+- **Try it:** <https://life-wrapped-jgpl.vercel.app>, or go straight to [a story with sample data](https://life-wrapped-jgpl.vercel.app/story/spotify?sample=1). Any deployment serves the same `/story/spotify?sample=1` link.
 - **Deploy your own:** [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fabdullahasghar966%2Flife-wrapped) (see [the deploy checklist](docs/DEPLOY.md)).
 
 ## Features
@@ -15,7 +15,7 @@
   - Spotify-style: bold duotones and bouncy motion
   - YouTube-style: player chrome and a scrubber
   - Netflix-style: cinematic glows, posters and credits
-  - The app's own aurora theme for the combined deck
+  - The app's own printed-receipt look for the combined deck
 - **Your real exports.** Drop zips, folders or single files:
   - Spotify Extended streaming history (old and new formats) or Account data
   - Google Takeout YouTube history (in any language)

@@ -54,7 +54,7 @@ Short ADRs in plain English: context → decision → alternatives → consequen
 
 **Context.** Each deck should feel like its platform, but the project must not imply endorsement or copy protected brand assets.
 
-**Decision.** Evoke platforms only through colour, free Google Fonts (Figtree, Roboto Condensed, Bebas Neue), layout patterns and motion. No logos, icons, wordmarks, screenshots, proprietary fonts or sounds. Platform names are used only descriptively ("Your Spotify story"). Every page footer and the README carry the non-affiliation disclaimer. Internally the themes are named `sound`, `watch`, `binge` and `aurora`, not after the brands.
+**Decision.** Evoke platforms only through colour, free Google Fonts (Figtree, Roboto Condensed, Bebas Neue), layout patterns and motion. No logos, icons, wordmarks, screenshots, proprietary fonts or sounds. Platform names are used only descriptively ("Your Spotify story"). Every page footer and the README carry the non-affiliation disclaimer. Internally the themes are named `sound`, `watch`, `binge` and `receipt` (originally `aurora`, see ADR-036), not after the brands.
 
 **Consequences.** The "1-second test" relies on colour, type and layout patterns. Netflix red is used only for large text and shapes because its contrast on black is under 4.5:1.
 
@@ -326,3 +326,33 @@ The policy in `next.config.ts` is the final one: sharing, the share page and the
 - 145 KB of JavaScript (gzipped)
 
 The LCP target is not met in Lighthouse's simulation. The headline paints with the first frame (160 ms unthrottled); the simulation charges it for the ~120 KB React and Next.js runtime downloading in parallel, which every App Router page needs.
+
+## ADR-036: The app's own look is a printed receipt, not "aurora"
+
+**Context.** The spec (§9.4, §10.2) gives the app shell and the Life deck an `aurora` theme: deep indigo, gradients, glows and orbs, set in Space Grotesk. After the first deploy, the project owner found it generic and chose a new direction from three mockups.
+
+**Decision.** A `receipt` theme replaces `aurora` for the shell and the Life deck.
+
+- **Colour.** Paper `#F3EFE6`, receipt paper `#FFFDF8`, ink `#16130F` and one red, `#FF3D12`. The red was picked to clear 3:1 on paper, so it can carry display-size type as well as fills. Small red text uses `#B12C0A`.
+- **Type.** Archivo Extra Condensed Black for display, IBM Plex Sans for body and IBM Plex Mono for receipt lines. Archivo is self-hosted with `next/font/local`. The file keeps Archivo's width axis, so the face pins `font-stretch: 62%`.
+- **Motif.** A till receipt: dotted leaders, dashed rules, torn edges, barcodes and a stamp. Motion is stepped (`steps()`), like a printer.
+- **Life cards.** They rotate three backdrops (paper, ink and red) and follow the platform decks' story grammar: one huge number or headline per card, stickers and bold colour. The platform colours from §9.4 stay; on paper they get an ink outline.
+- **Changes from the §9.4 card table.** Each card still shows the same data.
+  - The opener prints a receipt instead of orbiting orbs.
+  - The split is an outlined stacked bar with labelled rows instead of a donut.
+  - The personality card stamps the archetype and adds one line of character per archetype. That line is copy, with no numbers in it.
+  - The summary is a printed receipt.
+- **Old shares.** Shares stored under the old theme name are upgraded when read (`'aurora'` becomes `'receipt'`), so existing links keep working.
+
+**Alternatives.**
+
+- "Poster": white, huge condensed type, the decks fanned out. Rejected as too close to Spotify Wrapped's own marketing.
+- "Night edition": warm black, a serif headline, one amber accent.
+- Toning aurora down instead: the gradient-on-indigo look itself was the problem.
+
+**Consequences.**
+
+- This ADR supersedes the `aurora` entries in §9.4 and §10.2.
+- The brand components avoid `cn` (tailwind-merge). The site header is part of the client error boundary, which ships with every page, and tailwind-merge would have pushed the landing past its 150 KB budget.
+- The Life deck's visual baselines were regenerated.
+- Link-preview images use Plex for body text in every theme.

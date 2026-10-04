@@ -40,7 +40,7 @@ The app is a Next.js 16 project with static pages, one optional server feature (
   - Open the link in a private window and check the preview image at `/s/<id>/opengraph-image`.
   - Delete the card from the browser that shared it; the link should now show "This card isn't here".
 - [ ] Lighthouse: `pnpm lighthouse https://<your-domain>/`. Expect around 96 / 100 / 100 / 100 on mobile.
-- [ ] Put the live URL in the README.
+- [x] Put the live URL in the README.
 
 ## Other hosts
 

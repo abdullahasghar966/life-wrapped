@@ -117,10 +117,10 @@ sequenceDiagram
 
 ## Theme system
 
-Each theme is a typed token object (`src/story/themes/{sound,watch,binge,aurora}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.
+Each theme is a typed token object (`src/story/themes/{sound,watch,binge,receipt}.ts`): colours, a list of card backdrops (background + ink + muted + accent), fonts, radii and motion settings.
 
 - `themeStyle(theme)` turns tokens into CSS variables (`--t-*`) on the player root next to `data-theme`; `backdropStyle(backdrop)` sets the per-card `--c-*` variables. Cards read colours only through these variables.
-- Fonts come from `next/font/google` (self-hosted at build time). Only the app-shell fonts are preloaded.
+- Fonts are self-hosted through `next/font`: Google fonts are downloaded at build time, and Archivo (the display face of the app's own brand) is a local file in `src/fonts/`. Only the app-shell fonts are preloaded.
 - Theme-specific motion lives in `transitions.ts` (card-to-card), in each theme's `motion` tokens (eases, durations, staggers) and in the progress chrome (`progress/Progress.tsx`).
 - `tests/unit/themes.test.ts` checks every declared text/background pair against WCAG AA.
 - Generated artwork (`src/story/art/`) turns a name into a palette, pattern and initials, so covers, thumbnails, posters and avatars are deterministic and never fetched.
