@@ -21,7 +21,7 @@ function Ext({ href, children }: { href: string; children: React.ReactNode }) {
 export function ExportGuides({ defaultOpen }: { defaultOpen?: string }) {
   return (
     <section aria-labelledby="guides-title" className="mt-14">
-      <h2 id="guides-title" className="font-display text-2xl font-bold">
+      <h2 id="guides-title" className="font-display text-4xl uppercase">
         How to get your exports
       </h2>
       <p className="text-muted-foreground mt-2 text-sm">

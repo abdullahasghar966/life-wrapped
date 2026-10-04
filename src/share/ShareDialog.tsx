@@ -46,9 +46,9 @@ export function ShareDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="dark max-w-lg">
+      <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle className="font-display text-xl">Share this card</DialogTitle>
+          <DialogTitle className="font-display text-3xl uppercase">Share this card</DialogTitle>
           <DialogDescription>
             A link anyone can open. Only the numbers and names below are sent; your files and
             history stay on this device.

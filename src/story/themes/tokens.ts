@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type ThemeId = 'sound' | 'watch' | 'binge' | 'aurora';
+export type ThemeId = 'sound' | 'watch' | 'binge' | 'receipt';
 
 /** A card background with the colours that are safe to put on it. */
 export interface Backdrop {
@@ -33,7 +33,7 @@ export interface ThemeTokens {
   /** Filled call-to-action button with small text: must pass 4.5:1. */
   cta: string;
   onCta: string;
-  /** Optional decorative gradient (aurora). */
+  /** Optional decorative gradient. */
   gradient?: string;
   backdrops: Backdrop[];
   font: {

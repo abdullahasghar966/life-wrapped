@@ -18,8 +18,8 @@ export default function GlobalError({
           minHeight: '100vh',
           display: 'grid',
           placeItems: 'center',
-          background: '#0a0a1a',
-          color: '#f5f5ff',
+          background: '#f3efe6',
+          color: '#16130f',
           fontFamily: 'system-ui, sans-serif',
           textAlign: 'center',
           padding: 24,
@@ -28,7 +28,7 @@ export default function GlobalError({
         <main>
           <title>Something went wrong · Life, Wrapped</title>
           <h1 style={{ fontSize: 32, margin: 0 }}>Something went wrong</h1>
-          <p style={{ color: '#a6a6c8', maxWidth: 420, margin: '16px auto 0' }}>
+          <p style={{ color: '#5a534a', maxWidth: 420, margin: '16px auto 0' }}>
             Life, Wrapped hit an unexpected problem. Nothing was sent anywhere.
           </p>
           <button
@@ -37,10 +37,10 @@ export default function GlobalError({
             style={{
               marginTop: 32,
               padding: '12px 24px',
-              borderRadius: 999,
+              borderRadius: 0,
               border: 0,
-              background: '#22d3ee',
-              color: '#0a0a1a',
+              background: '#16130f',
+              color: '#f3efe6',
               fontWeight: 600,
               fontSize: 16,
               cursor: 'pointer',

@@ -19,10 +19,10 @@ export function IngestProgress({
 }) {
   const pct = Math.round((progress?.fraction ?? 0) * 100);
   return (
-    <section aria-label="Reading your files" className="bg-card/60 rounded-3xl border p-6">
+    <section aria-label="Reading your files" className="bg-paper-2 border-ink border-[1.5px] p-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Loader2 aria-hidden className="text-aurora-cyan size-5 animate-spin" />
+          <Loader2 aria-hidden className="text-red-ink size-5 animate-spin" />
           <div>
             <p className="font-semibold">{progress ? STAGE[progress.stage] : 'Starting…'}</p>
             {progress?.file && (
@@ -31,7 +31,7 @@ export function IngestProgress({
           </div>
         </div>
         {onCancel && (
-          <Button variant="outline" className="rounded-full" onClick={onCancel}>
+          <Button variant="outline" onClick={onCancel}>
             Cancel
           </Button>
         )}
@@ -42,10 +42,10 @@ export function IngestProgress({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={pct}
-        className="bg-muted mt-5 h-2 overflow-hidden rounded-full"
+        className="bg-paper-3 mt-5 h-2 overflow-hidden"
       >
         <div
-          className="h-full origin-left rounded-full bg-[linear-gradient(90deg,#7c5cff,#22d3ee,#a3e635)] transition-transform duration-300"
+          className="bg-ink h-full origin-left transition-transform duration-300"
           style={{ transform: `scaleX(${Math.max(0.02, pct / 100)})` }}
         />
       </div>

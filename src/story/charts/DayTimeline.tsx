@@ -55,8 +55,10 @@ export function DayTimeline({
                   y={y + 3}
                   width={Math.max(2, x(s.end) - x(s.start))}
                   height={laneH - 6}
-                  rx={4}
+                  rx={2}
                   fill={platformColor(p)}
+                  stroke="var(--c-ink)"
+                  strokeWidth={1.2}
                 />
               ))}
           </g>

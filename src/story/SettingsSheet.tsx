@@ -49,7 +49,7 @@ export function SettingsSheet({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="right" className="dark w-full overflow-y-auto sm:max-w-md">
+      <SheetContent side="right" className="w-full overflow-y-auto sm:max-w-md">
         <SheetHeader>
           <SheetTitle className="font-display text-xl">Story settings</SheetTitle>
           <SheetDescription>Changes apply instantly. Nothing leaves this tab.</SheetDescription>

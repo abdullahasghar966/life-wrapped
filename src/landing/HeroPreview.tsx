@@ -5,7 +5,7 @@ import type { NetflixSummary } from '@/engine/insights/netflix/summary';
 import type { SpotifySummary } from '@/engine/insights/spotify/summary';
 import type { YoutubeSummary } from '@/engine/insights/youtube/summary';
 import { useReducedMotion } from '@/story/runtime';
-import { backdropStyle, PLATFORM_COLORS, THEMES, themeStyle, type ThemeId } from '@/story/themes';
+import { backdropStyle, THEMES, themeStyle, type ThemeId } from '@/story/themes';
 import data from './preview.json';
 
 const SLIDE_MS = 3600;
@@ -147,50 +147,30 @@ function BingeSlide() {
   );
 }
 
-function AuroraSlide() {
-  const t = THEMES.aurora;
-  const parts = (['spotify', 'youtube', 'netflix'] as const).map((p) => ({
-    p,
-    share: life.shares[p],
-    label: p === 'youtube' ? 'YouTube' : p[0]!.toUpperCase() + p.slice(1),
-  }));
+function ReceiptSlide() {
+  const t = THEMES.receipt;
   return (
     <div
-      style={backdropStyle(t.backdrops[2]!)}
-      className="relative flex h-full flex-col bg-(--c-bg) px-[7cqw] pt-[12cqw] pb-[7cqw] text-(--c-ink)"
+      style={backdropStyle(t.backdrops[1]!)}
+      className="flex h-full flex-col bg-(--c-bg) px-[7cqw] pt-[12cqw] pb-[7cqw] text-(--c-ink)"
     >
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-70"
-        style={{
-          background:
-            'radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--c-accent) 40%, transparent), transparent 45%), radial-gradient(circle at 10% 95%, color-mix(in srgb, var(--t-accent) 27%, transparent), transparent 45%)',
-        }}
-      />
-      <p className="t-display relative text-[13cqw] leading-[0.92]">Your online life, wrapped.</p>
-      <div className="relative mt-auto flex h-[42cqw] items-end gap-[3cqw]">
-        {parts.map(({ p, share, label }) => (
-          <div key={p} className="flex h-full flex-1 flex-col justify-end">
-            <div
-              className="rounded-t-[4cqw]"
-              style={{ height: `${Math.max(16, share * 100)}%`, background: PLATFORM_COLORS[p] }}
-            />
-            <p className="t-body mt-[1.6cqw] text-center text-[3.4cqw] font-semibold">
-              {label} {Math.round(share * 100)}%
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="t-body relative mt-[6cqw] text-[3.4cqw] font-semibold tracking-[0.12em] text-(--c-muted) uppercase">
-        Total
+      <p className="font-mono text-[3.6cqw] font-medium tracking-[0.12em] text-(--c-muted) uppercase">
+        Your online life
       </p>
-      <p className="t-display relative text-[9cqw] leading-none">
-        {life.estimated ? '≈ ' : ''}
-        {nf.format(life.hours)} h · {nf.format(life.days)} days
+      <p className="t-display mt-[8cqw] text-[27cqw] leading-[0.8]">
+        {life.estimated ? '≈' : ''}
+        {nf.format(life.hours)}
       </p>
-      <p className="t-display text-gradient relative mt-[3cqw] text-[9cqw] leading-none">
-        {life.label}
+      <p className="t-display text-[11cqw] leading-none">Hours online</p>
+      <p
+        style={{ rotate: '-5deg' }}
+        className="t-display mt-[6cqw] self-start bg-(--c-accent) px-[3cqw] pt-[1.4cqw] pb-[0.8cqw] text-[8cqw] leading-none text-(--t-on-accent)"
+      >
+        That’s {life.estimated ? '≈ ' : ''}
+        {nf.format(life.days)} days
       </p>
+      <p className="mt-auto font-mono text-[3.4cqw] text-(--c-muted) uppercase">You’re</p>
+      <p className="t-display text-[11cqw] leading-[0.9]">{life.label}</p>
     </div>
   );
 }
@@ -199,7 +179,7 @@ const SLIDES: Array<{ theme: ThemeId; name: string; Slide: () => ReactNode }> = 
   { theme: 'sound', name: 'Spotify', Slide: SoundSlide },
   { theme: 'watch', name: 'YouTube', Slide: WatchSlide },
   { theme: 'binge', name: 'Netflix', Slide: BingeSlide },
-  { theme: 'aurora', name: 'your online life', Slide: AuroraSlide },
+  { theme: 'receipt', name: 'your online life', Slide: ReceiptSlide },
 ];
 
 /**
@@ -207,7 +187,7 @@ const SLIDES: Array<{ theme: ThemeId; name: string; Slide: () => ReactNode }> = 
  * its deck's theme, drawn from a committed JSON (no engine, no GSAP). It moves
  * on by itself unless reduced motion is on, and can always be paused (WCAG 2.2.2).
  */
-export function HeroPreview() {
+export function HeroPreview({ frameClassName }: { frameClassName?: string }) {
   const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
@@ -244,7 +224,7 @@ export function HeroPreview() {
         onMouseLeave={() => setHeld(false)}
         onFocus={() => setHeld(true)}
         onBlur={() => setHeld(false)}
-        className="[container-type:inline-size] relative aspect-[9/16] w-[min(72vw,300px)] overflow-hidden rounded-[28px] shadow-2xl ring-1 ring-white/10"
+        className={`[container-type:inline-size] relative aspect-[9/16] w-[min(72vw,290px)] overflow-hidden rounded-[18px] shadow-[0_24px_40px_-20px_rgb(22_19_15/0.55)] ${frameClassName ?? ''}`}
       >
         {SLIDES.map(({ theme, name, Slide }, i) => (
           <div

@@ -69,14 +69,14 @@ export default async function SharedCardPage({ params }: PageProps<'/s/[id]'>) {
           {share.isSample && (
             <p
               data-testid="sample-badge"
-              className="bg-secondary text-secondary-foreground mb-4 inline-flex rounded-full px-3 py-1 text-xs font-semibold"
+              className="bg-red text-ink mb-4 inline-flex px-2 py-1 font-mono text-xs tracking-[0.04em] uppercase"
             >
               Sample data · made with the built-in demo, not a real person’s history
             </p>
           )}
           <h1
             id="share-heading"
-            className="font-display text-4xl font-bold tracking-tight text-balance sm:text-5xl"
+            className="font-display text-6xl leading-[0.9] text-balance uppercase sm:text-7xl"
           >
             {HEADINGS[payload.cardType]}
           </h1>
@@ -87,13 +87,13 @@ export default async function SharedCardPage({ params }: PageProps<'/s/[id]'>) {
           <div className="mt-8 flex flex-wrap justify-center gap-3 md:justify-start">
             <Link
               href="/start"
-              className="bg-primary text-primary-foreground rounded-full px-6 py-3 font-semibold"
+              className="bg-ink text-paper hover:bg-ink/85 px-6 py-3 font-semibold"
             >
               Make your own
             </Link>
             <Link
               href={`/story/${deck}?sample=1`}
-              className="border-border rounded-full border px-6 py-3 font-semibold"
+              className="border-ink hover:bg-paper-3 border-[1.5px] px-6 py-3 font-semibold"
             >
               Try it with sample data
             </Link>

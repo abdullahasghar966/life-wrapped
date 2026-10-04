@@ -2,16 +2,17 @@ import { ImageResponse } from 'next/og';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import type { CSSProperties, ReactNode } from 'react';
-import { AURORA_GLOWS, PLATFORM_COLORS } from '@/story/themes/aurora';
+import { PLATFORM_COLORS } from '@/story/themes/receipt';
 import { SHARE_TITLES } from './cards';
 import type { ValidSharePayload } from './schema';
 
 export const OG_SIZE = { width: 1200, height: 630 };
 
 const FONT_FILES = [
-  { name: 'Inter', file: 'inter-latin-500-normal.woff', weight: 500 },
-  { name: 'Inter', file: 'inter-latin-700-normal.woff', weight: 700 },
-  { name: 'Space Grotesk', file: 'space-grotesk-latin-700-normal.woff', weight: 700 },
+  { name: 'IBM Plex Sans', file: 'ibm-plex-sans-latin-400-normal.woff', weight: 400 },
+  { name: 'IBM Plex Sans', file: 'ibm-plex-sans-latin-600-normal.woff', weight: 600 },
+  { name: 'IBM Plex Mono', file: 'ibm-plex-mono-latin-500-normal.woff', weight: 500 },
+  { name: 'Archivo', file: 'archivo-extra-condensed-900.ttf', weight: 900 },
   { name: 'Figtree', file: 'figtree-latin-900-normal.woff', weight: 900 },
   { name: 'Roboto Condensed', file: 'roboto-condensed-latin-800-normal.woff', weight: 800 },
   { name: 'Bebas Neue', file: 'bebas-neue-latin-400-normal.woff', weight: 400 },
@@ -20,7 +21,7 @@ const FONT_FILES = [
 type Fonts = Array<{
   name: string;
   data: Buffer;
-  weight: 400 | 500 | 700 | 800 | 900;
+  weight: 400 | 500 | 600 | 800 | 900;
   style: 'normal';
 }>;
 let fonts: Promise<Fonts> | undefined;
@@ -122,7 +123,8 @@ interface Model {
   approx: boolean;
   unit: string;
   facts: Array<{ label: string; value: string; approx?: boolean }>;
-  extra?: ReactNode;
+  /** Shown to the right of the text (the Life card's receipt). */
+  side?: ReactNode;
 }
 
 const FILL: CSSProperties = {
@@ -133,11 +135,6 @@ const FILL: CSSProperties = {
   bottom: 0,
   display: 'flex',
 };
-
-function rgba(hex: string, a: number): string {
-  const v = parseInt(hex.slice(1), 16);
-  return `rgba(${(v >> 16) & 255}, ${(v >> 8) & 255}, ${v & 255}, ${a})`;
-}
 
 function circle(cx: number, cy: number, r: number, color: string): CSSProperties {
   return {
@@ -256,24 +253,18 @@ const LOOKS: Record<ValidSharePayload['theme'], Look> = {
     ),
     badge: { background: '#FFFFFF', color: '#000000' },
   },
-  aurora: {
-    bg: '#0A0A1A',
-    ink: '#F5F5FF',
-    muted: '#A6A6C8',
-    display: { fontFamily: 'Space Grotesk', fontWeight: 700, letterSpacing: -5 },
-    decor: (
-      <div
-        style={{
-          ...FILL,
-          backgroundImage: [
-            `radial-gradient(circle at 88% 12%, ${rgba(AURORA_GLOWS[0], 0.6)}, ${rgba(AURORA_GLOWS[0], 0)} 42%)`,
-            `radial-gradient(circle at 100% 75%, ${rgba(AURORA_GLOWS[1], 0.4)}, ${rgba(AURORA_GLOWS[1], 0)} 38%)`,
-            `radial-gradient(circle at 70% 110%, ${rgba(AURORA_GLOWS[2], 0.33)}, ${rgba(AURORA_GLOWS[2], 0)} 40%)`,
-          ].join(', '),
-        }}
-      />
-    ),
-    badge: { background: '#F5F5FF', color: '#0A0A1A' },
+  receipt: {
+    bg: '#F3EFE6',
+    ink: '#16130F',
+    muted: '#5A534A',
+    display: {
+      fontFamily: 'Archivo',
+      fontWeight: 900,
+      letterSpacing: 0,
+      textTransform: 'uppercase',
+    },
+    decor: null,
+    badge: { background: '#FF3D12', color: '#16130F', borderRadius: 0 },
   },
 };
 
@@ -311,34 +302,23 @@ function model(p: ValidSharePayload): Model {
       const { numbers: n, names: s } = p;
       // YouTube time is estimated, so a total that includes it (and its days) is too.
       const approx = (n.youtubeShare ?? 0) > 0;
-      add('You’re', ogText(s.archetype));
       add('Mostly on', ogText(s.top));
       if (n.days) facts.push({ label: 'That’s', value: `${fmt(n.days)} whole days`, approx });
-      const parts = [
-        [PLATFORM_LABEL.spotify, n.spotifyShare ?? 0, PLATFORM_COLORS.spotify],
-        [PLATFORM_LABEL.youtube, n.youtubeShare ?? 0, PLATFORM_COLORS.youtube],
-        [PLATFORM_LABEL.netflix, n.netflixShare ?? 0, PLATFORM_COLORS.netflix],
-      ] as const;
-      const extra = (
-        <div style={{ display: 'flex', flexDirection: 'column', marginTop: 34, width: 760 }}>
-          <div style={{ display: 'flex', height: 16, borderRadius: 8, overflow: 'hidden' }}>
-            {parts
-              .filter(([, v]) => v > 0)
-              .map(([name, v, color]) => (
-                <div key={name} style={{ width: `${v * 100}%`, height: 16, background: color }} />
-              ))}
-          </div>
-          <div style={{ display: 'flex', gap: 28, marginTop: 12, fontSize: 22, fontWeight: 700 }}>
-            {parts
-              .filter(([, v]) => v > 0)
-              .map(([name, v, color]) => (
-                <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                  <div style={{ width: 14, height: 14, borderRadius: 7, background: color }} />
-                  {`${name} ${Math.round(v * 100)}%`}
-                </div>
-              ))}
-          </div>
-        </div>
+      const parts = (['spotify', 'youtube', 'netflix'] as const)
+        .map((k) => ({ k, share: n[`${k}Share`] ?? 0 }))
+        .filter((x) => x.share > 0);
+      const side = (
+        <ReceiptBox
+          lines={[
+            ...parts.map(
+              ({ k, share }) => [PLATFORM_LABEL[k], `${Math.round(share * 100)}%`] as const,
+            ),
+            ['Total', `${fmt(n.hours)} h`],
+          ]}
+          bar={parts.map(({ k, share }) => ({ color: PLATFORM_COLORS[k], share }))}
+          approxTotal={approx}
+          footer={ogText(s.archetype, 22)}
+        />
       );
       return {
         kicker,
@@ -346,7 +326,7 @@ function model(p: ValidSharePayload): Model {
         approx,
         unit: 'hours online',
         facts,
-        extra,
+        side,
       };
     }
   }
@@ -365,8 +345,8 @@ function Frame({ look, children, sample }: { look: Look; children: ReactNode; sa
         padding: '60px 72px 64px',
         background: look.bg,
         color: look.ink,
-        fontFamily: 'Inter',
-        fontWeight: 500,
+        fontFamily: 'IBM Plex Sans',
+        fontWeight: 400,
       }}
     >
       {/* One full-bleed layer: satori offsets absolute children by their parent's padding. */}
@@ -376,9 +356,10 @@ function Frame({ look, children, sample }: { look: Look; children: ReactNode; sa
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          fontSize: 22,
-          fontWeight: 700,
-          letterSpacing: 4,
+          fontSize: 20,
+          fontFamily: 'IBM Plex Mono',
+          fontWeight: 500,
+          letterSpacing: 3,
           textTransform: 'uppercase',
         }}
       >
@@ -389,7 +370,7 @@ function Frame({ look, children, sample }: { look: Look; children: ReactNode; sa
               display: 'flex',
               borderRadius: 999,
               padding: '8px 18px',
-              fontSize: 18,
+              fontSize: 17,
               ...look.badge,
             }}
           >
@@ -402,120 +383,223 @@ function Frame({ look, children, sample }: { look: Look; children: ReactNode; sa
   );
 }
 
+/** A printed receipt: paper, monospaced lines with dotted leaders, a torn edge. */
+function ReceiptBox({
+  lines,
+  bar,
+  approxTotal = false,
+  footer,
+  title = 'Your year, itemised',
+}: {
+  lines: Array<readonly [string, string]>;
+  bar?: Array<{ color: string; share: number }>;
+  approxTotal?: boolean;
+  footer?: string | null;
+  title?: string;
+}) {
+  const row = (label: string, value: string, i: number) => (
+    <div key={label} style={{ display: 'flex', alignItems: 'flex-end', marginTop: i ? 8 : 0 }}>
+      <div style={{ display: 'flex' }}>{label.toUpperCase()}</div>
+      <div
+        style={{
+          display: 'flex',
+          flex: 1,
+          borderBottom: '2px dashed #8A8278',
+          margin: '0 8px 6px',
+        }}
+      />
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {label === 'Total' && approxTotal && <Approx size={20} color="#16130F" />}
+        {value.toUpperCase()}
+      </div>
+    </div>
+  );
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        width: 330,
+        marginLeft: 48,
+        transform: 'rotate(3deg)',
+        alignSelf: 'center',
+        filter: 'drop-shadow(0 14px 18px rgba(22, 19, 15, 0.16))',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          background: '#FFFDF8',
+          color: '#16130F',
+          padding: '26px 26px 20px',
+          fontFamily: 'IBM Plex Mono',
+          fontWeight: 500,
+          fontSize: 19,
+        }}
+      >
+        <div style={{ display: 'flex', justifyContent: 'center', letterSpacing: 4 }}>
+          LIFE, WRAPPED
+        </div>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            fontSize: 15,
+            letterSpacing: 2,
+            color: '#5A534A',
+            marginTop: 4,
+          }}
+        >
+          {title.toUpperCase()}
+        </div>
+        <div style={{ display: 'flex', borderTop: '2px dashed #8A8278', margin: '14px 0' }} />
+        {lines.map(([label, value], i) => row(label, value, i))}
+        {bar && bar.length > 0 && (
+          <div style={{ display: 'flex', height: 18, marginTop: 12, border: '2px solid #16130F' }}>
+            {bar.map((b, i) => (
+              <div
+                key={b.color}
+                style={{
+                  display: 'flex',
+                  width: `${b.share * 100}%`,
+                  background: b.color,
+                  borderLeft: i ? '2px solid #16130F' : 'none',
+                }}
+              />
+            ))}
+          </div>
+        )}
+        <div style={{ display: 'flex', borderTop: '2px dashed #8A8278', margin: '14px 0 10px' }} />
+        {footer && <div style={{ display: 'flex' }}>{`YOU ARE: ${footer.toUpperCase()}`}</div>}
+        <div
+          style={{ display: 'flex', justifyContent: 'center', gap: 3, height: 40, marginTop: 14 }}
+        >
+          {Array.from({ length: 30 }, (_, i) => (
+            <div
+              key={i}
+              style={{ width: i % 3 === 0 ? 5 : 2, background: i % 2 ? '#FFFDF8' : '#16130F' }}
+            />
+          ))}
+        </div>
+      </div>
+      {/* The torn edge: a zigzag in the paper's colour. */}
+      <svg width={330} height={12} viewBox="0 0 330 12" style={{ display: 'flex' }}>
+        <path
+          d={`M0 0 ${Array.from({ length: 22 }, (_, i) => `L${i * 15 + 7.5} 12 L${(i + 1) * 15} 0`).join(' ')} Z`}
+          fill="#FFFDF8"
+        />
+      </svg>
+    </div>
+  );
+}
+
 function ShareImage({ payload, sample }: { payload: ValidSharePayload; sample: boolean }) {
   const look = LOOKS[payload.theme];
   const m = model(payload);
   return (
     <Frame look={look} sample={sample}>
-      <div style={{ display: 'flex', flexDirection: 'column', marginTop: 'auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 30,
-            ...look.display,
-            letterSpacing: look.display.textTransform ? 3 : 0,
-          }}
-        >
-          {m.kicker}
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            fontSize: m.big.length > 7 ? 150 : 176,
-            lineHeight: 0.95,
-            marginTop: 8,
-            ...look.display,
-          }}
-        >
-          {m.approx && <Approx size={96} color={look.ink} />}
-          {m.big}
-        </div>
-        <div style={{ display: 'flex', fontSize: 34, fontWeight: 700, marginTop: 6 }}>{m.unit}</div>
-        {m.extra}
-        <div style={{ display: 'flex', gap: 56, marginTop: 36 }}>
-          {m.facts.slice(0, 3).map((f) => (
-            <div key={f.label} style={{ display: 'flex', flexDirection: 'column', maxWidth: 330 }}>
+      <div style={{ display: 'flex', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              fontSize: 30,
+              ...look.display,
+              letterSpacing: look.display.textTransform ? 3 : 0,
+            }}
+          >
+            {m.kicker}
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              fontSize: m.big.length > 7 ? 150 : 176,
+              lineHeight: 0.95,
+              marginTop: 8,
+              ...look.display,
+            }}
+          >
+            {m.approx && <Approx size={96} color={look.ink} />}
+            {m.big}
+          </div>
+          <div style={{ display: 'flex', fontSize: 34, fontWeight: 600, marginTop: 6 }}>
+            {m.unit}
+          </div>
+          <div style={{ display: 'flex', gap: 48, marginTop: 36 }}>
+            {m.facts.slice(0, m.side ? 2 : 3).map((f) => (
               <div
-                style={{
-                  display: 'flex',
-                  fontSize: 18,
-                  fontWeight: 700,
-                  letterSpacing: 3,
-                  textTransform: 'uppercase',
-                  color: look.muted,
-                }}
+                key={f.label}
+                style={{ display: 'flex', flexDirection: 'column', maxWidth: 330 }}
               >
-                {f.label}
+                <div
+                  style={{
+                    display: 'flex',
+                    fontSize: 17,
+                    fontFamily: 'IBM Plex Mono',
+                    fontWeight: 500,
+                    letterSpacing: 3,
+                    textTransform: 'uppercase',
+                    color: look.muted,
+                  }}
+                >
+                  {f.label}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    fontSize: 32,
+                    fontWeight: 600,
+                    marginTop: 6,
+                  }}
+                >
+                  {f.approx && <Approx size={26} color={look.ink} />}
+                  {f.value}
+                </div>
               </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontSize: 32,
-                  fontWeight: 700,
-                  marginTop: 6,
-                }}
-              >
-                {f.approx && <Approx size={26} color={look.ink} />}
-                {f.value}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+        {m.side}
       </div>
     </Frame>
   );
 }
 
 function GenericImage() {
-  const look = LOOKS.aurora;
+  const look = LOOKS.receipt;
   return (
     <Frame look={look} sample={false}>
-      <div style={{ display: 'flex', flexDirection: 'column', marginTop: 'auto' }}>
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 92,
-            lineHeight: 1,
-            maxWidth: 900,
-            ...look.display,
-            letterSpacing: -3,
-          }}
-        >
-          Your whole online life, wrapped.
+      <div style={{ display: 'flex', marginTop: 'auto' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              fontSize: 132,
+              lineHeight: 0.86,
+              maxWidth: 680,
+              ...look.display,
+            }}
+          >
+            Your whole online life, wrapped.
+          </div>
+          <div style={{ display: 'flex', fontSize: 34, fontWeight: 600, marginTop: 28 }}>
+            Without it ever&nbsp;
+            <span style={{ background: '#FF3D12', padding: '0 6px' }}>leaving your device</span>.
+          </div>
         </div>
-        <div
-          style={{
-            display: 'flex',
-            fontSize: 36,
-            fontWeight: 700,
-            marginTop: 24,
-            color: '#22D3EE',
-          }}
-        >
-          Without it ever leaving your device.
-        </div>
-        <div style={{ display: 'flex', gap: 16, marginTop: 40, fontSize: 24, fontWeight: 700 }}>
-          {(['spotify', 'youtube', 'netflix'] as const).map((p) => (
-            <div
-              key={p}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 12,
-                padding: '10px 22px',
-                borderRadius: 999,
-                background: '#14142B',
-              }}
-            >
-              <div
-                style={{ width: 14, height: 14, borderRadius: 7, background: PLATFORM_COLORS[p] }}
-              />
-              {PLATFORM_LABEL[p]}
-            </div>
-          ))}
-        </div>
+        <ReceiptBox
+          title="Your year, itemised"
+          lines={[
+            ['Spotify', 'read'],
+            ['YouTube', 'read'],
+            ['Netflix', 'read'],
+            ['Uploaded', 'nothing'],
+          ]}
+        />
       </div>
     </Frame>
   );

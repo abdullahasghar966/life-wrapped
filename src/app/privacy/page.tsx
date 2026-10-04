@@ -1,4 +1,3 @@
-import { ShieldCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
@@ -27,7 +26,7 @@ const SHARED = [
 function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section aria-labelledby={id} className="mt-14">
-      <h2 id={id} className="font-display text-2xl font-bold tracking-tight">
+      <h2 id={id} className="font-display text-4xl leading-[0.9] uppercase">
         {title}
       </h2>
       <div className="text-muted-foreground mt-4 space-y-4 leading-relaxed">{children}</div>
@@ -40,11 +39,10 @@ export default function PrivacyPage() {
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-6 pb-20">
-        <p className="text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
-          <ShieldCheck aria-hidden className="text-aurora-lime size-3.5" /> No accounts · no
-          analytics · no uploads
+        <p className="text-ink-2 font-mono text-xs tracking-[0.1em] uppercase">
+          No accounts · no analytics · no uploads
         </p>
-        <h1 className="font-display mt-4 text-4xl font-bold tracking-tight text-balance sm:text-5xl">
+        <h1 className="font-display mt-4 text-6xl leading-[0.9] text-balance uppercase sm:text-7xl">
           Your data never leaves your device
         </h1>
         <p className="text-muted-foreground mt-4 text-lg">
@@ -166,15 +164,12 @@ export default function PrivacyPage() {
         </Section>
 
         <div className="mt-14 flex flex-wrap gap-3">
-          <Link
-            href="/start"
-            className="bg-primary text-primary-foreground rounded-full px-6 py-3 font-semibold"
-          >
+          <Link href="/start" className="bg-ink text-paper hover:bg-ink/85 px-6 py-3 font-semibold">
             Use my own data
           </Link>
           <Link
             href="/story/spotify?sample=1"
-            className="border-border rounded-full border px-6 py-3 font-semibold"
+            className="border-ink hover:bg-paper-3 border-[1.5px] px-6 py-3 font-semibold"
           >
             Try with sample data
           </Link>

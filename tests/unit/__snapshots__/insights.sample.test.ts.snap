@@ -305,7 +305,7 @@ exports[`life deck > life.summary 1`] = `
       "spotifyShare": 0.567,
       "youtubeShare": 0.374,
     },
-    "theme": "aurora",
+    "theme": "receipt",
   },
 }
 `;

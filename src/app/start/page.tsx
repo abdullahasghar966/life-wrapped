@@ -1,4 +1,3 @@
-import { ShieldCheck } from 'lucide-react';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { SiteFooter } from '@/components/SiteFooter';
@@ -17,11 +16,10 @@ export default function StartPage() {
     <>
       <SiteHeader />
       <main className="mx-auto w-full max-w-3xl flex-1 px-6 pt-6 pb-16">
-        <p className="text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
-          <ShieldCheck aria-hidden className="text-aurora-lime size-3.5" /> Processed on this device
-          · nothing is uploaded
+        <p className="text-ink-2 font-mono text-xs tracking-[0.1em] uppercase">
+          Processed on this device · nothing is uploaded
         </p>
-        <h1 className="font-display mt-4 text-4xl font-bold tracking-tight sm:text-5xl">
+        <h1 className="font-display mt-4 text-6xl leading-[0.88] uppercase sm:text-7xl">
           Bring your data
         </h1>
         <p className="text-muted-foreground mt-3 max-w-xl">

@@ -34,19 +34,31 @@ export async function createShare(
 
 const ID = /^[A-Za-z0-9_-]{10}$/;
 
+/** Cards shared before the rebrand (ADR-036) named the Life deck's theme 'aurora'. */
+function upgradeLegacy(payload: unknown): unknown {
+  if (
+    payload &&
+    typeof payload === 'object' &&
+    (payload as { theme?: unknown }).theme === 'aurora'
+  ) {
+    return { ...payload, theme: 'receipt' };
+  }
+  return payload;
+}
+
 export async function getShare(db: ShareDb, id: string): Promise<StoredShare | null> {
   if (!ID.test(id)) return null;
   const [row] = await db.select().from(sharedCards).where(eq(sharedCards.id, id)).limit(1);
   if (!row) return null;
   // Validated again on the way out, so a row that no longer matches the whitelist
   // (edited by hand, or written by an older schema) is treated as missing.
-  const payload = SharePayloadSchema.safeParse(row.payload);
+  const payload = SharePayloadSchema.safeParse(upgradeLegacy(row.payload));
   if (!payload.success) return null;
   return {
     id: row.id,
     createdAt: row.createdAt.toISOString(),
     cardType: row.cardType,
-    theme: row.theme,
+    theme: payload.data.theme,
     isSample: row.isSample,
     payload: payload.data,
   };

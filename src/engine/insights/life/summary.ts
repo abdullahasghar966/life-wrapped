@@ -46,7 +46,7 @@ export default define<LifeSummary>({
     `Your online life, wrapped: ${p.estimated ? 'about ' : ''}${n(p.hours)} hours, mostly ${PLATFORM_LABEL[p.top]}. You're ${p.label}.`,
   share: (p) => ({
     cardType: 'life.summary',
-    theme: 'aurora',
+    theme: 'receipt',
     numbers: {
       hours: p.hours,
       days: p.days,

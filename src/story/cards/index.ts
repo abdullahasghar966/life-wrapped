@@ -1,10 +1,10 @@
-import { LifeBusiestDay } from './aurora/LifeBusiestDay';
-import { LifeOpener } from './aurora/LifeOpener';
-import { LifePersonality } from './aurora/LifePersonality';
-import { LifeRhythm } from './aurora/LifeRhythm';
-import { LifeSplit } from './aurora/LifeSplit';
-import { LifeTotal } from './aurora/LifeTotal';
-import { LifeWeekdayWeekend } from './aurora/LifeWeekdayWeekend';
+import { LifeBusiestDay } from './receipt/LifeBusiestDay';
+import { LifeOpener } from './receipt/LifeOpener';
+import { LifePersonality } from './receipt/LifePersonality';
+import { LifeRhythm } from './receipt/LifeRhythm';
+import { LifeSplit } from './receipt/LifeSplit';
+import { LifeTotal } from './receipt/LifeTotal';
+import { LifeWeekdayWeekend } from './receipt/LifeWeekdayWeekend';
 import { BingeCountries } from './binge/BingeCountries';
 import { BingeDevices } from './binge/BingeDevices';
 import { BingeHours } from './binge/BingeHours';
@@ -43,7 +43,7 @@ import { WatchWeekly } from './watch/WatchWeekly';
  * - sound: 0 lime, 1 pink, 2 blue, 3 orange, 4 deep green, 5 near-black
  * - watch: 0 player black, 1 dark grey, 2 white "page", 3 raised grey
  * - binge: 0 black, 1 near-black, 2 deep black with a brighter red
- * - aurora: 0 deep indigo, 1 midnight blue, 2 violet night
+ * - receipt: 0 paper, 1 ink, 2 red
  */
 export const CARDS: Record<string, CardDef> = {
   'spotify.opener': { Component: SoundOpener, backdrop: 0 },
@@ -81,11 +81,11 @@ export const CARDS: Record<string, CardDef> = {
 
   'life.opener': { Component: LifeOpener, backdrop: 0 },
   'life.total': { Component: LifeTotal, backdrop: 1 },
-  'life.split': { Component: LifeSplit, backdrop: 2 },
-  'life.rhythm': { Component: LifeRhythm, backdrop: 0 },
-  'life.busiestDay': { Component: LifeBusiestDay, backdrop: 1 },
-  'life.weekdayWeekend': { Component: LifeWeekdayWeekend, backdrop: 2 },
-  'life.personality': { Component: LifePersonality, backdrop: 0 },
+  'life.split': { Component: LifeSplit, backdrop: 0 },
+  'life.rhythm': { Component: LifeRhythm, backdrop: 1 },
+  'life.busiestDay': { Component: LifeBusiestDay, backdrop: 0 },
+  'life.weekdayWeekend': { Component: LifeWeekdayWeekend, backdrop: 1 },
+  'life.personality': { Component: LifePersonality, backdrop: 2 },
 
   ...SUMMARY_CARDS,
 };

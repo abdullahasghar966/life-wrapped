@@ -39,12 +39,12 @@ export function PlatformTag({ platform, className }: { platform: Platform; class
   return (
     <span className={`inline-flex items-center gap-[1.6cqw] ${className ?? ''}`}>
       <span
-        className="inline-flex size-[5.4cqw] items-center justify-center rounded-full text-(--c-bg)"
+        className="inline-flex size-[5.4cqw] items-center justify-center rounded-full text-(--t-on-accent) ring-[0.4cqw] ring-(--c-ink)"
         style={{ background: platformColor(platform) }}
       >
         <PlatformGlyph platform={platform} className="size-[3.4cqw]" />
       </span>
-      <span className="font-semibold">{PLATFORM_NAME[platform]}</span>
+      <span className="t-body font-semibold">{PLATFORM_NAME[platform]}</span>
     </span>
   );
 }

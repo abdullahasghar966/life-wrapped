@@ -13,7 +13,7 @@ interface Props {
 
 /**
  * Per-theme progress chrome (§10.2): rounded pills (sound), one video scrubber
- * (watch), thin segments with an episode label (binge), gradient lines (aurora).
+ * (watch), thin segments with an episode label (binge), square ink ticks (receipt).
  * Tracks use the card's ink colour so they show on light and dark backdrops.
  */
 export function Progress(props: Props) {
@@ -24,13 +24,13 @@ export function Progress(props: Props) {
 const TRACK: Record<Exclude<ThemeId, 'watch'>, string> = {
   sound: 'h-[1.1cqw] rounded-full bg-(--c-ink)/30',
   binge: 'h-[0.6cqw] bg-(--c-ink)/25',
-  aurora: 'h-[0.55cqw] rounded-full bg-(--c-ink)/20',
+  receipt: 'h-[0.7cqw] bg-(--c-ink)/20',
 };
 
 const BAR: Record<Exclude<ThemeId, 'watch'>, string> = {
   sound: 'rounded-full bg-(--c-ink)',
   binge: 'bg-(--t-accent)',
-  aurora: 'rounded-full bg-[image:var(--t-gradient)]',
+  receipt: 'bg-(--c-ink)',
 };
 
 function Segments({ theme, total, index, subscribe }: Props) {

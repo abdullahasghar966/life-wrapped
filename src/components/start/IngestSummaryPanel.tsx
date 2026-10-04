@@ -9,7 +9,7 @@ import { fmtDate, fmtInt, fmt1 } from '@/lib/format';
 import { DECK_ORDER } from '@/story/decks';
 
 const STATUS_ICON: Record<FileReport['status'], React.ReactNode> = {
-  ok: <CheckCircle2 aria-label="Recognised" className="text-aurora-lime size-4 shrink-0" />,
+  ok: <CheckCircle2 aria-label="Recognised" className="text-ink size-4 shrink-0" />,
   duplicate: <Copy aria-label="Duplicate" className="text-muted-foreground size-4 shrink-0" />,
   unsupported: <Info aria-label="Not used" className="text-muted-foreground size-4 shrink-0" />,
   empty: <MinusCircle aria-label="Empty" className="text-muted-foreground size-4 shrink-0" />,
@@ -33,13 +33,16 @@ export function IngestSummaryPanel({ summary }: { summary: IngestSummary }) {
   const q = summary.isSample ? '?sample=1' : '';
 
   return (
-    <section aria-labelledby="summary-title" className="bg-card/60 rounded-3xl border p-6 sm:p-8">
+    <section
+      aria-labelledby="summary-title"
+      className="bg-paper-2 border-ink border-[1.5px] p-6 sm:p-8"
+    >
       {summary.isSample && (
-        <p className="bg-aurora-violet/15 mb-5 rounded-full px-4 py-2 text-sm">
+        <p className="bg-paper-3 mb-5 px-4 py-2 font-mono text-xs tracking-[0.06em] uppercase">
           You&apos;re viewing sample data for Alex. Drop your own files above to replace it.
         </p>
       )}
-      <h2 id="summary-title" className="font-display text-2xl font-bold">
+      <h2 id="summary-title" className="font-display text-4xl uppercase">
         {nothing ? 'Nothing we can use yet' : 'Here’s what we found'}
       </h2>
 
@@ -72,10 +75,7 @@ export function IngestSummaryPanel({ summary }: { summary: IngestSummary }) {
       )}
 
       {summary.youtubeHtmlFound && (
-        <div
-          role="status"
-          className="border-aurora-cyan/40 bg-aurora-cyan/10 mt-5 rounded-2xl border p-4 text-sm"
-        >
+        <div role="status" className="bg-paper-3 border-ink mt-5 border-l-4 p-4 text-sm">
           <p className="font-semibold">Your YouTube history is in HTML</p>
           <p className="text-muted-foreground mt-1">
             Google Takeout exports history as HTML by default, and we can only read the JSON
@@ -118,8 +118,8 @@ export function IngestSummaryPanel({ summary }: { summary: IngestSummary }) {
               return (
                 <label
                   key={p.name}
-                  className={`flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-(--ring) ${
-                    checked ? 'border-primary bg-primary/10' : 'hover:bg-muted'
+                  className={`flex cursor-pointer items-center gap-2 border px-4 py-2 text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-(--ring) ${
+                    checked ? 'border-ink bg-ink/5' : 'hover:bg-muted'
                   }`}
                 >
                   <input
@@ -141,7 +141,7 @@ export function IngestSummaryPanel({ summary }: { summary: IngestSummary }) {
 
       {decks.length > 0 ? (
         <div className="mt-8">
-          <h3 className="font-display text-lg font-bold">Your stories</h3>
+          <h3 className="font-display text-3xl uppercase">Your stories</h3>
           <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4" data-testid="deck-tiles">
             {decks.map((d) => (
               <DeckTile key={d} deck={d} href={`/story/${d}${q}`} sample={summary.isSample} />
@@ -164,18 +164,13 @@ export function IngestSummaryPanel({ summary }: { summary: IngestSummary }) {
 
       <div className="mt-8 flex flex-wrap items-center gap-3">
         {decks[0] && (
-          <Button asChild size="lg" className="rounded-full px-6">
+          <Button asChild size="lg" className="px-6">
             <Link href={`/story/${decks[0]}${q}`}>
               <Play /> Play my story
             </Link>
           </Button>
         )}
-        <Button
-          variant="destructive"
-          size="lg"
-          className="rounded-full px-5"
-          onClick={() => engine.clear()}
-        >
+        <Button variant="destructive" size="lg" className="px-5" onClick={() => engine.clear()}>
           <Trash2 /> Clear my data
         </Button>
       </div>

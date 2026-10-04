@@ -29,19 +29,14 @@ export function DropZone({
         if (disabled) return;
         onFiles(await filesFromDrop(e.dataTransfer));
       }}
-      className={`relative flex flex-col items-center rounded-3xl border-2 border-dashed px-6 py-12 text-center transition-colors ${
-        over ? 'border-aurora-cyan bg-aurora-cyan/5' : 'border-border bg-card/40'
+      className={`relative flex flex-col items-center border-2 border-dashed px-6 py-12 text-center transition-colors ${
+        over ? 'border-red-ink bg-red/10' : 'border-ink/40 bg-paper-2'
       }`}
     >
-      <div
-        aria-hidden
-        className="mb-4 flex size-14 items-center justify-center rounded-full bg-[conic-gradient(from_200deg,#7c5cff,#22d3ee,#a3e635,#7c5cff)] p-[2px]"
-      >
-        <span className="bg-background flex size-full items-center justify-center rounded-full">
-          <Upload className="size-6" />
-        </span>
+      <div aria-hidden className="bg-ink text-paper mb-4 flex size-14 items-center justify-center">
+        <Upload className="size-6" />
       </div>
-      <p className="font-display text-xl font-bold">Drop your export zips or files here</p>
+      <p className="font-display text-3xl uppercase">Drop your export zips or files here</p>
       <p className="text-muted-foreground mt-2 max-w-md text-sm">
         .zip, .json or .csv, as many as you like, or a whole folder. Files are read inside this
         browser tab and never uploaded.
@@ -49,7 +44,7 @@ export function DropZone({
       <div className="mt-6 flex flex-wrap justify-center gap-3">
         <Button
           size="lg"
-          className="rounded-full px-5"
+          className="px-5"
           disabled={disabled}
           onClick={() => fileInput.current?.click()}
         >
@@ -58,7 +53,7 @@ export function DropZone({
         <Button
           size="lg"
           variant="outline"
-          className="rounded-full px-5"
+          className="px-5"
           disabled={disabled}
           onClick={() => folderInput.current?.click()}
         >

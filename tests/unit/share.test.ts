@@ -2,6 +2,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { DELETE } from '@/app/api/share/[id]/route';
 import { GET, POST } from '@/app/api/share/route';
 import { getDb, resetDbForTests } from '@/server/db';
+import { sharedCards } from '@/server/schema';
 import { getShare } from '@/server/shares';
 import { SHARES_PER_HOUR } from '@/server/rateLimit';
 import { buildShareRequest, shareBody, ShareRequestSchema } from '@/share/schema';
@@ -123,6 +124,26 @@ describe('share API with a database (PGlite)', () => {
     expect((await del(id, deleteToken)).status).toBe(204);
     expect(await getShare(db, id)).toBeNull();
     expect((await del(id, deleteToken)).status).toBe(404);
+  });
+
+  it('reads Life cards shared under the old theme name', async () => {
+    const db = (await getDb())!;
+    const payload = {
+      cardType: 'life.summary',
+      theme: 'aurora',
+      numbers: { hours: 2777, days: 116 },
+      names: { archetype: 'The Binge Master', top: 'Spotify' },
+    };
+    await db.insert(sharedCards).values({
+      id: 'legacy0001',
+      cardType: 'life.summary',
+      theme: 'aurora',
+      isSample: true,
+      payload,
+      deleteTokenHash: '00',
+    });
+    const stored = await getShare(db, 'legacy0001');
+    expect(stored).toMatchObject({ theme: 'receipt', payload: { ...payload, theme: 'receipt' } });
   });
 
   it('rejects invalid and oversized bodies', async () => {

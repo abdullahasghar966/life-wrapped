@@ -5,7 +5,7 @@ import type { ThemeId } from './themes/tokens';
 /**
  * Card-to-card transitions (§10.2), transform and opacity only:
  * sound = colour-wipe blob, watch = vertical swipe, binge = fade through black,
- * aurora = crossfade with a drift. Reduced motion gets a plain 200 ms fade.
+ * receipt = fed in like a printer, in steps. Reduced motion gets a plain 200 ms fade.
  */
 export function enterSlide(
   el: HTMLElement,
@@ -38,12 +38,12 @@ export function enterSlide(
       });
     case 'binge':
       return gsap.from(el, { opacity: 0, duration: 0.8, ease: 'expo.out' });
-    case 'aurora':
+    case 'receipt':
+      // The stepped ease is the printer feeding the paper, line by line.
       return gsap.from(el, {
-        opacity: 0,
-        yPercent: 3 * direction,
-        duration: 1.1,
-        ease: 'sine.inOut',
+        yPercent: direction > 0 ? -100 : 100,
+        duration: 0.6,
+        ease: 'steps(10)',
       });
   }
 }

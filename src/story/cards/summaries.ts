@@ -1,4 +1,4 @@
-import { LifeSummary } from './aurora/LifeSummary';
+import { LifeSummary } from './receipt/LifeSummary';
 import { BingeSummary } from './binge/BingeSummary';
 import { SoundSummary } from './sound/SoundSummary';
 import type { CardDef } from './types';
@@ -15,5 +15,5 @@ export const SUMMARY_CARDS: Record<
   'spotify.summary': { Component: SoundSummary, backdrop: 5 },
   'youtube.summary': { Component: WatchSummary, backdrop: 0 },
   'netflix.summary': { Component: BingeSummary, backdrop: 0 },
-  'life.summary': { Component: LifeSummary, backdrop: 2 },
+  'life.summary': { Component: LifeSummary, backdrop: 0 },
 };

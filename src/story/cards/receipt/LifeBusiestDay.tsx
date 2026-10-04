@@ -12,32 +12,30 @@ import { CardBody, Eyebrow } from '../shared/Layout';
 import { useCardAnim } from '../shared/useCardAnim';
 import type { CardProps } from '../types';
 import { ESTIMATE_NOTE } from '../watch/WatchTotal';
-import { AuroraSky } from './AuroraSky';
-import { auroraDrift } from './useAuroraDrift';
+import { Line } from './parts';
 
+/** The biggest day: its total, its timeline and the bill per app. */
 export function LifeBusiestDay({ result }: CardProps<LifeBusiestDayProps>) {
   const p = result.props;
   const ref = useRef<HTMLDivElement>(null);
   const platforms = (Object.entries(p.hoursByPlatform) as Array<[Platform, number]>)
     .filter(([, h]) => h > 0)
     .map(([k]) => k);
-  useCardAnim(ref, (tl, { loop }) => {
-    auroraDrift(ref.current, loop);
+  useCardAnim(ref, (tl) => {
     tl.from(
       '[data-segment]',
-      { scaleX: 0, transformOrigin: '0% 50%', duration: 0.9, stagger: 0.04 },
-      0.4,
-    ).from('[data-row]', { opacity: 0, duration: 0.6, stagger: 0.1 }, 1);
+      { scaleX: 0, transformOrigin: '0% 50%', duration: 0.8, stagger: 0.04, ease: 'steps(10)' },
+      0.5,
+    ).from('[data-line]', { opacity: 0, duration: 0.01, stagger: 0.12 }, 1.2);
   });
   const day = fmtDayMonth(p.date);
   return (
     <CardBody ref={ref}>
-      <AuroraSky />
-      <Eyebrow className="relative">Busiest day · {fmtWeekday(p.date)}</Eyebrow>
-      <Headline className="relative mt-[2cqw] text-[12cqw] leading-[0.95] text-balance">
+      <Eyebrow className="font-mono font-medium">Busiest day · {fmtWeekday(p.date)}</Eyebrow>
+      <Headline className="mt-[2cqw] text-[15cqw] leading-[0.86] text-balance">
         {`${day} was a lot.`}
       </Headline>
-      <p className="t-display relative mt-[6cqw] flex items-center gap-[3cqw] text-[22cqw] leading-[0.85]">
+      <p className="t-display mt-[4cqw] flex items-center gap-[3cqw] text-[24cqw] leading-[0.8] text-(--c-accent)">
         <span>
           {p.estimated && <span aria-hidden>≈</span>}
           {p.estimated && <span className="sr-only">About </span>}
@@ -47,29 +45,25 @@ export function LifeBusiestDay({ result }: CardProps<LifeBusiestDayProps>) {
           <InfoTip label="Why this is an estimate">{`Includes YouTube. ${ESTIMATE_NOTE}`}</InfoTip>
         )}
       </p>
-      <p className="t-display relative mt-[2cqw] text-[8cqw] leading-none text-(--c-muted)">
-        hours of everything
-      </p>
-      <div className="relative mt-auto">
+      <p className="mt-[1cqw] font-mono text-[3.6cqw] uppercase">hours of everything</p>
+      <div className="mt-auto">
         <DayTimeline
           segments={p.segments}
           platforms={platforms}
           className="w-full"
           label={`Your activity on ${day}, by platform, from midnight to midnight.`}
         />
-        <ul className="mt-[4cqw] flex flex-col gap-[2cqw] text-[4cqw]">
+        <div className="mt-[3cqw] font-mono text-[3.8cqw] leading-[2.1]">
           {(Object.entries(p.hoursByPlatform) as Array<[Platform, number]>)
             .filter(([, h]) => h > 0)
             .map(([pl, h]) => (
-              <li key={pl} data-row className="flex items-center justify-between">
-                <PlatformTag platform={pl} />
-                <span className="text-(--c-muted) tabular-nums">
-                  {pl === 'youtube' ? '≈ ' : ''}
-                  {fmt1(h)} h
-                </span>
-              </li>
+              <Line
+                key={pl}
+                label={<PlatformTag platform={pl} className="normal-case" />}
+                value={`${pl === 'youtube' ? '≈ ' : ''}${fmt1(h)} h`}
+              />
             ))}
-        </ul>
+        </div>
       </div>
     </CardBody>
   );

@@ -12,7 +12,7 @@ export function DeckTile({ deck, href, sample }: { deck: DeckId; href: string; s
       href={href}
       data-theme={t.id}
       style={themeStyle(t)}
-      className="group relative flex aspect-[9/16] w-full flex-col justify-end overflow-hidden rounded-(--t-radius-frame) bg-(--t-bg) p-4 shadow-lg ring-1 ring-white/10 transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1"
+      className="group border-ink relative flex aspect-[9/16] w-full flex-col justify-end overflow-hidden rounded-(--t-radius-frame) border-[1.5px] bg-(--t-bg) p-4 shadow-[4px_4px_0_0_var(--color-ink)] transition-transform duration-300 hover:-translate-y-1 focus-visible:-translate-y-1"
       aria-label={`${meta.title}${sample ? ' (sample data)' : ''}`}
     >
       <TileArt deck={deck} t={t} />
@@ -71,19 +71,47 @@ function TileArt({ deck, t }: { deck: DeckId; t: ThemeTokens }) {
         </div>
       );
     case 'life':
+      // A slip printed with one line per platform: shapes only, no numbers.
       return (
         <div aria-hidden className="absolute inset-0">
-          {[
-            [PLATFORM_COLORS.spotify, 'top-6 left-6'],
-            [PLATFORM_COLORS.youtube, 'top-14 right-4'],
-            [PLATFORM_COLORS.netflix, 'top-28 left-12'],
-          ].map(([color, pos]) => (
-            <div
-              key={color}
-              className={`absolute size-20 rounded-full opacity-60 blur-xl ${pos}`}
-              style={{ background: color }}
-            />
-          ))}
+          <div className="absolute inset-x-5 top-5 rotate-[-4deg] drop-shadow-md">
+            <div className="flex flex-col gap-2 bg-(--t-surface) px-3 pt-3 pb-3">
+              <span className="mx-auto h-1.5 w-1/2 bg-(--t-text)" />
+              <span className="border-t border-dashed border-(--t-text)/40" />
+              {(['spotify', 'youtube', 'netflix'] as const).map((p, i) => (
+                <span key={p} className="flex items-center gap-1.5">
+                  <span className="size-2 shrink-0" style={{ background: PLATFORM_COLORS[p] }} />
+                  <span className="flex-1 border-b border-dotted border-(--t-text)/50" />
+                  <span className="h-1.5 bg-(--t-text)" style={{ width: `${18 - i * 4}%` }} />
+                </span>
+              ))}
+              <span className="flex h-2.5 border border-(--t-text)">
+                <span className="w-[55%]" style={{ background: PLATFORM_COLORS.spotify }} />
+                <span
+                  className="w-[33%] border-l border-(--t-text)"
+                  style={{ background: PLATFORM_COLORS.youtube }}
+                />
+                <span
+                  className="flex-1 border-l border-(--t-text)"
+                  style={{ background: PLATFORM_COLORS.netflix }}
+                />
+              </span>
+              <span className="mt-1 h-5 bg-[repeating-linear-gradient(90deg,var(--t-text)_0_2px,transparent_2px_4px,var(--t-text)_4px_5px,transparent_5px_8px)]" />
+            </div>
+            <svg
+              viewBox="0 0 100 6"
+              preserveAspectRatio="none"
+              className="block h-2 w-full text-(--t-surface)"
+            >
+              <path
+                d={`M0 0 ${Array.from({ length: 12 }, (_, i) => `L${i * 8.33 + 4.17} 6 L${(i + 1) * 8.33} 0`).join(' ')} Z`}
+                fill="currentColor"
+              />
+            </svg>
+          </div>
+          <span className="absolute top-[52%] right-3 rotate-[8deg] bg-(--t-accent) px-1.5 py-0.5 font-mono text-[0.6rem] font-medium tracking-widest text-(--t-on-accent) uppercase">
+            All of it
+          </span>
         </div>
       );
   }

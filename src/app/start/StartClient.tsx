@@ -1,5 +1,4 @@
 'use client';
-import { Sparkles } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { DropZone } from '@/components/start/DropZone';
@@ -23,7 +22,7 @@ export function StartClient() {
   return (
     <div className="space-y-6" data-engine-warm={warm}>
       {reloaded && !summary && (
-        <p role="status" className="bg-aurora-violet/15 rounded-2xl px-4 py-3 text-sm">
+        <p role="status" className="bg-paper-3 border-ink border-l-4 px-4 py-3 text-sm">
           Your data was cleared when the page reloaded. That&apos;s by design: nothing is saved
           anywhere. Drop your files again to pick up where you left off.
         </p>
@@ -37,10 +36,10 @@ export function StartClient() {
           <Button
             variant="secondary"
             size="lg"
-            className="rounded-full px-5"
+            className="px-5"
             onClick={() => void engine.loadSample()}
           >
-            <Sparkles /> Try with sample data
+            Try with sample data
           </Button>
         </div>
       )}
@@ -63,7 +62,7 @@ export function StartClient() {
       {error && (
         <p
           role="alert"
-          className="border-destructive/40 bg-destructive/10 rounded-2xl border px-4 py-3 text-sm"
+          className="border-destructive/40 bg-destructive/10 border px-4 py-3 text-sm"
         >
           {error}
         </p>

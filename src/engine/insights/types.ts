@@ -24,7 +24,7 @@ export interface DataCtx {
 /** Whitelisted summary data that may leave the device when the user shares a card. */
 export interface SharePayload {
   cardType: string;
-  theme: 'sound' | 'watch' | 'binge' | 'aurora';
+  theme: 'sound' | 'watch' | 'binge' | 'receipt';
   numbers: Record<string, number>;
   names: Record<string, string>;
 }

@@ -27,7 +27,7 @@ export const SHAREABLE = {
     names: ['persona', 'topSeries'],
   },
   'life.summary': {
-    theme: 'aurora',
+    theme: 'receipt',
     numbers: ['hours', 'days', 'spotifyShare', 'youtubeShare', 'netflixShare'],
     names: ['archetype', 'top'],
   },

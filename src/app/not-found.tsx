@@ -10,24 +10,23 @@ export default function NotFound() {
     <>
       <SiteHeader />
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center px-6 py-24 text-center">
-        <p className="text-gradient font-display text-7xl font-bold">404</p>
-        <h1 className="font-display mt-4 text-4xl font-bold tracking-tight">
+        <p aria-hidden className="font-display text-red text-[9rem] leading-none">
+          404
+        </p>
+        <h1 className="font-display mt-4 text-6xl leading-[0.9] uppercase sm:text-7xl">
           There’s nothing here
         </h1>
         <p className="text-muted-foreground mt-4">
           The link may be mistyped, or the page has moved. Your stories are a click away.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/"
-            className="bg-primary text-primary-foreground rounded-full px-6 py-3 font-semibold"
-          >
+          <Link href="/" className="bg-ink text-paper hover:bg-ink/85 px-6 py-3 font-semibold">
             Go home
           </Link>
           <Link
             href="/start"
             prefetch={false}
-            className="border-border rounded-full border px-6 py-3 font-semibold"
+            className="border-ink hover:bg-paper-3 border-[1.5px] px-6 py-3 font-semibold"
           >
             Use my data
           </Link>

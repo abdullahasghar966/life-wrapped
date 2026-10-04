@@ -12,8 +12,10 @@ for (const [size, file] of [
   [180, 'apple-touch-icon.png'],
 ]) {
   const page = await browser.newPage({ viewport: { width: size, height: size } });
+  // iOS rounds the corners itself and fills transparency with black, so its icon is square.
+  const shape = file.startsWith('apple') ? svg.replace(/ rx="\d+"/, '') : svg;
   await page.setContent(
-    `<html><body style="margin:0;background:transparent">${svg.replace('<svg ', `<svg width="${size}" height="${size}" `)}</body></html>`,
+    `<html><body style="margin:0;background:transparent">${shape.replace('<svg ', `<svg width="${size}" height="${size}" `)}</body></html>`,
   );
   await page.screenshot({ path: path.join('public', file), omitBackground: true });
   await page.close();

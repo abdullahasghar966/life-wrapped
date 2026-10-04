@@ -1,47 +1,33 @@
-import {
-  ArrowRight,
-  EyeOff,
-  FileDown,
-  FolderOpen,
-  Lock,
-  Play,
-  ShieldCheck,
-  Trash2,
-  WifiOff,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { SiteFooter } from '@/components/SiteFooter';
 import { SiteHeader } from '@/components/SiteHeader';
 import { HeroPreview } from '@/landing/HeroPreview';
+import { Receipt } from '@/landing/Receipt';
 import { PLATFORM_COLORS } from '@/story/themes';
 
 const STEPS = [
   {
-    icon: FileDown,
     title: 'Ask for your data',
     body: 'Spotify, YouTube and Netflix each let you download your history. It arrives by email: within minutes from Google Takeout, and within days or a few weeks from the others.',
   },
   {
-    icon: FolderOpen,
     title: 'Drop the files here',
     body: 'Zips, folders or single files. Each export is recognised by what’s inside, even if your language renamed it, and read inside this browser tab.',
   },
   {
-    icon: Play,
     title: 'Play your stories',
     body: 'Music, videos, shows, and all of it together, each styled like the app it’s about. Save any card as an image, or share a summary card if you like.',
   },
 ] as const;
 
 const PROMISES = [
-  { icon: Lock, text: 'No uploads. Your files are read in your browser and never sent anywhere.' },
-  { icon: EyeOff, text: 'No accounts, no analytics, no cookies, no third-party scripts.' },
-  {
-    icon: ShieldCheck,
-    text: 'IP addresses, device details and other sensitive fields are dropped as files are read.',
-  },
-  { icon: Trash2, text: 'Nothing is saved. Close the tab and it’s gone.' },
+  'No uploads. Your files are read in your browser and never sent anywhere.',
+  'No accounts, no analytics, no cookies, no third-party scripts.',
+  'IP addresses, device details and other sensitive fields are dropped as files are read.',
+  'Nothing is saved. Close the tab and it’s gone.',
+  'Works offline after the first visit, even with your own files.',
 ] as const;
 
 const EXPORTS = [
@@ -100,18 +86,18 @@ const FAQ: Array<[string, ReactNode]> = [
 // only once the visitor chooses to start (§15 landing budget).
 function CtaLinks({ className = '' }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap gap-3 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-x-6 gap-y-3 ${className}`}>
       <Link
         href="/story/spotify?sample=1"
         prefetch={false}
-        className="bg-primary text-primary-foreground inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold transition-opacity hover:opacity-90"
+        className="bg-ink text-paper hover:bg-ink/85 inline-flex items-center gap-2 px-6 py-3.5 font-semibold transition-colors"
       >
         Try with sample data <ArrowRight aria-hidden className="size-4" />
       </Link>
       <Link
         href="/start"
         prefetch={false}
-        className="border-border hover:bg-secondary rounded-full border px-6 py-3 font-semibold transition-colors"
+        className="hover:decoration-red py-2 font-semibold underline decoration-2 underline-offset-[6px] transition-colors"
       >
         Use my own data
       </Link>
@@ -119,142 +105,119 @@ function CtaLinks({ className = '' }: { className?: string }) {
   );
 }
 
-function SectionTitle({
-  id,
-  eyebrow,
-  children,
-}: {
-  id: string;
-  eyebrow: string;
-  children: ReactNode;
-}) {
-  return (
-    <div>
-      <p className="text-aurora-cyan text-sm font-semibold tracking-[0.14em] uppercase">
-        {eyebrow}
-      </p>
-      <h2
-        id={id}
-        className="font-display mt-2 text-3xl font-bold tracking-tight text-balance sm:text-4xl"
-      >
-        {children}
-      </h2>
-    </div>
-  );
-}
+const SECTION = 'border-ink border-t-[1.5px] px-5 py-16 sm:px-8 sm:py-20';
+const H2 = 'font-display text-[clamp(2.75rem,7vw,4.5rem)] leading-[0.88] uppercase';
 
 export default function Home() {
   return (
     <>
       <SiteHeader>
-        <Link className="hover:text-foreground" href="/start" prefetch={false}>
+        <Link className="hover:text-red-ink" href="/start" prefetch={false}>
           Use my data
         </Link>
       </SiteHeader>
       <main className="flex-1">
         <section
           aria-labelledby="hero-title"
-          className="relative overflow-hidden px-6 pt-6 pb-20 sm:pt-12"
+          className="overflow-hidden px-5 pt-8 pb-16 sm:px-8 sm:pt-12"
         >
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 -z-10"
-            style={{
-              background:
-                'radial-gradient(ellipse 50% 40% at 80% 20%, rgb(124 92 255 / 0.22), transparent), radial-gradient(ellipse 40% 35% at 10% 80%, rgb(34 211 238 / 0.12), transparent)',
-            }}
-          />
-          <div className="mx-auto grid max-w-5xl items-center gap-12 md:grid-cols-[1.15fr_0.85fr]">
+          <div className="mx-auto grid max-w-6xl items-center gap-x-10 gap-y-14 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
-              <p className="text-muted-foreground inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs">
-                <ShieldCheck aria-hidden className="text-aurora-lime size-3.5" /> Spotify · YouTube
-                · Netflix · processed on your device
+              <p className="text-ink-2 font-mono text-xs tracking-[0.1em] uppercase">
+                Spotify · YouTube · Netflix — read on your device
               </p>
-              <h1
-                id="hero-title"
-                className="font-display mt-5 text-5xl leading-[1.02] font-bold tracking-tight text-balance sm:text-6xl"
-              >
-                Your whole online life, wrapped.{' '}
-                <span className="text-gradient">Without it ever leaving your device.</span>
+              <h1 id="hero-title" className="mt-5">
+                <span className="font-display block text-[clamp(3.4rem,9vw,7rem)] leading-[0.86] uppercase">
+                  Your whole online life, wrapped.
+                </span>
+                <span className="mt-5 block text-xl font-medium sm:text-2xl">
+                  Without it ever <mark className="bg-red text-ink px-1">leaving your device</mark>.
+                </span>
               </h1>
-              <p className="text-muted-foreground mt-6 max-w-xl text-lg">
-                Drop the data exports you can download from Spotify, YouTube and Netflix. Get
-                animated stories, each in the style of the app it’s about, made right here in your
-                browser.
+              <p className="text-ink-2 mt-5 max-w-lg text-lg">
+                Drop the data exports you can download from Spotify, YouTube and Netflix and get
+                animated stories, each in the style of the app it’s about. They’re made right here
+                in your browser, and nothing is uploaded.
               </p>
               <CtaLinks className="mt-8" />
-              <p className="text-muted-foreground mt-4 text-sm">
+              <p className="text-ink-2 mt-6 font-mono text-xs tracking-[0.08em] uppercase">
                 Free · no sign-up · works offline
               </p>
             </div>
-            <HeroPreview />
+            <div className="relative mx-auto flex w-full max-w-md flex-col items-center sm:flex-row sm:items-start sm:justify-center">
+              <HeroPreview frameClassName="-rotate-3" />
+              <Receipt className="relative z-10 -mt-6 rotate-2 sm:mt-16 sm:-ml-14" />
+            </div>
           </div>
         </section>
 
-        <section aria-labelledby="how-title" className="border-border/60 border-t px-6 py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle id="how-title" eyebrow="How it works">
-              Three steps, all of them on your device
-            </SectionTitle>
-            <ol className="mt-10 grid gap-6 md:grid-cols-3">
-              {STEPS.map(({ icon: Icon, title, body }, i) => (
-                <li key={title} className="bg-card rounded-2xl border p-6">
-                  <span className="text-aurora-cyan flex items-center gap-3 text-sm font-semibold">
-                    <span className="bg-secondary flex size-9 items-center justify-center rounded-full">
-                      <Icon aria-hidden className="size-4" />
-                    </span>
-                    Step {i + 1}
+        <section aria-labelledby="how-title" className={SECTION}>
+          <div className="mx-auto max-w-6xl">
+            <h2 id="how-title" className={H2}>
+              How it works
+            </h2>
+            <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+              {STEPS.map(({ title, body }, i) => (
+                <li key={title} className="border-ink border-t-[1.5px] pt-4">
+                  <span aria-hidden className="font-display text-red text-6xl leading-none">
+                    0{i + 1}
                   </span>
-                  <h3 className="font-display mt-4 text-xl font-bold">{title}</h3>
-                  <p className="text-muted-foreground mt-2 leading-relaxed">{body}</p>
+                  <h3 className="mt-3 text-xl font-semibold">
+                    <span className="sr-only">Step {i + 1}: </span>
+                    {title}
+                  </h3>
+                  <p className="text-ink-2 mt-2 leading-relaxed">{body}</p>
                 </li>
               ))}
             </ol>
           </div>
         </section>
 
-        <section aria-labelledby="privacy-title" className="border-border/60 border-t px-6 py-20">
-          <div className="mx-auto grid max-w-5xl gap-10 md:grid-cols-2 md:items-center">
+        <section
+          aria-labelledby="privacy-title"
+          className="bg-ink text-paper px-5 py-16 sm:px-8 sm:py-20"
+        >
+          <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-end">
             <div>
-              <SectionTitle id="privacy-title" eyebrow="The privacy promise">
-                Turn off your <span className="whitespace-nowrap">Wi-Fi</span>: it still works.
-              </SectionTitle>
-              <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
+              <p className="text-paper/70 font-mono text-xs tracking-[0.1em] uppercase">
+                The privacy promise
+              </p>
+              <h2 id="privacy-title" className={`${H2} mt-3`}>
+                Turn off your <span className="whitespace-nowrap">Wi-Fi</span>. It still works.
+              </h2>
+              <p className="text-paper/80 mt-5 max-w-lg text-lg leading-relaxed">
                 After your first visit, Life, Wrapped runs entirely on your device. No server ever
                 sees your history, so there is nothing to leak, sell or lose.
               </p>
               <Link
                 href="/privacy"
-                className="text-aurora-cyan mt-6 inline-flex items-center gap-2 font-semibold hover:underline"
+                prefetch={false}
+                className="decoration-red mt-6 inline-flex items-center gap-2 font-semibold underline decoration-2 underline-offset-[6px]"
               >
-                Read exactly how it works, and check it yourself
+                How it works, and how to check it yourself
                 <ArrowRight aria-hidden className="size-4" />
               </Link>
             </div>
-            <ul className="grid gap-3">
-              {PROMISES.map(({ icon: Icon, text }) => (
-                <li key={text} className="bg-card flex items-start gap-3 rounded-2xl border p-4">
-                  <Icon aria-hidden className="text-aurora-lime mt-0.5 size-5 shrink-0" />
-                  <span>{text}</span>
+            <ul className="divide-paper/20 border-paper/20 divide-y border-y font-mono text-sm">
+              {PROMISES.map((text) => (
+                <li key={text} className="flex gap-3 py-3">
+                  <span aria-hidden className="bg-red mt-1.5 size-2 shrink-0" />
+                  {text}
                 </li>
               ))}
-              <li className="bg-card flex items-start gap-3 rounded-2xl border p-4">
-                <WifiOff aria-hidden className="text-aurora-lime mt-0.5 size-5 shrink-0" />
-                <span>Works offline after the first visit, even with your own files.</span>
-              </li>
             </ul>
           </div>
         </section>
 
-        <section aria-labelledby="exports-title" className="border-border/60 border-t px-6 py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle id="exports-title" eyebrow="Supported exports">
+        <section aria-labelledby="exports-title" className={SECTION}>
+          <div className="mx-auto max-w-6xl">
+            <h2 id="exports-title" className={H2}>
               Bring what you have
-            </SectionTitle>
+            </h2>
             <div className="mt-10 grid gap-6 md:grid-cols-3">
               {EXPORTS.map(({ platform, name, what, files }) => (
-                <div key={name} className="bg-card flex flex-col rounded-2xl border p-6">
-                  <h3 className="font-display flex items-center gap-2 text-xl font-bold">
+                <div key={name} className="bg-paper-2 border-ink flex flex-col border-[1.5px] p-5">
+                  <h3 className="font-display flex items-center gap-2.5 text-3xl uppercase">
                     <span
                       aria-hidden
                       className="size-3 rounded-full"
@@ -262,23 +225,24 @@ export default function Home() {
                     />
                     {name}
                   </h3>
-                  <p className="text-muted-foreground mt-3 leading-relaxed">{what}</p>
-                  <ul className="mt-4 flex flex-wrap gap-2" aria-label={`${name} files we read`}>
+                  <p className="text-ink-2 mt-3 leading-relaxed">{what}</p>
+                  <ul
+                    className="border-ink/40 mt-auto space-y-1 border-t border-dashed pt-3 font-mono text-xs"
+                    aria-label={`${name} files we read`}
+                  >
                     {files.map((f) => (
-                      <li key={f}>
-                        <code className="bg-muted rounded-md px-2 py-1 text-xs">{f}</code>
-                      </li>
+                      <li key={f}>{f}</li>
                     ))}
                   </ul>
                 </div>
               ))}
             </div>
-            <p className="text-muted-foreground mt-6">
+            <p className="text-ink-2 mt-6">
               Zips, folders and translated file names all work.{' '}
               <Link
                 href="/start"
                 prefetch={false}
-                className="text-aurora-cyan font-semibold hover:underline"
+                className="text-ink font-semibold underline decoration-2 underline-offset-4"
               >
                 Step-by-step export guides
               </Link>
@@ -286,24 +250,24 @@ export default function Home() {
           </div>
         </section>
 
-        <section aria-labelledby="faq-title" className="border-border/60 border-t px-6 py-20">
-          <div className="mx-auto max-w-5xl">
-            <SectionTitle id="faq-title" eyebrow="FAQ">
-              Questions, answered
-            </SectionTitle>
-            <div className="mt-8 max-w-3xl divide-y rounded-2xl border">
+        <section aria-labelledby="faq-title" className={SECTION}>
+          <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.8fr_1.2fr]">
+            <h2 id="faq-title" className={H2}>
+              Questions
+            </h2>
+            <div className="border-ink divide-ink/20 divide-y border-y-[1.5px]">
               {FAQ.map(([q, a]) => (
-                <details key={q} className="group px-5 py-4">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-semibold [&::-webkit-details-marker]:hidden">
+                <details key={q} className="group py-4">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-semibold [&::-webkit-details-marker]:hidden">
                     {q}
                     <span
                       aria-hidden
-                      className="text-muted-foreground transition-transform group-open:rotate-45"
+                      className="font-mono text-xl transition-transform group-open:rotate-45"
                     >
                       +
                     </span>
                   </summary>
-                  <p className="text-muted-foreground mt-3 leading-relaxed">{a}</p>
+                  <p className="text-ink-2 mt-3 leading-relaxed">{a}</p>
                 </details>
               ))}
             </div>
@@ -312,15 +276,14 @@ export default function Home() {
 
         <section
           aria-labelledby="cta-title"
-          className="border-border/60 border-t px-6 py-20 text-center"
+          className="bg-red text-ink px-5 py-16 sm:px-8 sm:py-20"
         >
-          <h2
-            id="cta-title"
-            className="font-display text-3xl font-bold tracking-tight text-balance sm:text-4xl"
-          >
-            See your year, <span className="text-gradient">without giving it away.</span>
-          </h2>
-          <CtaLinks className="mt-8 justify-center" />
+          <div className="mx-auto flex max-w-6xl flex-col gap-8 md:flex-row md:items-end md:justify-between">
+            <h2 id="cta-title" className={`${H2} max-w-2xl`}>
+              See your year. Keep it to yourself.
+            </h2>
+            <CtaLinks />
+          </div>
         </section>
       </main>
       <SiteFooter />

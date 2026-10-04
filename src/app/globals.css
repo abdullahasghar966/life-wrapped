@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), system-ui, sans-serif;
-  --font-display: var(--font-space-grotesk), system-ui, sans-serif;
-  --font-heading: var(--font-space-grotesk), system-ui, sans-serif;
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-display: var(--font-archivo), 'Arial Narrow', sans-serif;
+  --font-heading: var(--font-archivo), 'Arial Narrow', sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -26,9 +27,14 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --color-aurora-violet: #7c5cff;
-  --color-aurora-cyan: #22d3ee;
-  --color-aurora-lime: #a3e635;
+  /* The receipt brand: paper, ink and one red. Every text pairing passes WCAG AA. */
+  --color-paper: #f3efe6;
+  --color-paper-2: #fffdf8;
+  --color-paper-3: #e9e3d6;
+  --color-ink: #16130f;
+  --color-ink-2: #5a534a;
+  --color-red: #ff3d12;
+  --color-red-ink: #b12c0a;
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -38,28 +44,28 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* The app shell always uses the aurora theme (§10.2). */
+/* The app shell (landing, start, privacy, shared cards) uses the receipt brand (ADR-036). */
 :root {
-  --background: #0a0a1a;
-  --foreground: #f5f5ff;
-  --card: #14142b;
-  --card-foreground: #f5f5ff;
-  --popover: #14142b;
-  --popover-foreground: #f5f5ff;
-  --primary: #22d3ee;
-  --primary-foreground: #0a0a1a;
-  --secondary: #1f1f3d;
-  --secondary-foreground: #f5f5ff;
-  --muted: #1a1a35;
-  --muted-foreground: #a6a6c8;
-  --accent: #23234a;
-  --accent-foreground: #f5f5ff;
-  --destructive: #ff6b81;
-  --border: rgb(166 166 200 / 0.18);
-  --input: rgb(166 166 200 / 0.25);
-  --ring: #22d3ee;
-  --radius: 0.75rem;
-  color-scheme: dark;
+  --background: #f3efe6;
+  --foreground: #16130f;
+  --card: #fffdf8;
+  --card-foreground: #16130f;
+  --popover: #fffdf8;
+  --popover-foreground: #16130f;
+  --primary: #16130f;
+  --primary-foreground: #f3efe6;
+  --secondary: #e9e3d6;
+  --secondary-foreground: #16130f;
+  --muted: #e9e3d6;
+  --muted-foreground: #5a534a;
+  --accent: #e9e3d6;
+  --accent-foreground: #16130f;
+  --destructive: #b12c0a;
+  --border: rgb(22 19 15 / 0.16);
+  --input: rgb(22 19 15 / 0.28);
+  --ring: #ff3d12;
+  --radius: 0.375rem;
+  color-scheme: light;
 }
 
 @layer base {
@@ -73,13 +79,6 @@
     outline: 2px solid var(--ring);
     outline-offset: 2px;
   }
-}
-
-@utility text-gradient {
-  background-image: linear-gradient(120deg, #7c5cff 0%, #22d3ee 50%, #a3e635 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
 }
 
 @utility sr-only-focusable {
